@@ -157,46 +157,56 @@
   "roles": 
   {
   "Application Developer": {
-    "description": "Build secure containerized applications on OpenShift, ensuring proper use of trusted images, secrets, RBAC, and safe development practices.",
-    "responsibilities": ["R1", "R2", "R3", "R4", "R5", "R6", "R7"],
+    "description": "Build secure containerized applications on OpenShift, using trusted images, secrets, RBAC, and secure development practices.",
+    "responsibilities": [
+      "R1", "R2", "R3", "R4", "R5", "R6", "R7"
+    ],
     "skills": {
-      "Basic": ["B1", "B2", "B5", "B6", "B9"],
+      "Basic":   ["B1", "B2", "B5", "B6", "B9"],
       "Intermediate": ["I1", "I5", "I6"],
-      "Advanced": []
+      "Advanced": ["A2", "A6", "A8"]
     }
   },
   "Platform Operator": {
-    "description": "Deploy, operate, and harden OpenShift clusters, enforcing policies, managing access, and integrating platform-level security tools.",
-    "responsibilities": ["R8", "R9", "R10", "R11", "R12", "R13", "R14", "R28"],
+    "description": "Deploy, operate, and harden OpenShift clusters, enforcing security policies, managing access, logging, compliance, and encryption.",
+    "responsibilities": [
+      "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R28"
+    ],
     "skills": {
-      "Basic": ["B1", "B3", "B4", "B7", "B8"],
-      "Intermediate": ["I2", "I3", "I4", "I7", "I8"],
-      "Advanced": ["A1", "A3", "A4", "A8"]
+      "Basic":   ["B1", "B3", "B4", "B7", "B8", "B10"],
+      "Intermediate": ["I2", "I3", "I4", "I7", "I8", "I10"],
+      "Advanced": ["A1", "A3", "A4", "A8", "A9"]
     }
   },
   "DevSecOps Engineer": {
     "description": "Secure CI/CD pipelines and enforce policy throughout the application lifecycle, bridging development and security through automation.",
-    "responsibilities": ["R13", "R19", "R20", "R21", "R25", "R26"],
+    "responsibilities": [
+      "R13", "R19", "R20", "R21", "R25", "R26"
+    ],
     "skills": {
-      "Basic": ["B1", "B3", "B6"],
+      "Basic":   ["B1", "B3", "B4", "B6"],
       "Intermediate": ["I5", "I7", "I10"],
       "Advanced": ["A2", "A4", "A7"]
     }
   },
   "Security Architect": {
-    "description": "Design security strategies and architectures for OpenShift, driving governance, compliance, and risk reduction across teams.",
-    "responsibilities": ["R15", "R16", "R17", "R18", "R27"],
+    "description": "Design security strategies and architectures for OpenShift, driving governance, compliance, supply chain risk reduction, and zero-trust across teams.",
+    "responsibilities": [
+      "R6", "R12", "R15", "R16", "R17", "R18", "R21", "R27"
+    ],
     "skills": {
-      "Basic": ["B1", "B4"],
-      "Intermediate": ["I4", "I8", "I9"],
-      "Advanced": ["A1", "A3", "A6", "A9"]
+      "Basic":   ["B1", "B2", "B4", "B8", "B10"],
+      "Intermediate": ["I2", "I3", "I4", "I8", "I9", "I10"],
+      "Advanced": ["A1", "A2", "A3", "A6", "A7", "A9", "A10"]
     }
   },
   "Network & Infrastructure Engineer": {
-    "description": "Design and secure OpenShift networking and infrastructure, including segmentation, TLS, and cluster-wide security features.",
-    "responsibilities": ["R22", "R23", "R24", "R14"],
+    "description": "Design and secure OpenShift networking and infrastructure, including segmentation, encryption, and logging.",
+    "responsibilities": [
+      "R14", "R22", "R23", "R24"
+    ],
     "skills": {
-      "Basic": ["B4", "B7"],
+      "Basic":   ["B4", "B7", "B10"],
       "Intermediate": ["I4", "I8"],
       "Advanced": ["A3", "A9"]
     }
