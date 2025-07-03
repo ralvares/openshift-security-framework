@@ -78,7 +78,7 @@ Test access (replace <ROUTE_URL> with the actual route hostname):
 curl http://<ROUTE_URL>
 ```
 
-### 7. Confirm UID again
+### 7. Confirm UID
 
 ```sh
 kubectl exec -it deploy/httpd-unprivileged -- id
