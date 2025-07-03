@@ -1,3 +1,25 @@
+# 🚧 Work In Progress (WIP)
+
+---
+
+## Why This Project?
+
+I’ve built an OpenShift Security Enablement Framework—a structured, role-based approach to help teams understand what security looks like in practice, not just in theory. It maps common roles (like Developers, Platform Engineers, Architects, and more) to clear responsibilities and skills, from basic to advanced levels.
+
+The goal is to:
+- Simplify conversations about OpenShift security.
+- Help align expectations early (before jumping straight into ACS).
+- Enable everyone — from sales to delivery — to talk about value, not just features.
+- Provide a foundation for training, workshops, and customer enablement.
+
+If you’re working with customers who struggle to understand where ACS fits, or are comparing it to “all-in-one” security tools, this framework can help reset the conversation and clarify what OpenShift secures by design, and where ACS adds value.
+
+**Your feedback is invaluable!**
+
+**If this framework resonates with you or sparks ideas, let’s connect and explore ways to collaborate!**
+
+---
+
 # OpenShift Security Role-Based Skills Framework
 
 The **OpenShift Security Role-Based Skills Framework** is a structured, dynamic model that maps Kubernetes/OpenShift security concepts to key technical personas within an organization. It empowers teams by aligning daily responsibilities with actionable security skills, tailored by role and maturity level—from foundational knowledge to advanced leadership.
