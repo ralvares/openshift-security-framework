@@ -284,6 +284,3 @@ Confirming who a user or process is (login, certificates, etc.).
 
 **What is authorization?**
 Deciding what a user or process is allowed to do, based on roles and policies.
-
-**What is User Entity and Behavior Analytics (UEBA)?**
-A security approach using behavioral analytics and machine learning to spot unusual, risky, or suspicious activities in the environment.
