@@ -1,5 +1,9 @@
 {
   "skills": {
+  "B0": {
+    "desc": "Understand the fundamentals of container security, including how containers work, common risks, and the basics of securing containerized workloads and Kubernetes clusters.",
+    "relevance": "Container isolation, container images, container runtime, Kubernetes architecture basics, shared responsibility, common container threats (e.g., privilege escalation, image vulnerabilities), and why security is critical from build to runtime."
+  },
   "B1": {
     "desc": "Understand how OpenShift’s security layers protect applications and data by default, including the hardened OS and basic cluster controls.",
     "relevance": "Red Hat Enterprise Linux CoreOS (RHCOS), OpenShift default platform security settings, immutable infrastructure."
@@ -171,7 +175,7 @@
       "R1", "R2", "R3", "R4", "R5", "R6", "R7"
     ],
     "skills": {
-      "Basic":   ["B1", "B2", "B4", "B5", "B6", "B9"],
+      "Basic":   ["B0", "B1", "B2", "B4", "B5", "B6", "B9"],
       "Intermediate": ["I1", "I5", "I6"],
       "Advanced": ["A2", "A6", "A8"]
     }
@@ -182,7 +186,7 @@
       "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R28", "R30"
     ],
     "skills": {
-      "Basic":   ["B1", "B2", "B3", "B4", "B7", "B8", "B10", "B11"],
+      "Basic":   ["B0", "B1", "B2", "B3", "B4", "B7", "B8", "B10", "B11"],
       "Intermediate": ["I2", "I3", "I4", "I7", "I8", "I10", "I11"],
       "Advanced": ["A1", "A3", "A4", "A8", "A9"]
     }
@@ -193,7 +197,7 @@
       "R13", "R19", "R20", "R21", "R25", "R26", "R30"
     ],
     "skills": {
-      "Basic":   ["B1", "B3", "B4", "B6", "B11"],
+      "Basic":   ["B0", "B1", "B3", "B4", "B6", "B11"],
       "Intermediate": ["I5", "I7", "I10", "I11"],
       "Advanced": ["A2", "A4", "A7"]
     }
@@ -204,7 +208,7 @@
       "R6", "R12", "R15", "R16", "R17", "R18", "R21", "R27", "R30"
     ],
     "skills": {
-      "Basic":   ["B1", "B2", "B4", "B8", "B10", "B11"],
+      "Basic":   ["B0", "B1", "B2", "B4", "B8", "B10", "B11"],
       "Intermediate": ["I2", "I3", "I4", "I8", "I9", "I10", "I11"],
       "Advanced": ["A1", "A2", "A3", "A6", "A7", "A9", "A10"]
     }
@@ -215,7 +219,7 @@
       "R14", "R22", "R23", "R24", "R30"
     ],
     "skills": {
-      "Basic":   ["B4", "B7", "B10", "B11"],
+      "Basic":   ["B0", "B4", "B7", "B10", "B11"],
       "Intermediate": ["I4", "I8", "I11"],
       "Advanced": ["A3", "A9"]
     }
