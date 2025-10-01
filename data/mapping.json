@@ -26,7 +26,7 @@
   },
   "B6": {
     "desc": "Understand why only trusted container images should be run and the basics of checking image safety.",
-    "relevance": "OpenShift internal registry, Red Hat UBI, image signing, image scanning, supply chain security."
+    "relevance": "Image Provenance, Red Hat UBI, image signing, image scanning, supply chain security."
   },
   "B7": {
     "desc": "Learn how audit logs act as security cameras, tracking who did what and when in the cluster.",
@@ -43,10 +43,6 @@
   "B10": {
     "desc": "Know how encryption protects data in transit and at rest inside OpenShift.",
     "relevance": "TLS encryption (including API Server TLS 1.3), etcd encryption, KMS, Route encryption (Edge, Passthrough, Reencrypt), service mesh mTLS."
-  },
-  "B11": {
-    "desc": "Understand resource governance in OpenShift using quotas and limits to protect platform health.",
-    "relevance": "ResourceQuota, LimitRange, Platform Operator automation, CI/CD resource enforcement."
   },
   "I1": {
     "desc": "Perform threat modeling to find and reduce security risks in OpenShift applications and workloads.",
@@ -87,10 +83,6 @@
   "I10": {
     "desc": "Configure and enforce admission control policies to govern cluster resource usage and security.",
     "relevance": "Gatekeeper, OPA, RHACM Policy Framework, OpenShift Admission Controllers."
-  },
-  "I11": {
-    "desc": "Automate and monitor resource quotas and limits to enforce fair and secure resource allocation.",
-    "relevance": "Automated ResourceQuota and LimitRange management, CI/CD integration, alerting on quota breaches."
   },
   "A1": {
     "desc": "Lead OpenShift cluster security design and governance across multiple teams and projects.",
