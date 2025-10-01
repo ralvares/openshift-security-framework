@@ -1,131 +1,131 @@
 {
   "skills": {
-  "B0": {
-    "desc": "Understand the fundamentals of container security, including how containers work, common risks, and the basics of securing containerized workloads and Kubernetes clusters.",
-    "relevance": "Container isolation, container images, container runtime, Kubernetes architecture basics, shared responsibility, common container threats (e.g., privilege escalation, image vulnerabilities), and why security is critical from build to runtime."
+    "B0": {
+      "desc": "Understand container security fundamentals: how containers work, shared responsibility, and common risks.",
+      "relevance": "Container isolation, images vs runtime, basic Kubernetes architecture, typical threats (privilege escalation, vulnerable images)."
+    },
+    "B1": {
+      "desc": "Recognize default OpenShift platform security layers that protect workloads by default.",
+      "relevance": "RHCOS immutability, default hardened configuration, platform-managed updates."
+    },
+    "B2": {
+      "desc": "Grasp basic access control: users, groups, and simple RBAC role bindings.",
+      "relevance": "RBAC roles/rolebindings, OAuth authentication, basic service account usage."
+    },
+    "B3": {
+      "desc": "Understand default workload guardrails limiting container permissions and resources.",
+      "relevance": "Default SCC behavior, Pod Security Admission (baseline/restricted), ResourceQuotas, LimitRanges (concept only)."
+    },
+    "B4": {
+      "desc": "Explain basic in-cluster network isolation using NetworkPolicies.",
+      "relevance": "Kubernetes/ OpenShift NetworkPolicies (allow/deny patterns), default allow/deny concepts."
+    },
+    "B5": {
+      "desc": "Know how Secrets store sensitive values and basic protection expectations.",
+      "relevance": "Kubernetes Secrets, etcd encryption (concept), minimal exposure principles."
+    },
+    "B6": {
+      "desc": "Identify trusted image sources and perform basic vulnerability scanning awareness.",
+      "relevance": "Trusted registries (Quay, Red Hat), base image hygiene, high-level image scanning."
+    },
+    "B7": {
+      "desc": "Understand the purpose of audit and cluster logs for accountability.",
+      "relevance": "API audit logs, cluster logging basics, forwarding concept to SIEM."
+    },
+    "B8": {
+      "desc": "Be aware of built-in security extension operators (what they do, not how to configure).",
+      "relevance": "Compliance Operator, Security Profiles Operator (SPO), Advanced Cluster Security (ACS) high-level purpose."
+    },
+    "B9": {
+      "desc": "Explain least privilege for workloads: non-root, minimal capabilities, limited namespaces.",
+      "relevance": "Non-root containers, minimal privileges via SCC/PSA defaults, capability minimization."
+    },
+    "B10": {
+      "desc": "Understand basic encryption protections for data in transit and at rest.",
+      "relevance": "TLS for API/Routes, etcd encryption (concept), route termination modes (edge/passthrough/reencrypt)."
+    },
+    "I1": {
+      "desc": "Apply practical threat modeling to applications and workloads deployed on OpenShift.",
+      "relevance": "Data flow mapping, attack surface review using RBAC/SCC/NetworkPolicy context, ACS policy insights."
+    },
+    "I2": {
+      "desc": "Implement advanced RBAC and service account security including token hardening.",
+      "relevance": "Fine-grained roles, aggregated roles, service account scoping, bound service account tokens, least privilege patterns."
+    },
+    "I3": {
+      "desc": "Customize and enforce workload security controls to prevent privilege escalation.",
+      "relevance": "Custom SCCs, Pod Security Admission configuration, SELinux types, seccomp profiles (usage)."
+    },
+    "I4": {
+      "desc": "Design network segmentation and implement egress/ingress controls across namespaces.",
+      "relevance": "Advanced NetworkPolicies, egress rules, Egress IP, Multus/UDN basics, firewall integration."
+    },
+    "I5": {
+      "desc": "Integrate security scanning and policy checks into CI/CD pipelines.",
+      "relevance": "OpenShift Pipelines, image scanning gates, policy-as-code (OPA/Conftest), build-time checks."
+    },
+    "I6": {
+      "desc": "Manage secret lifecycle: rotation, external encryption, and controlled distribution.",
+      "relevance": "Secret rotation workflows, external KMS integration basics, Sealed Secrets / External Secrets patterns."
+    },
+    "I7": {
+      "desc": "Correlate audit logs and monitoring signals to detect suspicious activity.",
+      "relevance": "Audit log parsing, cluster logging queries (Loki/EFK), runtime event correlation (ACS runtime)."
+    },
+    "I8": {
+      "desc": "Automate compliance assessments and remediation workflows.",
+      "relevance": "Compliance Operator tailoring, CIS benchmark scans, ACS compliance dashboards, auto-remediation scripts."
+    },
+    "I9": {
+      "desc": "Apply advanced workload restriction profiles for tighter isolation.",
+      "relevance": "Security Profiles Operator (SPO) custom seccomp/SELinux/AppArmor profiles, syscall minimization."
+    },
+    "I10": {
+      "desc": "Govern resource and security posture with admission and policy controllers.",
+      "relevance": "Gatekeeper/OPA constraints, RHACM policy sets, OpenShift admission webhooks."
+    },
+    "A1": {
+      "desc": "Lead platform-wide security governance and multi-team architecture decisions.",
+      "relevance": "Security operating model, RBAC & namespace strategy, segmentation blueprints."
+    },
+    "A2": {
+      "desc": "Implement GitOps-driven policy and compliance pipelines at scale.",
+      "relevance": "GitOps reconciliation, policy-as-code repositories, automated drift detection."
+    },
+    "A3": {
+      "desc": "Architect multi-tenant zero-trust network and service segmentation.",
+      "relevance": "Service mesh mTLS, layered NetworkPolicies, multi-network CNIs, egress governance, zero-trust patterns."
+    },
+    "A4": {
+      "desc": "Engineer runtime threat detection pipelines and integrate them into response workflows.",
+      "relevance": "Falco/ACS runtime detections, streaming log enrichment, alert routing, pre-incident playbooks."
+    },
+    "A5": {
+      "desc": "Lead coordinated incident response and forensic investigation on the platform.",
+      "relevance": "Forensic data collection, timeline reconstruction, threat intel correlation, root cause analysis."
+    },
+    "A6": {
+      "desc": "Establish end-to-end supply chain integrity and artifact provenance.",
+      "relevance": "Sigstore/cosign signing, SBOM generation & attestation, SLSA levels, ACS supply chain policies."
+    },
+    "A7": {
+      "desc": "Automate remediation and policy enforcement using controllers and operators.",
+      "relevance": "Custom controllers/operators, Gatekeeper mutation, RHACM remediation actions."
+    },
+    "A8": {
+      "desc": "Drive security culture, coaching teams and maturing practices.",
+      "relevance": "Enablement programs, documentation standards, internal guilds, maturity roadmaps."
+    },
+    "A9": {
+      "desc": "Design advanced cryptography, observability, and encryption strategies.",
+      "relevance": "KMS integration (envelope encryption), etcd encryption tiers, mesh mTLS architecture, audit pipeline design."
+    },
+    "A10": {
+      "desc": "Implement zero-trust workload identity and confidential computing.",
+      "relevance": "SPIFFE/SPIRE identities, Confidential Containers, Kata Containers, hardware attestation."
+    }
   },
-  "B1": {
-    "desc": "Understand how OpenShift’s security layers protect applications and data by default, including the hardened OS and basic cluster controls.",
-    "relevance": "Red Hat Enterprise Linux CoreOS (RHCOS), OpenShift default platform security settings, immutable infrastructure."
-  },
-  "B2": {
-    "desc": "Know the basics of user access control in OpenShift, including how keycards (RBAC) regulate who can do what in the cluster.",
-    "relevance": "OpenShift Role-Based Access Control (RBAC), OAuth authentication, service accounts."
-  },
-  "B3": {
-    "desc": "Learn how container guardrails (SecurityContextConstraints) and resource controls limit what containers can do inside OpenShift.",
-    "relevance": "Security Context Constraints (SCCs), Pod Security Admission (PSA), ResourceQuotas, LimitRanges."
-  },
-  "B4": {
-    "desc": "Understand network segmentation inside the cluster that controls which applications can talk to each other.",
-    "relevance": "OpenShift NetworkPolicies, Egress IP, User-Defined Networks (UDN), Multus/OVN secondary networks."
-  },
-  "B5": {
-    "desc": "Know how secrets like passwords and API keys are safely stored and protected in OpenShift.",
-    "relevance": "Kubernetes Secrets, etcd encryption, KMS integration, secret rotation."
-  },
-  "B6": {
-    "desc": "Understand why only trusted container images should be run and the basics of checking image safety.",
-    "relevance": "Image Provenance, Red Hat UBI, image signing, image scanning, supply chain security."
-  },
-  "B7": {
-    "desc": "Learn how audit logs act as security cameras, tracking who did what and when in the cluster.",
-    "relevance": "OpenShift Audit Logging, Cluster Logging, Loki, integration with SIEM."
-  },
-  "B8": {
-    "desc": "Be familiar with add-ons that enhance OpenShift security and compliance posture.",
-    "relevance": "Compliance Operator, Security Profiles Operator (SPO), Pod Security Standards, RHACS (Advanced Cluster Security)."
-  },
-  "B9": {
-    "desc": "Understand workload isolation including why containers shouldn’t run as cluster admins or root users, and why they can only bind to non-privileged ports.",
-    "relevance": "Least privilege container execution, SCC and Pod Security Admission policies, user namespaces, container networking constraints."
-  },
-  "B10": {
-    "desc": "Know how encryption protects data in transit and at rest inside OpenShift.",
-    "relevance": "TLS encryption (including API Server TLS 1.3), etcd encryption, KMS, Route encryption (Edge, Passthrough, Reencrypt), service mesh mTLS."
-  },
-  "I1": {
-    "desc": "Perform threat modeling to find and reduce security risks in OpenShift applications and workloads.",
-    "relevance": "OpenShift security architecture, SCCs, NetworkPolicies, RHACS policy analysis."
-  },
-  "I2": {
-    "desc": "Manage advanced user access control with fine-grained permissions and service accounts.",
-    "relevance": "Advanced OpenShift RBAC, OAuth, service accounts, ServiceAccountTokenNodeBinding."
-  },
-  "I3": {
-    "desc": "Configure and enforce workload security policies to prevent privilege escalation and unauthorized host access.",
-    "relevance": "Custom SCCs, Pod Security Admission, SELinux, user namespaces, seccomp."
-  },
-  "I4": {
-    "desc": "Design and apply network policies and segmentation to limit communications and reduce attack surface.",
-    "relevance": "Advanced OpenShift NetworkPolicies, Egress IP, UDN, Multus/OVN, firewall integration."
-  },
-  "I5": {
-    "desc": "Integrate security checks into CI/CD pipelines to catch vulnerabilities early in the software supply chain.",
-    "relevance": "OpenShift Pipelines, RHACS, image scanning tools, policy-as-code."
-  },
-  "I6": {
-    "desc": "Manage secret lifecycles securely, including encryption, rotation, and controlled access.",
-    "relevance": "Kubernetes Secrets, KMS, automated secret rotation, sealed secrets."
-  },
-  "I7": {
-    "desc": "Analyze audit logs and monitoring data to detect security incidents or suspicious behaviors.",
-    "relevance": "OpenShift Audit Logging, Cluster Logging, Loki, RHACS runtime monitoring, SIEM integration."
-  },
-  "I8": {
-    "desc": "Automate compliance checks against industry standards to maintain cluster security posture.",
-    "relevance": "Compliance Operator, RHACS compliance, CIS benchmarks, automated remediation."
-  },
-  "I9": {
-    "desc": "Apply advanced workload restrictions using custom security profiles and kernel controls.",
-    "relevance": "Security Profiles Operator (SPO), Seccomp, SELinux, AppArmor, confidential containers, Kata Containers."
-  },
-  "I10": {
-    "desc": "Configure and enforce admission control policies to govern cluster resource usage and security.",
-    "relevance": "Gatekeeper, OPA, RHACM Policy Framework, OpenShift Admission Controllers."
-  },
-  "A1": {
-    "desc": "Lead OpenShift cluster security design and governance across multiple teams and projects.",
-    "relevance": "OpenShift security best practices, security governance models, RBAC and network policy architecture."
-  },
-  "A2": {
-    "desc": "Develop and automate security policies and compliance workflows using GitOps and Infrastructure as Code.",
-    "relevance": "GitOps, Policy as Code (OPA, Gatekeeper), Compliance Operator automation, RHACS policy automation."
-  },
-  "A3": {
-    "desc": "Architect multi-tenant network segmentation and enforce strict communication boundaries.",
-    "relevance": "Advanced NetworkPolicies, service mesh security, UDN, multi-network CNIs, egress firewall, zero-trust segmentation."
-  },
-  "A4": {
-    "desc": "Implement runtime security monitoring and threat detection to respond to attacks quickly.",
-    "relevance": "RHACS runtime detection, Falco integration, Cluster Logging, SIEM pipelines, forensic workflow."
-  },
-  "A5": {
-    "desc": "Lead incident response activities using audit data, threat intelligence, and forensic analysis.",
-    "relevance": "OpenShift Audit Logs, RHACS incident response, forensics tools, threat intelligence integration."
-  },
-  "A6": {
-    "desc": "Design secure supply chains including image provenance, signing, and vulnerability management.",
-    "relevance": "Image signing (cosign), Quay, Red Hat UBI images, RHACS supply chain governance, Sigstore, SLSA."
-  },
-  "A7": {
-    "desc": "Automate cluster-wide security enforcement and remediation using policy agents and custom controllers.",
-    "relevance": "Gatekeeper, RHACM Policy Framework, OpenShift Operators, custom controllers."
-  },
-  "A8": {
-    "desc": "Mentor teams on security best practices and foster a security-first culture.",
-    "relevance": "Security training, brown bags, documentation, Red Hat training resources, internal enablement."
-  },
-  "A9": {
-    "desc": "Design cryptography, logging, and observability for maximum security and auditability.",
-    "relevance": "TLS, mTLS (service mesh), etcd encryption, centralized logging (Loki, EFK), audit event pipelines."
-  },
-  "A10": {
-    "desc": "Implement zero-trust workload identity and confidential computing to protect sensitive workloads.",
-    "relevance": "Confidential Containers, Zero Trust patterns, workload identity with SPIFFE/SPIRE, Kata Containers."
-  }
-}
-  ,
+  
   "responsibilities": {
   "R1": "Design applications using threat modeling to reduce security risks on OpenShift.",
   "R2": "Use OpenShift service accounts and Role-Based Access Control (RBAC) for secure access management.",
@@ -159,62 +159,51 @@
   "R30": "Define and manage ResourceQuotas and LimitRanges per project to prevent resource exhaustion and enforce platform guardrails."
 }
   ,
-  "roles": 
-{
-  "Application Developer": {
-    "description": "Build secure containerized applications on OpenShift, following trusted image, secret management, RBAC, and secure development best practices.",
-    "responsibilities": [
-      "R1", "R2", "R3", "R4", "R5", "R6", "R7"
-    ],
-    "skills": {
-      "Basic":   ["B0", "B1", "B2", "B4", "B5", "B6", "B9"],
-      "Intermediate": ["I1", "I5", "I6"],
-      "Advanced": ["A2", "A6", "A8"]
-    }
-  },
-  "Platform Operator": {
-    "description": "Deploy, operate, and harden OpenShift clusters, enforcing policies, managing access, logging, resource quotas, compliance, encryption, and advanced network security.",
-    "responsibilities": [
-      "R8", "R9", "R10", "R11", "R12", "R13", "R14", "R28", "R30"
-    ],
-    "skills": {
-      "Basic":   ["B0", "B1", "B2", "B3", "B4", "B7", "B8", "B10"],
-      "Intermediate": ["I2", "I3", "I4", "I7", "I8", "I10"],
-      "Advanced": ["A1", "A3", "A4", "A8", "A9"]
-    }
-  },
-  "DevSecOps Engineer": {
-    "description": "Secure CI/CD pipelines and enforce policy throughout the application lifecycle, integrating automation for resource governance, supply chain, and runtime controls.",
-    "responsibilities": [
-      "R13", "R19", "R20", "R21", "R25", "R26", "R30"
-    ],
-    "skills": {
-      "Basic":   ["B0", "B1", "B3", "B4", "B6"],
-      "Intermediate": ["I5", "I7", "I10"],
-      "Advanced": ["A2", "A4", "A7"]
-    }
-  },
-  "Security Architect": {
-    "description": "Design security strategies and architectures for OpenShift, driving governance, compliance, network segmentation, resource controls, supply chain risk reduction, and zero-trust.",
-    "responsibilities": [
-      "R6", "R12", "R15", "R16", "R17", "R18", "R21", "R27", "R30"
-    ],
-    "skills": {
-      "Basic":   ["B0", "B1", "B2", "B4", "B8", "B10"],
-      "Intermediate": ["I2", "I3", "I4", "I8", "I9", "I10"],
-      "Advanced": ["A1", "A2", "A3", "A6", "A7", "A9", "A10"]
-    }
-  },
-  "Network & Infrastructure Engineer": {
-    "description": "Design and secure OpenShift networking and infrastructure, including segmentation, encryption, egress controls, resource quotas, and observability.",
-    "responsibilities": [
-      "R14", "R22", "R23", "R24", "R30"
-    ],
-    "skills": {
-      "Basic":   ["B0", "B4", "B7", "B10"],
-      "Intermediate": ["I4", "I8"],
-      "Advanced": ["A3", "A9"]
+  "roles": {
+    "Application Developer": {
+      "description": "Build secure containerized applications focusing on fundamentals, trusted images, secrets, and integrating baseline security into delivery.",
+      "responsibilities": ["R1", "R2", "R3", "R4", "R5", "R6", "R7"],
+      "skills": {
+        "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B6", "B9"],
+        "Intermediate": ["I1", "I5", "I6"],
+        "Advanced": ["A2", "A6", "A8"]
+      }
+    },
+    "Platform Operator": {
+      "description": "Operate and harden clusters: enforce policies, manage access, logging, compliance, quotas, and platform security posture.",
+      "responsibilities": ["R8", "R9", "R10", "R11", "R12", "R13", "R14", "R28", "R30"],
+      "skills": {
+        "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B7", "B8", "B9", "B10"],
+        "Intermediate": ["I2", "I3", "I4", "I6", "I7", "I8", "I9", "I10"],
+        "Advanced": ["A1", "A3", "A4", "A7", "A9", "A10"]
+      }
+    },
+    "DevSecOps Engineer": {
+      "description": "Embed security in pipelines, enforce policy gates, manage supply chain and runtime feedback loops.",
+      "responsibilities": ["R13", "R19", "R20", "R21", "R25", "R26", "R30"],
+      "skills": {
+        "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B6"],
+        "Intermediate": ["I5", "I6", "I7", "I8", "I10"],
+        "Advanced": ["A2", "A4", "A6", "A7", "A9"]
+      }
+    },
+    "Security Architect": {
+      "description": "Design platform security architecture, governance models, segmentation, compliance, and zero-trust strategy.",
+      "responsibilities": ["R6", "R12", "R15", "R16", "R17", "R18", "R21", "R27", "R30"],
+      "skills": {
+        "Basic": ["B0", "B1", "B2", "B3", "B4", "B7", "B8", "B10"],
+        "Intermediate": ["I1", "I2", "I4", "I8", "I9", "I10"],
+        "Advanced": ["A1", "A2", "A3", "A5", "A6", "A7", "A9", "A10"]
+      }
+    },
+    "Network & Infrastructure Engineer": {
+      "description": "Engineer resilient networking, segmentation, encryption, traffic governance, and observability foundations.",
+      "responsibilities": ["R14", "R22", "R23", "R24", "R30"],
+      "skills": {
+        "Basic": ["B0", "B3", "B4", "B7", "B10"],
+        "Intermediate": ["I4", "I7", "I8", "I9", "I10"],
+        "Advanced": ["A3", "A9"]
+      }
     }
   }
-}
 }
