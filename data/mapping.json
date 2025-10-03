@@ -164,9 +164,9 @@
       "description": "Build secure containerized applications focusing on fundamentals, trusted images, secrets, and integrating baseline security into delivery.",
       "responsibilities": ["R1", "R2", "R3", "R4", "R5", "R6", "R7"],
       "skills": {
-        "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B6", "B9"],
-        "Intermediate": ["I1", "I5", "I6"],
-        "Advanced": ["A6", "A8"]
+        "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B9", "B10"],
+        "Intermediate": ["I5", "I6"],
+        "Advanced": []
       }
     },
     "Platform Operator": {
@@ -175,33 +175,33 @@
       "skills": {
         "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B7", "B8", "B9", "B10"],
         "Intermediate": ["I2", "I3", "I4", "I6", "I7", "I8", "I9", "I10"],
-        "Advanced": ["A1", "A3", "A4", "A7", "A9", "A10"]
+        "Advanced": ["A1", "A3", "A4", "A7", "A8", "A9", "A10"]
       }
     },
     "DevSecOps Engineer": {
       "description": "Embed security in pipelines, enforce policy gates, manage supply chain and runtime feedback loops.",
-      "responsibilities": ["R13", "R19", "R20", "R21", "R25", "R26", "R30"],
+      "responsibilities": ["R13", "R19", "R20", "R21", "R25", "R26"],
       "skills": {
-        "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B6"],
-        "Intermediate": ["I5", "I6", "I7", "I8", "I10"],
-        "Advanced": ["A2", "A4", "A6", "A7", "A9"]
+        "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B9", "B10"],
+        "Intermediate": ["I1", "I5", "I6", "I7", "I8", "I10"],
+        "Advanced": ["A2", "A4", "A6", "A7", "A9", "A10"]
       }
     },
     "Security Architect": {
       "description": "Design platform security architecture, governance models, segmentation, compliance, and zero-trust strategy.",
-      "responsibilities": ["R6", "R12", "R15", "R16", "R17", "R18", "R21", "R27", "R30"],
+      "responsibilities": ["R6", "R12", "R15", "R16", "R17", "R18", "R21", "R27", "R29", "R30"],
       "skills": {
-        "Basic": ["B0", "B1", "B2", "B3", "B4", "B7", "B8", "B10"],
+        "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B10"],
         "Intermediate": ["I1", "I2", "I4", "I8", "I9", "I10"],
-        "Advanced": ["A1", "A2", "A3", "A5", "A6", "A7", "A9", "A10"]
+        "Advanced": ["A1", "A2", "A3", "A5", "A6", "A7", "A8", "A9", "A10"]
       }
     },
     "Network & Infrastructure Engineer": {
       "description": "Engineer resilient networking, segmentation, encryption, traffic governance, and observability foundations.",
-      "responsibilities": ["R14", "R22", "R23", "R24", "R30"],
+      "responsibilities": ["R14", "R22", "R23", "R24"],
       "skills": {
         "Basic": ["B0", "B3", "B4", "B7", "B10"],
-        "Intermediate": ["I4", "I7", "I8", "I9", "I10"],
+        "Intermediate": ["I2", "I4", "I7", "I8", "I10"],
         "Advanced": ["A3", "A9"]
       }
     }
