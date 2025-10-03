@@ -3,7 +3,7 @@
 :cis-summary: "Layer scanning, profiles, and security contexts (Compliance, SPO, RHACS) for continuous hardening."
 :mitre-summary: "Prevents undetected runtime and supply chain risks through layered scanning, enforced profiles, and policy-driven detection."
 :audit-evidence: "Commands list compliance profiles, schedule scan, and map components to hardening/detection roles."
-:cis-mitre-codes: '{"cisMapping":{"primary":["5.7.2","5.7.3"],"related":[]},"mitre":{"techniques":["T1611","T1195"],"tactics":["TA0004","TA0001"],"mitigations":["M1048","M1016"]}}'
+:cis-mitre-codes: '{"cisMapping":{"primary":["5.7.2"]},"mitre":{"techniques":["T1611","T1195"],"tactics":["TA0004","TA0001"],"mitigations":["M1048","M1016"]}}'
 :toc:
 :sectnums:
 :icons: font

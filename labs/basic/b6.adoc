@@ -159,6 +159,22 @@ Why block DockerHub?:: Default registry fallback; weaker provenance guarantees.
 Can I still use public images?:: Mirror/import them into a trusted registry first.
 How to add another internal registry?:: Extend the CEL expression with another `startsWith`.
 Why namespace label scoping?:: Progressive opt-in reduces outage risk.
+
+[[control-mapping-detail]]
+== Appendix: Control Mapping Detail (CIS ↔ MITRE)
+
+Only CIS 5.5.1 (image provenance & policy) is asserted.
+
+[cols="1,3",options="header"]
+|===
+|Aspect | Explanation
+|Primary CIS Control (5.5.1) | Demonstrated by admission denial of unapproved registry image and success of trusted UBI; provenance (image + digest) verified post-admission.
+|ATT&CK Technique | T1195 (Supply Chain Compromise) – reducing ingress of unvetted artifacts.
+|Mitigation | M1016 (Vulnerability / Patch Management) by gating to curated, maintained sources.
+|Observed Evidence | Denied nginx pull; allowed UBI deployment; describe output shows registry + digest.
+|Learner Outcome | Implement allow‑list policies rather than ad hoc manual reviews.
+|Audit Use | Admission policy manifests + denied event + successful trusted deployment form traceable enforcement.
+|===
 Where does Lab B1 fit?:: B1 covers runtime least privilege; B6 covers image provenance.
 
 == Closing Story

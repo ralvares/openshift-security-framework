@@ -3,7 +3,7 @@
 :cis-summary: "Limit powerful role use; rely on built-in view/edit/admin tiers instead of broad superuser access."
 :mitre-summary: "Prevents unnecessary privilege escalation by using built-in least-privilege roles instead of broad cluster-admin grants."
 :audit-evidence: "'oc auth can-i' shows view read-only, edit mutates without RBAC changes, admin adds RoleBinding and secret management."
-:cis-mitre-codes: '{"cisMapping":{"primary":["1.2.6","5.1.1"],"related":["5.1.3","5.1.2","5.1.5","5.1.6"]},"mitre":{"techniques":["T1078"],"tactics":["TA0001","TA0004"],"mitigations":["M1026"]}}'
+:cis-mitre-codes: '{"cisMapping":{"primary":["5.1.1"],"supporting":["5.1.2","5.1.5","5.1.8"]},"mitre":{"techniques":["T1078","T1098"],"tactics":["TA0001","TA0003","TA0004"],"mitigations":["M1026","M1012","M1018"]}}'
 :toc:
 :sectnums:
 :icons: font
@@ -161,4 +161,3 @@ Default RBAC roles are the building’s standard badge templates. Consistency sh
 * Script a periodic “can-i” matrix for critical identities
 * Enforce a rule: no direct ClusterRoleBinding unless justified in Git
 * Add RHACS policy: alert when service account gains admin-level verbs
-

@@ -3,7 +3,7 @@
 :cis-summary: "Maintain comprehensive audit logging to record sensitive API actions (exec, port‑forward, RBAC changes)."
 :mitre-summary: "Prevents undetected misuse by capturing exec and port-forward activity for rapid escalation investigation."
 :audit-evidence: "jq filters extract exec and portforward entries with user, pod, namespace, commands, and source IPs for incident summary."
-:cis-mitre-codes: '{"cisMapping":{"primary":["3.2.1","3.2.2"],"related":[]},"mitre":{"techniques":["T1543"],"tactics":["TA0003","TA0004"],"mitigations":["M1026","M1047"]}}'
+:cis-mitre-codes: '{"cisMapping":{"primary":["3.2.1"]},"mitre":{"techniques":["T1543"],"tactics":["TA0003","TA0004"],"mitigations":["M1026","M1047"]}}'
 :toc:
 :sectnums:
 :icons: font
@@ -125,4 +125,3 @@ Audit logs are a time machine—without them investigation is guesswork, not evi
 * Daily exec counts per user summary
 * Correlate events with workload restarts
 * Integrate RHACS alerts into incident pipeline
-

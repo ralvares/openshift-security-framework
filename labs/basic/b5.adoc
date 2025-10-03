@@ -137,4 +137,3 @@ Treat secrets like house keys: stored & rotated intentionally, never glued to th
 * Periodic rotation pipeline
 * External KMS provider integration
 * Repo scanning (gitleaks, truffleHog)
-

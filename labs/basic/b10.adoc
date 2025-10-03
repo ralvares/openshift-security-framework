@@ -3,7 +3,7 @@
 :cis-summary: "Enforce TLS on application routes with automatic HTTP→HTTPS redirects."
 :mitre-summary: "Prevents credential theft and data tampering by enforcing TLS and redirecting all plaintext route access."
 :audit-evidence: "Initial HTTP curl succeeds; after edge TLS route with redirect, HTTPS response retrieved and HTTP downgraded traffic redirected."
-:cis-mitre-codes: '{"cisMapping":{"primary":["1.2.26","1.2.30"],"related":[]},"mitre":{"techniques":["T1040"],"tactics":["TA0006"],"mitigations":["M1041"]}}'
+:cis-mitre-codes: '{"cisMapping":{"primary":["1.2.26"]},"mitre":{"techniques":["T1040"],"tactics":["TA0006"],"mitigations":["M1041"]}}'
 :toc:
 :sectnums:
 :icons: font
@@ -111,4 +111,5 @@ Enabling TLS + redirect is installing automatic door closers—connections don�
 * Deny non-TLS routes in prod via policy
 * Implement HSTS headers
 * Cert age monitoring & renewal alerts
+
 

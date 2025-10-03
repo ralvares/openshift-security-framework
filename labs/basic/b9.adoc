@@ -3,7 +3,7 @@
 :cis-summary: "Build images to run non-root on high ports with correct ownership—no special SCC required."
 :mitre-summary: "Prevents privilege escalation and drift by rebuilding images to run non-root on high ports under restricted SCC."
 :audit-evidence: "Rebuilt UBI image deploys under restricted SCC; id shows random non-root UID; service exposed without anyuid exception."
-:cis-mitre-codes: '{"cisMapping":{"primary":["5.2.6"],"related":["5.2.5"]},"mitre":{"techniques":["T1611"],"tactics":["TA0004"],"mitigations":["M1026","M1048"]}}'
+:cis-mitre-codes: '{"cisMapping":{"primary":["5.2.6"]},"mitre":{"techniques":["T1611"],"tactics":["TA0004"],"mitigations":["M1026","M1048"]}}'
 :toc:
 :sectnums:
 :icons: font
@@ -139,6 +139,5 @@ Rebuilding is embedding security into the product lifecycle—fewer exceptions, 
 * Pipeline check: fail if USER root in final layer
 * Image signing before deployment
 * Compare CVE count before vs after
-
 
 

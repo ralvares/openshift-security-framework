@@ -3,7 +3,7 @@
 :cis-summary: "Restrict granting of privileged SCCs like anyuid—prefer fixing images to run under restricted defaults."
 :mitre-summary: "Prevents container privilege escalation by denying root/privileged assumptions and discouraging anyuid exceptions."
 :audit-evidence: "Port 80 start and runAsUser=0 fail under restricted; after anyuid grant pod runs as UID 0 illustrating risky exception."
-:cis-mitre-codes: '{"cisMapping":{"primary":["5.2.6","5.2.10"],"related":["5.2.5","5.2.1"]},"mitre":{"techniques":["T1611"],"tactics":["TA0004"],"mitigations":["M1048","M1026"]}}'
+:cis-mitre-codes: '{"cisMapping":{"primary":["5.2.6"]},"mitre":{"techniques":["T1611"],"tactics":["TA0004"],"mitigations":["M1048","M1026"]}}'
 :toc:
 :sectnums:
 :icons: font
