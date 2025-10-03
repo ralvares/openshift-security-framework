@@ -17,32 +17,32 @@
       "relevance": "Default workload permission boundaries, pod security policy tiers, resource quota and limit range concepts."
     },
     "B4": {
-      "desc": "Explain basic in-cluster network isolation using NetworkPolicies.",
-      "relevance": "Network segmentation policies (allow/deny patterns), namespace isolation, baseline ingress/egress concepts."
-    },
-    "B5": {
-      "desc": "Know how Secrets store sensitive values and basic protection expectations.",
-      "relevance": "Kubernetes Secrets, minimal exposure principles."
-    },
-    "B6": {
-      "desc": "Identify trusted image sources and perform basic vulnerability scanning awareness.",
-      "relevance": "Trusted image source curation, base image hygiene, introductory image vulnerability awareness."
-    },
-    "B7": {
-      "desc": "Understand the purpose of audit and cluster logs for accountability.",
-      "relevance": "Control plane / workload audit events, centralized log aggregation patterns, forwarding to monitoring / analytics platforms."
-    },
-    "B8": {
-      "desc": "Be aware of built-in security extension operators (what they do, not how to configure).",
-      "relevance": "Security extension capabilities: compliance scanning, workload profile enforcement, runtime security visibility (high-level only)."
-    },
-    "B9": {
       "desc": "Explain least privilege for workloads: non-root, minimal capabilities, limited namespaces.",
       "relevance": "Non-root containers, minimal privileges via SCC/PSA defaults, capability minimization."
     },
-    "B10": {
+    "B5": {
+      "desc": "Explain basic in-cluster network isolation using NetworkPolicies.",
+      "relevance": "Network segmentation policies (allow/deny patterns), namespace isolation, baseline ingress/egress concepts."
+    },
+    "B6": {
+      "desc": "Know how Secrets store sensitive values and basic protection expectations.",
+      "relevance": "Kubernetes Secrets, minimal exposure principles."
+    },
+    "B7": {
+      "desc": "Identify trusted image sources and perform basic vulnerability scanning awareness.",
+      "relevance": "Trusted image source curation, base image hygiene, introductory image vulnerability awareness."
+    },
+    "B8": {
       "desc": "Understand basic encryption protections for data in transit and at rest.",
       "relevance": "Transport encryption fundamentals, termination patterns, basic at-rest encryption concepts."
+    },
+    "B9": {
+      "desc": "Understand the purpose of audit and cluster logs for accountability.",
+      "relevance": "Control plane / workload audit events, centralized log aggregation patterns, forwarding to monitoring / analytics platforms."
+    },
+    "B10": {
+      "desc": "Be aware of built-in security extension operators (what they do, not how to configure).",
+      "relevance": "Security extension capabilities: compliance scanning, workload profile enforcement, runtime security visibility (high-level only)."
     },
     "I1": {
       "desc": "Apply practical threat modeling to applications and workloads deployed on OpenShift.",
@@ -57,36 +57,36 @@
       "relevance": "Custom SCCs, Pod Security Admission configuration, SELinux types, seccomp profiles (usage)."
     },
     "I4": {
-      "desc": "Design network segmentation and implement egress/ingress controls across namespaces.",
-      "relevance": "Advanced segmentation policies, egress governance patterns, multi-network attachment concepts, perimeter / firewall integration."
-    },
-    "I5": {
-      "desc": "Integrate security scanning and policy checks into CI/CD pipelines.",
-      "relevance": "Pipeline-integrated scanning gates, policy-as-code engines, build-time compliance and configuration checks."
-    },
-    "I6": {
-      "desc": "Manage secret lifecycle: rotation, external encryption, and controlled distribution.",
-      "relevance": "Secret rotation workflows, external key management integration, encrypted distribution abstractions."
-    },
-    "I7": {
-      "desc": "Correlate audit logs and monitoring signals to detect suspicious activity.",
-      "relevance": "Audit log parsing, centralized log querying patterns, runtime telemetry correlation for anomaly detection."
-    },
-    "I8": {
-      "desc": "Automate compliance assessments and remediation workflows.",
-      "relevance": "Compliance scan tailoring, security benchmark execution, compliance dashboard interpretation, automated remediation scripting."
-    },
-    "I9": {
       "desc": "Apply advanced workload restriction profiles for tighter isolation.",
       "relevance": "Custom workload restriction profiles (seccomp, MAC policies), syscall minimization strategies."
     },
-    "I10": {
-      "desc": "Govern resource and security posture with admission and policy controllers.",
-      "relevance": "Admission / policy controller constraints, aggregated policy set management, custom admission extension patterns."
+    "I5": {
+      "desc": "Design network segmentation and implement egress/ingress controls across namespaces.",
+      "relevance": "Advanced segmentation policies, egress governance patterns, multi-network attachment concepts, perimeter / firewall integration."
     },
-    "I11": {
+    "I6": {
+      "desc": "Integrate security scanning and policy checks into CI/CD pipelines.",
+      "relevance": "Pipeline-integrated scanning gates, policy-as-code engines, build-time compliance and configuration checks."
+    },
+    "I7": {
       "desc": "Build secure, minimal, and reproducible container images with basic signing & attestation integration.",
       "relevance": "Dockerfile/Build strategy hardening (least packages, non-root, multi-stage), reproducible builds, embedding metadata (labels/SBOM), basic artifact signing and attestation generation/verification in the development workflow."
+    },
+    "I8": {
+      "desc": "Manage secret lifecycle: rotation, external encryption, and controlled distribution.",
+      "relevance": "Secret rotation workflows, external key management integration, encrypted distribution abstractions."
+    },
+    "I9": {
+      "desc": "Correlate audit logs and monitoring signals to detect suspicious activity.",
+      "relevance": "Audit log parsing, centralized log querying patterns, runtime telemetry correlation for anomaly detection."
+    },
+    "I10": {
+      "desc": "Automate compliance assessments and remediation workflows.",
+      "relevance": "Compliance scan tailoring, security benchmark execution, compliance dashboard interpretation, automated remediation scripting."
+    },
+    "I11": {
+      "desc": "Govern resource and security posture with admission and policy controllers.",
+      "relevance": "Admission / policy controller constraints, aggregated policy set management, custom admission extension patterns."
     },
     "A1": {
       "desc": "Lead platform-wide security governance and multi-team architecture decisions.",
@@ -176,8 +176,8 @@
       "description": "Build secure containerized applications focusing on fundamentals, trusted images, secrets, and integrating baseline security into delivery.",
       "responsibilities": ["R1", "R2", "R3", "R4", "R5", "R6", "R7", "R37"],
       "skills": {
-        "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B9", "B10"],
-        "Intermediate": ["I1", "I5", "I6", "I11"],
+        "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8"],
+        "Intermediate": ["I1", "I6", "I7", "I8"],
         "Advanced": []
       }
     },
@@ -185,8 +185,8 @@
       "description": "Operate and harden clusters: enforce policies, manage access, logging, compliance, quotas, and platform security posture.",
       "responsibilities": ["R8", "R9", "R10", "R11", "R12", "R13", "R14", "R28", "R30", "R32"],
       "skills": {
-        "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B7", "B8", "B9", "B10"],
-        "Intermediate": ["I2", "I3", "I4", "I6", "I7", "I8", "I9", "I10"],
+        "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9", "B10"],
+        "Intermediate": ["I2", "I3", "I4", "I5", "I8", "I9", "I10", "I11"],
         "Advanced": ["A1", "A7", "A8"]
       }
     },
@@ -194,8 +194,8 @@
       "description": "Embed security in pipelines, enforce policy gates, manage supply chain and runtime feedback loops.",
       "responsibilities": ["R13", "R19", "R20", "R21", "R25", "R26", "R31", "R33"],
       "skills": {
-        "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B9", "B10"],
-        "Intermediate": ["I1", "I5", "I6", "I7", "I8", "I10", "I11"],
+        "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8"],
+        "Intermediate": ["I1", "I2", "I3", "I6", "I7", "I8", "I9", "I10", "I11"],
         "Advanced": ["A2", "A4", "A6", "A7", "A9", "A10"]
       }
     },
@@ -203,8 +203,8 @@
       "description": "Design platform security architecture, governance models, segmentation, compliance, and zero-trust strategy.",
       "responsibilities": ["R6", "R12", "R15", "R16", "R17", "R18", "R21", "R27", "R29", "R34", "R35", "R36"],
       "skills": {
-        "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B10"],
-        "Intermediate": ["I1", "I2", "I4", "I8", "I9", "I10"],
+        "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9", "B10"],
+        "Intermediate": ["I1", "I2", "I4", "I5", "I8", "I9", "I10", "I11"],
         "Advanced": ["A1", "A2", "A3", "A5", "A6", "A7", "A8", "A9", "A10"]
       }
     },
@@ -212,8 +212,8 @@
       "description": "Specialized ownership of data plane security: advanced segmentation, secure service-to-service trust, encryption patterns, identity-aware routing, and traffic anomaly engineering.",
       "responsibilities": ["R22", "R23", "R24", "R34", "R36", "R41"],
       "skills": {
-        "Basic": ["B4", "B7", "B10"],
-        "Intermediate": ["I4", "I7", "I10"],
+        "Basic": ["B0", "B1","B3","B5", "B8", "B9"],
+        "Intermediate": ["I5", "I9", "I11"],
         "Advanced": ["A3", "A9", "A10"]
       }
     }
