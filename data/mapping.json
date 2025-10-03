@@ -22,7 +22,7 @@
     },
     "B5": {
       "desc": "Know how Secrets store sensitive values and basic protection expectations.",
-      "relevance": "Kubernetes Secrets, etcd encryption (concept), minimal exposure principles."
+      "relevance": "Kubernetes Secrets, minimal exposure principles."
     },
     "B6": {
       "desc": "Identify trusted image sources and perform basic vulnerability scanning awareness.",
@@ -42,7 +42,7 @@
     },
     "B10": {
       "desc": "Understand basic encryption protections for data in transit and at rest.",
-      "relevance": "TLS for API/Routes, etcd encryption (concept), route termination modes (edge/passthrough/reencrypt)."
+      "relevance": "TLS for API/Routes, route termination modes (edge/passthrough/reencrypt)."
     },
     "I1": {
       "desc": "Apply practical threat modeling to applications and workloads deployed on OpenShift.",
@@ -98,7 +98,7 @@
     },
     "A4": {
       "desc": "Engineer runtime threat detection pipelines and integrate them into response workflows.",
-      "relevance": "Falco/ACS runtime detections, streaming log enrichment, alert routing, pre-incident playbooks."
+      "relevance": "ACS runtime detections, streaming log enrichment, alert routing, pre-incident playbooks."
     },
     "A5": {
       "desc": "Lead coordinated incident response and forensic investigation on the platform.",
@@ -118,7 +118,7 @@
     },
     "A9": {
       "desc": "Design advanced cryptography, observability, and encryption strategies.",
-      "relevance": "KMS integration (envelope encryption), etcd encryption tiers, mesh mTLS architecture, audit pipeline design."
+      "relevance": "KMS integration (envelope encryption), mesh mTLS architecture, audit pipeline design."
     },
     "A10": {
       "desc": "Implement zero-trust workload identity and confidential computing.",
@@ -166,7 +166,7 @@
       "skills": {
         "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B6", "B9"],
         "Intermediate": ["I1", "I5", "I6"],
-        "Advanced": ["A2", "A6", "A8"]
+        "Advanced": ["A6", "A8"]
       }
     },
     "Platform Operator": {
