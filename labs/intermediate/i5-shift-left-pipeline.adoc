@@ -1,4 +1,4 @@
- = Lab: Shift Left – CI/CD Scanning & Signing Pipeline
+= Lab: Shift Left – CI/CD Scanning & Signing Pipeline
 :role: Intermediate Supply Chain
 :skills: Tekton, Image Scanning, Signing, Admission Gating
 :labid: LAB-I5
@@ -24,14 +24,16 @@ You will build a minimal Tekton pipeline: build image → vulnerability scan →
 
 == Namespace & Service Account
 Tekton CRDs require YAML; only typos fixed and kept minimal.
-```sh
+[source,sh]
+----
 oc new-project i5-pipeline
-oc create sa pipeline -n i5-pipeline
+och create sa pipeline -n i5-pipeline
 oc adm policy add-scc-to-user anyuid -z pipeline -n i5-pipeline  # only if build strategy requires
-```
+----
 
 == Build Task (S2I or Buildah Simplified)
-```sh
+[source,sh]
+----
 oc apply -n i5-pipeline -f - <<'EOF'
 apiVersion: tekton.dev/v1
 kind: Task
@@ -54,10 +56,11 @@ spec:
       DIGEST=$(skopeo inspect docker://$(params.IMAGE) | jq -r .Digest)
       echo -n "$DIGEST" > $(results.image-digest.path)
 EOF
-```
+----
 
 == Scan Task (Simulated)
-```sh
+[source,sh]
+----
 oc apply -n i5-pipeline -f - <<'EOF'
 apiVersion: tekton.dev/v1
 kind: Task
@@ -70,7 +73,7 @@ spec:
   - name: scan-status
   steps:
   - name: scan
-  image: registry.access.redhat.com/ubi9/ubi
+    image: registry.access.redhat.com/ubi9/ubi
     script: |
       #!/usr/bin/env bash
       echo "Simulating vulnerability scan"
@@ -78,10 +81,11 @@ spec:
       if [ "$FAIL" = "1" ]; then echo -n FAIL > $(results.scan-status.path); exit 1; fi
       echo -n PASS > $(results.scan-status.path)
 EOF
-```
+----
 
 == Sign Task (Cosign Simulated)
-```sh
+[source,sh]
+----
 oc apply -n i5-pipeline -f - <<'EOF'
 apiVersion: tekton.dev/v1
 kind: Task
@@ -93,16 +97,17 @@ spec:
   - name: DIGEST
   steps:
   - name: sign
-  image: registry.access.redhat.com/ubi9/ubi
+    image: registry.access.redhat.com/ubi9/ubi
     script: |
       #!/usr/bin/env bash
       echo "Simulating cosign sign $(params.IMAGE)@$(params.DIGEST)"
       echo "signature-ok" > /tekton/home/signature.txt
 EOF
-```
+----
 
 == Pipeline Definition
-```sh
+[source,sh]
+----
 oc apply -n i5-pipeline -f - <<'EOF'
 apiVersion: tekton.dev/v1
 kind: Pipeline
@@ -139,10 +144,11 @@ spec:
     - name: DIGEST
       value: $(tasks.build.results.image-digest)
 EOF
-```
+----
 
 == Run Pipeline
-```sh
+[source,sh]
+----
 oc apply -n i5-pipeline -f - <<'EOF'
 apiVersion: tekton.dev/v1
 kind: PipelineRun
@@ -156,20 +162,23 @@ spec:
   - name: IMAGE
     value: image-registry.openshift-image-registry.svc:5000/i5-pipeline/demo:latest
 EOF
-```
+----
 Monitor:
-```sh
+[source,sh]
+----
 oc get pipelineruns -n i5-pipeline
-oc describe pipelinerun secure-build-run -n i5-pipeline | grep -i status
-```
+och describe pipelinerun secure-build-run -n i5-pipeline | grep -i status
+----
 Get digest:
-```sh
+[source,sh]
+----
 oc get pipelinerun secure-build-run -n i5-pipeline -o jsonpath='{.status.pipelineResults}'
-```
+----
 
 == Deployment Using Digest (Gate Simulation)
 Replace <DIGEST> with extracted digest:
-```sh
+[source,sh]
+----
 oc apply -n i5-pipeline -f - <<'EOF'
 apiVersion: apps/v1
 kind: Deployment
@@ -187,7 +196,7 @@ spec:
       - name: web
         image: image-registry.openshift-image-registry.svc:5000/i5-pipeline/demo@sha256:<DIGEST>
 EOF
-```
+----
 
 == (Optional) Admission Tie-In
 Add Gatekeeper policy to require annotation `signed=ok` or actual cosign verification (see I10 lab) before allowing tag-based images.
@@ -196,12 +205,13 @@ Add Gatekeeper policy to require annotation `signed=ok` or actual cosign verific
 Re-run with FAIL=1 env (edit scan task to export) and confirm sign task skipped.
 
 == Cleanup
-```sh
+[source,sh]
+----
 oc delete project i5-pipeline --wait=false
-```
+----
 
 == Key Points
-- Pipeline enforces scan-before-sign
-- Conditional task (when clause) implements gate
-- Digest pin ensures immutability; admission can extend trust policies
-- Extensible to SBOM generation & policy-as-code checks
+* Pipeline enforces scan-before-sign
+* Conditional task (when clause) implements gate
+* Digest pin ensures immutability; admission can extend trust policies
+* Extensible to SBOM generation & policy-as-code checks

@@ -1,4 +1,4 @@
- = Lab: Policy at the Front Door – Admission Governance (Gatekeeper)
+= Lab: Policy at the Front Door – Admission Governance (Gatekeeper)
 :role: Intermediate Admission Governance
 :skills: Admission Control, Gatekeeper, Policy Layering, Governance
 :labid: LAB-I10
@@ -30,7 +30,8 @@ oc new-project i10-govern
 
 == No Root UID Constraint
 ConstraintTemplate:
-```sh
+[source,sh]
+----
 oc apply -f - <<'EOF'
 apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
@@ -52,9 +53,10 @@ spec:
           msg := sprintf("Container %s must set runAsNonRoot=true", [c.name])
         }
 EOF
-```
+----
 Constraint:
-```sh
+[source,sh]
+----
 oc apply -f - <<'EOF'
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sNonRootUid
@@ -62,10 +64,11 @@ metadata:
   name: nonroot-required
 spec: {}
 EOF
-```
+----
 
 Test (expect denial):
-```sh
+[source,sh]
+----
 oc apply -n i10-govern -f - <<'EOF'
 apiVersion: v1
 kind: Pod
@@ -79,7 +82,7 @@ spec:
       runAsNonRoot: false
     command: ["sleep","5"]
 EOF
-```
+----
 
 == Mandatory NetworkPolicy Constraint
 Template:

@@ -13,34 +13,9 @@ Apply layered network governance so platform (admin) policies set immutable guar
 * Demonstrate developer attempt to bypass (fails)
 * Add default-deny ingress at a lower priority tier
 * Selectively re-allow intended ingress via developer policy
-
-== Why it Matters
-Flat policy models are like a shared whiteboard where anyone can erase the “Do Not Enter” zones. One over‑permissive change reintroduces lateral movement. Tiers create a constitution: admin policies are the unerasable ink; developer policies are sticky notes that can refine—but never override—the ink. Business result: consistent baseline segmentation, reduced accidental exposure, and faster audit explanations of “who controls what.”
-
-== What it Solves
-Without tiers you get policy tug‑of‑war: developers relax rules to fix connectivity fast, reintroducing risk. Ordering confusion (“Which rule won?”) wastes incident time. Tiering locks core guardrails, letting teams self‑serve safely inside a protected sandbox.
-
-With tiers you gain:
-* Immutable baseline denies and egress allowlists
-* Clear division of duties (platform vs application team scope)
-* Deterministic precedence (fewer debugging escalations)
-
-== Understanding the Attack Surface
-| Layer | If Missing | With Tiering |
-|-------|-----------|--------------|
-| Admin High-Priority | Drift to broad access | Stable baseline guardrail |
-| Developer Layer | Central team bottleneck | Delegated fine-grain control |
-| Baseline Deny | Hidden lateral paths | Explicit opt-in flows |
-| Egress Allowlist | Arbitrary outbound reach | Curated destinations only |
-
-== How to Secure (Lifecycle View)
-* Build: Catalogue necessary service dependencies (only those go on the allowlist).
-* Registry: (Optional) Annotate images with intended network tier to aid automation.
-* Deploy: Apply admin policies (deny/allow baselines) before onboarding applications.
-* Runtime: Observe denied attempts to refine rules deliberately—never widen by guess.
-
 == How to Try It
-1. Namespaces & services:
+. Namespaces & services:
++
 [source,sh]
 ----
 oc new-project i4-tiered
@@ -54,13 +29,15 @@ APPROVED_IP=$(oc get svc approved -n i4-tiered -o jsonpath='{.spec.clusterIP}')
 ALT_IP=$(oc get svc alt -n i4-alt -o jsonpath='{.spec.clusterIP}')
 oc run client --image=registry.access.redhat.com/ubi9/ubi -n i4-tiered -- sleep 3600
 ----
-Baseline connectivity (both allowed initially):
+. Baseline connectivity (both allowed initially):
++
 [source,sh]
 ----
 oc exec client -n i4-tiered -- curl -s -o /dev/null -w '%{http_code}\n' http://$APPROVED_IP:8080
 oc exec client -n i4-tiered -- curl -s -o /dev/null -w '%{http_code}\n' http://$ALT_IP:9090
 ----
-2. Tier 1 AdminNetworkPolicy (egress allowlist):
+. Tier 1 AdminNetworkPolicy (egress allowlist):
++
 [source,sh]
 ----
 cat <<'EOF' | oc apply -f -
@@ -89,13 +66,15 @@ spec:
       - cidr: 0.0.0.0/0
 EOF
 ----
-Retest (alt path should fail):
+. Retest (alt path should fail):
++
 [source,sh]
 ----
 oc exec client -n i4-tiered -- curl -s -o /dev/null -w '%{http_code}\n' http://$APPROVED_IP:8080
 oc exec client -n i4-tiered -- curl -s --max-time 3 -o /dev/null -w '%{http_code}\n' http://$ALT_IP:9090 || echo DENIED
 ----
-3. Tier 2 developer attempt (ineffective override):
+. Tier 2 developer attempt (ineffective override):
++
 [source,sh]
 ----
 cat <<'EOF' | oc apply -n i4-tiered -f -
@@ -117,13 +96,15 @@ spec:
 EOF
 oc exec client -n i4-tiered -- curl -s --max-time 3 -o /dev/null -w '%{http_code}\n' http://$ALT_IP:9090 || echo STILL_DENIED
 ----
-4. Pre-baseline ingress test (currently open):
+. Pre-baseline ingress test (currently open):
++
 [source,sh]
 ----
 oc run alt-client --image=registry.access.redhat.com/ubi9/ubi -n i4-alt -- sleep 3600
 oc exec alt-client -n i4-alt -- curl -s -o /dev/null -w '%{http_code}\n' http://$APPROVED_IP:8080
 ----
-5. Tier 3 baseline ingress deny:
+. Tier 3 baseline ingress deny:
++
 [source,sh]
 ----
 cat <<'EOF' | oc apply -f -
@@ -145,7 +126,8 @@ spec:
 EOF
 oc exec alt-client -n i4-alt -- curl -s --max-time 3 -o /dev/null -w '%{http_code}\n' http://$APPROVED_IP:8080 || echo BLOCKED
 ----
-6. Developer ingress allow inside baseline:
+. Developer ingress allow inside baseline:
++
 [source,sh]
 ----
 cat <<'EOF' | oc apply -n i4-tiered -f -
@@ -169,7 +151,8 @@ spec:
 EOF
 oc exec alt-client -n i4-alt -- curl -s -o /dev/null -w '%{http_code}\n' http://$APPROVED_IP:8080
 ----
-7. (Optional) Cleanup:
+. (Optional) Cleanup:
++
 [source,sh]
 ----
 oc delete project i4-tiered --wait=false
@@ -184,25 +167,20 @@ oc delete adminnetworkpolicy tier1-egress tier3-baseline-ingress || true
 * Observability: Logging/metrics of denied flows to drive iterative improvement.
 
 == Summary Table
-| What to Secure | How | Outcome |
-|----------------|-----|---------|
-| Outbound Scope | AdminNetworkPolicy allowlist | Prevents arbitrary scanning |
-| Ingress Baseline | High-priority deny | Zero-trust default stance |
-| App-to-App Flows | Developer NetworkPolicies | Fine-grained openness |
-| Order Predictability | Priority tiers | Fewer debugging cycles |
+[options="header"]
+|===
+| What to Secure | How | Outcome
+| Outbound Scope | AdminNetworkPolicy allowlist | Prevents arbitrary scanning
+| Ingress Baseline | High-priority deny | Zero-trust default stance
+| App-to-App Flows | Developer NetworkPolicies | Fine-grained openness
+| Order Predictability | Priority tiers | Fewer debugging cycles
+|===
 
 == FAQs
-Q: Can a developer NetworkPolicy override an admin deny?  
-A: No—higher-priority admin actions always win.
-
-Q: Why have a broad deny at a later (higher) priority?  
-A: It activates after specific earlier allows, ensuring minimal necessary openness.
-
-Q: How do I debug which policy blocked traffic?  
-A: Check AdminNetworkPolicy evaluation order + network plugin events; keep a doc mapping priority ranges to ownership.
-
-Q: What if developers need a new egress destination?  
-A: They request an allowlist update; never workaround with a broad developer policy.
+Can a developer NetworkPolicy override an admin deny?:: No—higher-priority admin actions always win.
+Why have a broad deny at a later (higher) priority?:: It activates after specific earlier allows, ensuring minimal necessary openness.
+How do I debug which policy blocked traffic?:: Check AdminNetworkPolicy evaluation order + network plugin events; keep a doc mapping priority ranges to ownership.
+What if developers need a new egress destination?:: They request an allowlist update; never workaround with a broad developer policy.
 
 == Closing Story
 Admin policies are the building’s fire code; developer policies are furniture layout. One sets non‑negotiable safety, the other arranges usability inside those rules.

@@ -1,4 +1,4 @@
- = Lab: Safer by Default – Seccomp & SELinux With Security Profiles Operator (SPO)
+= Lab: Safer by Default – Seccomp & SELinux With Security Profiles Operator (SPO)
 :role: Intermediate Runtime Isolation
 :skills: Seccomp, SELinux, Security Profiles Operator
 :labid: LAB-I9B
@@ -23,12 +23,14 @@ Even with SCC controls, overly broad seccomp or SELinux settings increase attack
 * SPO installed (OperatorHub => Security Profiles Operator)
 
 == Confirm Operator
-```sh
+[source,sh]
+----
 oc get csv -n openshift-security-profiles 2>/dev/null | grep -i security-profiles || echo "Install Security Profiles Operator"
-```
+----
 
 == Namespace & Recorder Pod
-```sh
+[source,sh]
+----
 oc new-project i9-spo
 cat <<'EOF' | oc apply -f -
 apiVersion: security-profiles-operator.x-k8s.io/v1alpha1
@@ -41,16 +43,17 @@ EOF
 
 # Start a pod that triggers syscalls
 oc run demo --image=registry.access.redhat.com/ubi9/ubi -n i9-spo --command -- sh -c 'id; ls /proc/self; sleep 10'
-```
-
+----
 After it runs, list generated profile statuses:
-```sh
+[source,sh]
+----
 oc get seccompprofiles -n i9-spo
-```
+----
 
 == Capture & Enforce Minimal Profile
 Export the generated JSON (name may differ if using profile recording CRD mode). For simplicity create a curated profile:
-```sh
+[source,sh]
+----
 oc apply -n i9-spo -f - <<'EOF'
 apiVersion: security-profiles-operator.x-k8s.io/v1alpha1
 kind: SeccompProfile
@@ -64,10 +67,11 @@ spec:
     - action: SCMP_ACT_ALLOW
       names: ["exit_group","rt_sigreturn","read","write","fstat","arch_prctl","brk","mmap","mprotect","munmap","set_tid_address","set_robust_list","rt_sigaction","close","access","openat","newfstatat","prlimit64","getrandom"]
 EOF
-```
+----
 
 == Enforce Profile on Pod
-```sh
+[source,sh]
+----
 oc delete pod demo -n i9-spo --ignore-not-found
 cat <<'EOF' | oc apply -f -
 apiVersion: v1
@@ -79,15 +83,16 @@ metadata:
 spec:
   containers:
   - name: app
-  image: registry.access.redhat.com/ubi9/ubi
+    image: registry.access.redhat.com/ubi9/ubi
     command: ["sh","-c","sleep 30"]
 EOF
-```
+----
 Confirm annotation accepted and pod Running.
 
 == (Optional) SELinux Profile
 If SPO supports SELinuxProfile CRD in your version:
-```sh
+[source,sh]
+----
 cat <<'EOF' | oc apply -f -
 apiVersion: security-profiles-operator.x-k8s.io/v1alpha2
 kind: SELinuxProfile
@@ -98,21 +103,23 @@ spec:
     - domain: container_t
       types: ["proc_t"]
 EOF
-```
+----
 Annotate pod with `io.kubernetes.cri.selinux.profile-name` if required (runtime dependent).
 
 == Negative Test
 Attempt a syscall outside allow-list (e.g., `unshare`) inside confined pod (should fail):
-```sh
+[source,sh]
+----
 oc exec confined -- unshare -m true || echo "Blocked as expected"
-```
+----
 
 == Cleanup
-```sh
+[source,sh]
+----
 oc delete project i9-spo --wait=false
-```
+----
 
 == Key Points
-- SPO streamlines seccomp/SELinux profile lifecycle
-- Least privilege at syscall layer narrows exploitation surface
-- Pair with SCC & admission to enforce mandatory profiles
+* SPO streamlines seccomp/SELinux profile lifecycle
+* Least privilege at syscall layer narrows exploitation surface
+* Pair with SCC & admission to enforce mandatory profiles

@@ -27,13 +27,15 @@ Broad SCC usage silently enables:
 Hardening prunes that list down to essentials. Negative tests (deliberate failing pods) ensure protections aren’t theoretical.
 
 == Understanding the Attack Surface
-| Element | Over-Broad Posture Risk | Hardened Outcome |
-|---------|-------------------------|------------------|
-| Capabilities | Kernel abuse primitives available | ALL dropped; add none |
-| Root UID | Direct escalation stepping stone | Enforced non-root range |
-| SELinux Context | Ambient cross-label access | Predictable confined label |
-| Syscalls | Escape / privilege chain surface | Minimal allow list |
-| Priv Escalation | `allowPrivilegeEscalation=true` defaults | Explicitly false by default |
+[options="header"]
+|===
+| Element | Over-Broad Posture Risk | Hardened Outcome
+| Capabilities | Kernel abuse primitives available | ALL dropped; add none
+| Root UID | Direct escalation stepping stone | Enforced non-root range
+| SELinux Context | Ambient cross-label access | Predictable confined label
+| Syscalls | Escape / privilege chain surface | Minimal allow list
+| Priv Escalation | `allowPrivilegeEscalation=true` defaults | Explicitly false by default
+|===
 
 == How to Secure (Lifecycle View)
 * Build: Refactor apps so they do not require legacy capabilities (replace ping with HTTP health, etc.).
@@ -42,12 +44,14 @@ Hardening prunes that list down to essentials. Negative tests (deliberate failin
 * Runtime: Alert when a hardened namespace pod is scheduled under an unexpected SCC annotation.
 
 == How to Try It
-1. Inspect baseline:
+. Inspect baseline:
++
 [source,sh]
 ----
 oc get scc restricted -o yaml | head -n 40
 ----
-2. Create hardened SCC:
+. Create hardened SCC:
++
 [source,sh]
 ----
 oc apply -f - <<'EOF'
@@ -89,13 +93,15 @@ users: []
 priority: 10
 EOF
 ----
-3. Namespace + bind SCC:
+. Namespace + bind SCC:
++
 [source,sh]
 ----
 oc new-project i3-harden
 oc adm policy add-scc-to-group hardened-nonroot system:serviceaccounts:i3-harden
 ----
-4. Valid pod (should Run):
+. Valid pod (should Run):
++
 [source,sh]
 ----
 oc apply -n i3-harden -f - <<'EOF'
@@ -118,7 +124,8 @@ spec:
 EOF
 oc get pod good -n i3-harden -o jsonpath='{.metadata.annotations.openshift\.io/scc}{"\n"}'
 ----
-5. Negative test – disallowed capability:
+. Negative test – disallowed capability:
++
 [source,sh]
 ----
 oc apply -n i3-harden -f - <<'EOF'
@@ -137,7 +144,8 @@ spec:
 EOF
 oc describe pod bad-cap -n i3-harden | grep -i deni || true
 ----
-6. Negative test – root UID:
+. Negative test – root UID:
++
 [source,sh]
 ----
 oc apply -n i3-harden -f - <<'EOF'
@@ -155,12 +163,14 @@ spec:
 EOF
 ----
 Expected rejection / scheduling failure.
-7. (Optional) Seccomp check:
+. (Optional) Seccomp check:
++
 [source,sh]
 ----
 oc exec good -- unshare -m true || echo "Blocked or not permitted (expected)"
 ----
-8. (Optional) Cleanup:
+. (Optional) Cleanup:
++
 [source,sh]
 ----
 oc delete project i3-harden --wait=false
@@ -174,26 +184,24 @@ oc delete project i3-harden --wait=false
 * RHACS Policy: Detect unexpected added caps or privileged pods.
 
 == Summary Table
-| What to Secure | How | Outcome |
-|----------------|-----|---------|
-| UID / Priv Esc | SCC MustRunAsRange + no escalation | Stops silent root runs |
-| Kernel Capabilities | requiredDrop=ALL | Strips abuse primitives |
-| Syscalls | Seccomp runtime/default or minimal | Smaller exploit chain surface |
-| SELinux Domain | Fixed context | Predictable isolation |
-| Drift | Audit SCC annotation & RHACS alerts | Early detection |
+[options="header"]
+|===
+| What to Secure | How | Outcome
+| UID / Priv Esc | SCC MustRunAsRange + no escalation | Stops silent root runs
+| Kernel Capabilities | requiredDrop=ALL | Strips abuse primitives
+| Syscalls | Seccomp runtime/default or minimal | Smaller exploit chain surface
+| SELinux Domain | Fixed context | Predictable isolation
+| Drift | Audit SCC annotation & RHACS alerts | Early detection
+|===
 
 == FAQs
-Q: Why a UID range instead of a single UID?  
-A: Provides diversity (harder to predict) while constraining to an acceptable bucket.
+Q: Why a UID range instead of a single UID?:: Provides diversity (harder to predict) while constraining to an acceptable bucket.
 
-Q: When NOT to create a custom SCC?  
-A: If the built‑in restricted SCC already denies what you don’t need—avoid duplicating for vanity.
+Q: When NOT to create a custom SCC?:: If the built‑in restricted SCC already denies what you don’t need—avoid duplicating for vanity.
 
-Q: How do I know if an app still “needs” a capability?  
-A: Run without it and observe failures; then redesign the feature rather than granting the capability.
+Q: How do I know if an app still “needs” a capability?:: Run without it and observe failures; then redesign the feature rather than granting the capability.
 
-Q: How do I detect privilege drift?  
-A: Daily export of SCC assignments + RHACS policy on unexpected elevated privileges.
+Q: How do I detect privilege drift?:: Daily export of SCC assignments + RHACS policy on unexpected elevated privileges.
 
 == Closing Story
 Generic armor protects, but tailored armor removes gaps a spear tip could find. Hardened runtime policy is that tailoring—subtle adjustments that make a huge difference when stress hits.

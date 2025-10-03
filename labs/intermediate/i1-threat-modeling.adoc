@@ -32,15 +32,17 @@ With a model:
 * Focused backlog: sequence of high leverage, low regret steps
 
 == Understanding the Attack Surface
-| Asset / Flow | Primary Risk | Example Threat | Control Category |
-|--------------|-------------|----------------|------------------|
-| Registry Supply Chain | Tampered image | Injected backdoor layer | Scanning + Signing |
-| Frontend ↔ API | Lateral movement | Compromised pod probes east-west | NetworkPolicy tiers |
-| API ↔ DB | Data exposure | Stolen DB creds reused | Secrets mgmt + RBAC |
-| CI → Cluster | Privilege misuse | Unsigned image deploy | Admission + RHACS |
-| Service Account Tokens | Replay | Token exfil reused elsewhere | Short-lived / Bound tokens |
-| Runtime Syscalls | Escape attempt | Dangerous syscall executes | Seccomp / SPO |
-| Privileged Actions | Escalation | Wildcard RBAC verbs | Custom RBAC roles |
+[options="header"]
+|===
+| Asset / Flow | Primary Risk | Example Threat | Control Category
+| Registry Supply Chain | Tampered image | Injected backdoor layer | Scanning + Signing
+| Frontend ↔ API | Lateral movement | Compromised pod probes east-west | NetworkPolicy tiers
+| API ↔ DB | Data exposure | Stolen DB creds reused | Secrets mgmt + RBAC
+| CI → Cluster | Privilege misuse | Unsigned image deploy | Admission + RHACS
+| Service Account Tokens | Replay | Token exfil reused elsewhere | Short-lived / Bound tokens
+| Runtime Syscalls | Escape attempt | Dangerous syscall executes | Seccomp / SPO
+| Privileged Actions | Escalation | Wildcard RBAC verbs | Custom RBAC roles
+|===
 
 == How to Secure (Lifecycle View)
 * Build: Scan & sign images; fail CI on critical vulns or unsigned artifacts.
@@ -49,22 +51,22 @@ With a model:
 * Runtime: RHACS anomaly & policy checks; minimal seccomp; periodic compliance scans.
 
 == How to Try It
-1. (Optional) Create visual aid namespaces:
+. (Optional) Create visual aid namespaces:
 [source,sh]
 ----
 oc new-project app-frontend
 oc new-project app-backend
 oc new-project app-db
 ----
-2. List assets: code, images, secrets, database, CI system, cluster API.
-3. Textual data flow (sample below) – adjust to reality.
-4. Mark trust boundaries (Internet ingress, CI → cluster, app → db, registry ↔ kubelet).
-5. Apply STRIDE sampling to 5–10 flows (avoid exhaustiveness trap).
-6. Build a Threat → Control table (start with provided excerpt; extend locally).
-7. Qualitatively score (High/Med/Low impact & likelihood) + effort (S/M/L); sort.
-8. Turn top ranked 5–7 into backlog tickets with acceptance criteria.
-9. Commit artifact (`threat-model-app.md`) and schedule a quarterly review.
-10. (Optional) Cleanup:
+. List assets: code, images, secrets, database, CI system, cluster API.
+. Textual data flow (sample below) – adjust to reality.
+. Mark trust boundaries (Internet ingress, CI → cluster, app → db, registry ↔ kubelet).
+. Apply STRIDE sampling to 5–10 flows (avoid exhaustiveness trap).
+. Build a Threat → Control table (start with provided excerpt; extend locally).
+. Qualitatively score (High/Med/Low impact & likelihood) + effort (S/M/L); sort.
+. Turn top ranked 5–7 into backlog tickets with acceptance criteria.
+. Commit artifact (`threat-model-app.md`) and schedule a quarterly review.
+. (Optional) Cleanup:
 [source,sh]
 ----
 oc delete project app-frontend app-backend app-db --wait=false
@@ -86,29 +88,33 @@ Trust Boundaries:
 * Runtime (node/OS) boundary
 
 == STRIDE Sampling (Examples)
-| STRIDE | Example Scenario | Potential Control |
-|--------|------------------|-------------------|
-| Spoofing | Stolen service account token reused | Short-lived tokens / RBAC scope |
-| Tampering | Unsigned image pushed & deployed | Signing + admission gate |
-| Repudiation | RBAC change without trace | GitOps-managed RBAC + audit logs |
-| Information Disclosure | Broad secret mounts | External secrets + narrow Roles |
-| Denial of Service | Unlimited pod CPU | Quotas + limits + autoscale guards |
-| Elevation of Privilege | Pod adds CAP_SYS_ADMIN | Hardened SCC + seccomp |
+[options="header"]
+|===
+| STRIDE | Example Scenario | Potential Control
+| Spoofing | Stolen service account token reused | Short-lived tokens / RBAC scope
+| Tampering | Unsigned image pushed & deployed | Signing + admission gate
+| Repudiation | RBAC change without trace | GitOps-managed RBAC + audit logs
+| Information Disclosure | Broad secret mounts | External secrets + narrow Roles
+| Denial of Service | Unlimited pod CPU | Quotas + limits + autoscale guards
+| Elevation of Privilege | Pod adds CAP_SYS_ADMIN | Hardened SCC + seccomp
+|===
 
 == Threat → Control Mapping (Excerpt)
-| Threat | Control | Referenced Lab |
-|--------|---------|---------------|
-| Root container escape try | Hardened SCC + seccomp | I3 / I9b |
-| East-west reconnaissance | Tiered NetworkPolicies | I4b |
-| Arbitrary external egress | EgressIP + baseline deny | I4a |
-| Token replay | Bound/rotated tokens | I2 |
-| Unsigned image deploy | Scan + sign + admission | I5 / I10 |
-| Secret dump via env | External secret projection | I6a / I6b |
-| Malicious syscall usage | SPO enforced profile | I9b |
-| Privilege escalation via RBAC | Custom Role scoping | I2 |
-| Missing NetworkPolicy | Admission requirement | I10 |
-| Compliance drift | Tailored profile scans | I8 |
-| Suspicious exec | Audit + anomaly correlation | I7 |
+[options="header"]
+|===
+| Threat | Control | Referenced Lab
+| Root container escape try | Hardened SCC + seccomp | I3 / I9b
+| East-west reconnaissance | Tiered NetworkPolicies | I4b
+| Arbitrary external egress | EgressIP + baseline deny | I4a
+| Token replay | Bound/rotated tokens | I2
+| Unsigned image deploy | Scan + sign + admission | I5 / I10
+| Secret dump via env | External secret projection | I6a / I6b
+| Malicious syscall usage | SPO enforced profile | I9b
+| Privilege escalation via RBAC | Custom Role scoping | I2
+| Missing NetworkPolicy | Admission requirement | I10
+| Compliance drift | Tailored profile scans | I8
+| Suspicious exec | Audit + anomaly correlation | I7
+|===
 
 == Prioritizing Mitigations
 Formula (simple): Rank = (Impact × Likelihood) / Effort. You want early wins: high rank, low change risk. Typical first five:
@@ -151,27 +157,21 @@ flowchart LR
 * Vault / External Secrets: Reduce secret sprawl & ease rotation
 
 == Summary Table
-| What to Secure | Why It Matters | Example Controls |
-|----------------|---------------|------------------|
-| Image Integrity | Prevent hidden tampering | Signing, scanning, RHACS gate |
-| Network Paths | Limit lateral movement | Default deny + tiered policies |
-| Secrets | Reduce leakage risk | Externalization + scoped RBAC |
-| Runtime Syscalls | Shrink escape surface | Seccomp/SPO profiles |
-| Privileged Actions | Stop escalation chains | Custom RBAC + audit |
-| Compliance State | Avoid silent drift | Tailored profiles + scans |
+[options="header"]
+|===
+| What to Secure | Why It Matters | Example Controls
+| Image Integrity | Prevent hidden tampering | Signing, scanning, RHACS gate
+| Network Paths | Limit lateral movement | Default deny + tiered policies
+| Secrets | Reduce leakage risk | Externalization + scoped RBAC
+| Runtime Syscalls | Shrink escape surface | Seccomp/SPO profiles
+| Privileged Actions | Stop escalation chains | Custom RBAC + audit
+| Compliance State | Avoid silent drift | Tailored profiles + scans
+|===
 
-== FAQs
-Q: How detailed should the model be?  
-A: Enough to prioritize decisively. If it reads like a thesis, you over‑modeled.
-
-Q: Do we model every microservice?  
-A: Start at tier level; dive deeper only for high‑risk or internet‑facing components.
-
-Q: How often to revisit?  
-A: Triggered by meaningful architecture change, plus at least quarterly.
-
-Q: Is STRIDE mandatory?  
-A: No, just a balanced checklist. Use any framework that ensures coverage (PASTA, ATT&CK, etc.).
+How detailed should the model be?:: Enough to prioritize decisively. If it reads like a thesis, you over‑modeled.
+Do we model every microservice?:: Start at tier level; dive deeper only for high‑risk or internet‑facing components.
+How often to revisit?:: Triggered by meaningful architecture change, plus at least quarterly.
+Is STRIDE mandatory?:: No, use any framework that ensures balanced coverage (PASTA, ATT&CK, etc.).
 
 == Closing Story
 The threat model is the cluster’s security blueprint: once drawn, each control placed feels intentional. Without it, defenses accumulate like random furniture—cluttered and still missing a front door lock.

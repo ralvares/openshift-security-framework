@@ -21,12 +21,14 @@ Picture a large office tower with one anonymous exit; a suspicious package appea
 Unlabeled outbound traffic encourages over‑broad firewalls (“just allow the whole node CIDR”) and slows incident response (“Which team triggered that outbound DNS burst?”). EgressIP restores accountability by stamping a namespace’s traffic with a stable, pre‑approved IP—tightening external ACLs while remaining transparent to application code.
 
 == Understanding the Attack Surface
-| Vector | Without Attribution | With EgressIP |
-|--------|---------------------|--------------|
-| Data Exfiltration | Slow source identification | Rapid namespace pinpoint |
-| Shadow Services | Hard to notice rogue calls | Per‑namespace allowlists |
-| Firewall Scope | Wide CIDR allowances | Narrow explicit IP rules |
-| Incident Containment | Broad quarantine needed | Surgical namespace isolation |
+[options="header"]
+|===
+| Vector | Without Attribution | With EgressIP
+| Data Exfiltration | Slow source identification | Rapid namespace pinpoint
+| Shadow Services | Hard to notice rogue calls | Per‑namespace allowlists
+| Firewall Scope | Wide CIDR allowances | Narrow explicit IP rules
+| Incident Containment | Broad quarantine needed | Surgical namespace isolation
+|===
 
 == How to Secure (Lifecycle View)
 * Build: Remove gratuitous external calls (telemetry, update checks) unless justified.
@@ -37,13 +39,15 @@ Unlabeled outbound traffic encourages over‑broad firewalls (“just allow the 
 == How to Try It
 Prereqs: OVN-Kubernetes, a spare IP on the same L2 segment as worker nodes.
 
-1. Namespace & label:
+. Namespace & label:
++
 [source,sh]
 ----
 oc new-project i4-egress-demo
 oc label namespace i4-egress-demo egress=tracked
 ----
-2. Create EgressIP (replace placeholder IP):
+. Create EgressIP (replace placeholder IP):
++
 [source,sh]
 ----
 cat <<'EOF' | oc apply -f -
@@ -60,14 +64,16 @@ spec:
 EOF
 oc get egressip i4-egressip -o yaml | egrep 'egressIPs|node'
 ----
-3. Test pod from tracked namespace:
+. Test pod from tracked namespace:
++
 [source,sh]
 ----
 oc run tester --image=registry.access.redhat.com/ubi9/ubi -- sleep 3600
 oc exec tester -- curl -s ifconfig.me || oc exec tester -- curl -s https://ifconfig.me
 ----
 Confirm returned IP = reserved EgressIP after propagation.
-4. Control namespace (no EgressIP):
+. Control namespace (no EgressIP):
++
 [source,sh]
 ----
 oc new-project i4-egress-control
@@ -75,14 +81,16 @@ oc run plain --image=registry.access.redhat.com/ubi9/ubi -- sleep 3600
 oc exec plain -- curl -s ifconfig.me
 ----
 Observe: shows node IP (or shared outbound IP), not the dedicated one.
-5. (Optional) External log correlation: Inspect external HTTP server / proxy logs for the EgressIP as source.
+. (Optional) External log correlation: Inspect external HTTP server / proxy logs for the EgressIP as source.
 
 == Troubleshooting
-| Symptom | Likely Cause | Resolution |
-|---------|--------------|-----------|
-| EgressIP pending | IP not in correct L2 | Allocate proper subnet IP |
-| Still node IP | ARP / routing not converged | Retry after short delay |
-| Shared IP between namespaces | Misconfiguration | Assign unique IPs |
+[options="header"]
+|===
+| Symptom | Likely Cause | Resolution
+| EgressIP pending | IP not in correct L2 | Allocate proper subnet IP
+| Still node IP | ARP / routing not converged | Retry after short delay
+| Shared IP between namespaces | Misconfiguration | Assign unique IPs
+|===
 
 == Solutions/Controls
 * EgressIP: Deterministic outbound identity per namespace.
@@ -91,24 +99,22 @@ Observe: shows node IP (or shared outbound IP), not the dedicated one.
 * RHACS / SIEM Analytics: Detect destination drift or unusual data volume.
 
 == Summary Table
-| What to Secure | How | Benefit |
-|----------------|-----|---------|
-| Outbound Identity | Assign EgressIP | Rapid attribution |
-| Firewall Scope | Limit to specific IPs | Reduced over-permit |
-| Anomaly Detection | Baseline per IP | Faster anomaly triage |
+[options="header"]
+|===
+| What to Secure | How | Benefit
+| Outbound Identity | Assign EgressIP | Rapid attribution
+| Firewall Scope | Limit to specific IPs | Reduced over-permit
+| Anomaly Detection | Baseline per IP | Faster anomaly triage
+|===
 
 == FAQs
-Q: Does EgressIP replace NetworkPolicies?  
-A: No—one handles identity outside the cluster, the other controls internal traffic.
+Q: Does EgressIP replace NetworkPolicies?:: No—one handles identity outside the cluster, the other controls internal traffic.
 
-Q: Can multiple namespaces share an EgressIP?  
-A: Technically yes; operationally avoid—it muddies attribution.
+Q: Can multiple namespaces share an EgressIP?:: Technically yes; operationally avoid—it muddies attribution.
 
-Q: What if I need per‑pod identity?  
-A: Consider service mesh or egress gateways; finer granularity raises management cost.
+Q: What if I need per‑pod identity?:: Consider service mesh or egress gateways; finer granularity raises management cost.
 
-Q: Will this break existing connections?  
-A: EgressIP applies to new flows; plan a maintenance window if deterministic attribution is critical midstream.
+Q: Will this break existing connections?:: EgressIP applies to new flows; plan a maintenance window if deterministic attribution is critical midstream.
 
 == Closing Story
 EgressIP is the name tag at a crowded conference exit—suddenly you know exactly who just walked past the security desk.

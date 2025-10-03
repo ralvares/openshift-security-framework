@@ -1,4 +1,4 @@
- = Lab: Wired for Trust – Binding VLAN Networks to Dedicated Nodes (Multus)
+= Lab: Wired for Trust – Binding VLAN Networks to Dedicated Nodes (Multus)
 :role: Intermediate Network Segmentation
 :skills: Multus, VLAN Isolation, Node Affinity, NetworkAttachmentDefinition
 :labid: LAB-I4D
@@ -10,45 +10,42 @@
 Network segmentation (multi-network & physical VLAN isolation).
 
 == Scenario
-Sensitive workloads must attach to a secure VLAN reachable only from specific nodes. Use node labeling + (optional) taints plus Multus NetworkAttachmentDefinition to ensure only authorized pods get the interface.
+Sensitive workloads must attach to a secure VLAN reachable only from specific nodes. Use node labeling (and optional taints) plus a Multus NetworkAttachmentDefinition (NAD) so only authorized pods get the interface.
 
 == Objectives
-* Label & (optionally) taint a VLAN-capable node
-* Create VLAN NAD
-* Deploy pod with attachment on labeled node
-* Attempt on unlabeled node (fail to schedule or reject)
+* Label & optionally taint a VLAN-capable node
+* Create a VLAN NetworkAttachmentDefinition
+* Deploy a pod with the VLAN attachment constrained to the labeled node
+* Attempt (and fail) to schedule same attachment on an unlabeled node
 
 == Prerequisites
 * Multus (default in OpenShift)
-* Node interface (e.g., eth1) trunking VLAN 200
-* DHCP or static IPAM strategy for VLAN network
+* Worker node interface (e.g., eth1) trunking the target VLAN (example: 200)
+* DHCP on that VLAN or adjust to static IPAM
+* Cluster admin privileges
 
-## 1. Identify Node
-== Identify Node
+== 1. Identify & Prepare Node
 [source,sh]
 ----
 oc get nodes -o wide
-NODE=<vlan-node>
+NODE=<vlan-capable-node-name>
 ----
-Label & taint (optional):
-Label & taint (optional):
+Label (required) & optionally taint (prevents accidental scheduling):
 [source,sh]
 ----
 oc label node $NODE vlan200=yes --overwrite
 oc adm taint nodes $NODE vlan=restricted:NoSchedule
 ----
+(Taint is optional; you will add a toleration to the authorized pod.)
 
-## 2. Namespace
-== Namespace
+== 2. Namespace
 [source,sh]
 ----
 oc new-project i4-vlan
 ----
 
-## 3. VLAN NetworkAttachmentDefinition
-Adjust `master` and `vlan` as needed:
-== VLAN NetworkAttachmentDefinition
-Adjust `master` and `vlan` as needed:
+== 3. VLAN NetworkAttachmentDefinition
+Adjust `master` and `vlan` for your environment.
 [source,sh]
 ----
 oc apply -f - <<'EOF'
@@ -56,6 +53,7 @@ apiVersion: k8s.cni.cncf.io/v1
 kind: NetworkAttachmentDefinition
 metadata:
   name: vlan200-net
+  namespace: i4-vlan
 spec:
   config: |
     {
@@ -67,11 +65,12 @@ spec:
       "vlan": 200
     }
 EOF
-```
+----
 
-## 4. Authorized Pod
-```sh
-oc apply -f - <<'EOF'
+== 4. Authorized Pod (Attached to VLAN)
+[source,sh]
+----
+oc apply -n i4-vlan -f - <<'EOF'
 apiVersion: v1
 kind: Pod
 metadata:
@@ -81,72 +80,66 @@ metadata:
 spec:
   nodeSelector:
     vlan200: "yes"
-  ----
+  tolerations:
   - key: vlan
     operator: Equal
-  == Authorized Pod
-  [source,sh]
-  ----
+    value: restricted
     effect: NoSchedule
   containers:
   - name: app
-  ----
+    image: registry.access.redhat.com/ubi9/ubi
     command: ["sh","-c","ip -o addr; sleep 3600"]
-  Check interface:
-  [source,sh]
-  ----
-```
-  ----
-Check interface:
-```sh
-oc exec vlan-app -- ip link
-```
-  == Unlabeled Node Attempt
-  [source,sh]
-  ----
+EOF
+----
+Check interface presence:
+[source,sh]
+----
+oc exec vlan-app -n i4-vlan -- ip link
+oc exec vlan-app -n i4-vlan -- ip -o addr | grep vlan || true
+----
 
-## 5. Unlabeled Node Attempt
-```sh
-  ----
+== 5. Unlabeled Node Attempt (Should Fail Scheduling)
+Create a pod referencing the network but without node selector:
+[source,sh]
+----
+oc apply -n i4-vlan -f - <<'EOF'
 apiVersion: v1
-  Describe for scheduling/taint messages:
-  [source,sh]
-  ----
+kind: Pod
 metadata:
-  ----
   name: unprivileged
   annotations:
-  == Security Considerations
-  * Limit who can create NADs via RBAC
-  * Combine with NetworkPolicies for in-cluster restrictions
-  * Monitor NAD usage via audit / cluster metrics
+    k8s.v1.cni.cncf.io/networks: vlan200-net
+spec:
+  containers:
   - name: app
-  image: registry.access.redhat.com/ubi9/ubi
-  == Cleanup
-  [source,sh]
-  ----
+    image: registry.access.redhat.com/ubi9/ubi
+    command: ["sh","-c","ip addr; sleep 120"]
 EOF
-```
-Describe for scheduling/taint messages:
-  ----
-```sh
-oc describe pod unprivileged | egrep -i 'taint|Warning' || true
-  == Key Points
-  * Physical VLAN + node pinning gives strong isolation boundary
-  * Multus enables fine-grained multi-network attachment
-  * Complement with admission controls to prevent unauthorized attachment
-- Limit who can create NADs via RBAC
-- Combine with NetworkPolicies for in-cluster restrictions
-- Monitor NAD usage via audit / cluster metrics
+----
+Describe for scheduling / taint / node selection messages:
+[source,sh]
+----
+oc describe pod unprivileged -n i4-vlan | egrep -i 'taint|Warning|FailedScheduling' || true
+----
+(If it schedules anyway, verify you actually tainted or that nodeSelector constraints are in place. For stricter control, you can also add an admission policy limiting NAD usage to labeled namespaces.)
 
-## 7. Cleanup
-```sh
+== 6. Security Considerations
+* RBAC: Limit who can create or modify NAD objects
+* Admission: Optionally require annotation / label for pods using specific NAD names
+* NetworkPolicies: Still apply for intra-cluster traffic on primary interface
+* Monitoring: Audit NAD usage and watch for unexpected attachments
+* Separation of Duties: Platform team owns VLAN NADs; app teams only reference existing ones
+
+== 7. Cleanup
+[source,sh]
+----
 oc delete project i4-vlan --wait=false
+# Remove taint & label (if desired)
 oc adm taint nodes $NODE vlan=restricted:NoSchedule- || true
 oc label node $NODE vlan200- || true
-```
+----
 
-## Key Points
-- Physical VLAN + node pinning gives strong isolation boundary
-- Multus enables fine-grained multi-network attachment
-- Complement with admission controls to prevent unauthorized attachment
+== Key Points
+* VLAN + node pinning yields a strong isolation boundary beyond logical policies
+* Multus enables declarative multi-network attachment per workload
+* Combine with admission & RBAC to prevent unauthorized use of sensitive VLANs

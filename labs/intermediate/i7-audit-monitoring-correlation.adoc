@@ -1,4 +1,4 @@
- = Lab: See the Story – Audit Log & Monitoring Correlation
+= Lab: See the Story – Audit Log & Monitoring Correlation
 :role: Intermediate Detection & Response
 :skills: Audit Logs, Correlation, Monitoring, Threat Detection
 :labid: LAB-I7A
@@ -24,58 +24,64 @@ You will generate a suspicious event (exec into a pod) and correlate the API aud
 * Permissions to read audit indices
 
 == Namespace & Pod
-```sh
+[source,sh]
+----
 oc new-project i7-correlation
 oc run sleeper --image=registry.access.redhat.com/ubi9/ubi -- sleep 600
-```
+----
 
 == Suspicious Exec
-```sh
+[source,sh]
+----
 oc exec sleeper -- sh -c 'id; uname -a'
-```
+----
 (Optional: exec multiple times to simulate repeated probing.)
 
 == Query Audit (Conceptual Command)
 If using Loki:
-```
+[source,promql]
+----
 {log_type="kube-apiserver"} |= `connect` |= `exec` |= `sleeper` | json
-```
+----
 Look for fields:
-- user.username
-- objectRef.name / namespace
-- verb (connect) + subresource=exec
-- sourceIPs[]
+* user.username
+* objectRef.name / namespace
+* verb (connect) + subresource=exec
+* sourceIPs[]
 
 == Extract Fields (API Example)
-```sh
+[source,sh]
+----
 # If you have direct file access (control plane), pseudo:
 grep sleeper /var/log/kube-apiserver/audit* | grep exec | tail -1
-```
+----
 Parse JSON: identify timestamp, user, pod.
 
 == Metrics / Logs Correlation
 Check pod logs around timestamp:
-```sh
+[source,sh]
+----
 oc logs sleeper -n i7-correlation --since=2m
-```
+----
 If using ACS runtime, find corresponding process execution alert conceptually.
 
 == Detection Logic Draft
 Rule: IF (exec to prod namespace pod) AND (user not in admin group) THEN alert severity=high.
 Data Points:
-- Audit: user, verb=connect, subresource=exec
-- RBAC: subject group membership
-- Namespace label: env=prod
+* Audit: user, verb=connect, subresource=exec
+* RBAC: subject group membership
+* Namespace label: env=prod
 
 == (Optional) SIEM Enrichment
 Add cluster / namespace labels when forwarding audit to SIEM for simplified queries.
 
 == Cleanup
-```sh
+[source,sh]
+----
 oc delete project i7-correlation --wait=false
-```
+----
 
 == Key Points
-- Audit gives intent (API action) while pod logs/metrics give runtime context
-- Correlation fields: namespace, pod, user, verb, timestamp
-- Foundation for anomaly & policy-based detections
+* Audit gives intent (API action) while pod logs/metrics give runtime context
+* Correlation fields: namespace, pod, user, verb, timestamp
+* Foundation for anomaly & policy-based detections

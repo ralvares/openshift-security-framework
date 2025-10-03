@@ -1,4 +1,4 @@
- = Lab: Meaningful Compliance – Tailoring a Profile
+= Lab: Meaningful Compliance – Tailoring a Profile
 :role: Intermediate Compliance
 :skills: Compliance Operator, Tailored Profiles, Remediation
 :labid: LAB-I8
@@ -24,7 +24,8 @@ A default compliance profile flags findings not relevant to your environment. Yo
 * Cluster admin privileges
 
 == Baseline Scan
-```sh
+[source,sh]
+----
 oc apply -f - <<'EOF'
 apiVersion: compliance.openshift.io/v1alpha1
 kind: ComplianceScan
@@ -37,27 +38,31 @@ spec:
   contentImage: registry.redhat.io/compliance/openshift-compliance-content-rhel9:latest
   debug: false
 EOF
-```
+----
 Monitor:
-```sh
+[source,sh]
+----
 oc get compliancescans -n openshift-compliance
-```
+----
 
 == Findings
 When phase=DONE:
-```sh
+[source,sh]
+----
 oc get complianceremediations -n openshift-compliance | head
 oc logs job/baseline-scan-rhcos4-moderate-master -n openshift-compliance | head
-```
+----
 Fetch results tar (optional) via pod logs / artifacts.
 
 Identify a rule to exclude (example id placeholder `rhcos4-useless-example`):
-```sh
+[source,sh]
+----
 oc get complianceremediations -n openshift-compliance | grep -i chrony || true
-```
+----
 
 == Tailored Profile
-```sh
+[source,sh]
+----
 oc apply -f - <<'EOF'
 apiVersion: compliance.openshift.io/v1alpha1
 kind: TailoredProfile
@@ -70,10 +75,11 @@ spec:
   disableRules:
     - name: rhcos4-useless-example
 EOF
-```
+----
 
 == Tailored Scan
-```sh
+[source,sh]
+----
 oc apply -f - <<'EOF'
 apiVersion: compliance.openshift.io/v1alpha1
 kind: ComplianceScan
@@ -85,31 +91,35 @@ spec:
   tailoredProfile: rhcos4-moderate-tailored
   contentImage: registry.redhat.io/compliance/openshift-compliance-content-rhel9:latest
 EOF
-```
+----
 Compare result counts:
-```sh
+[source,sh]
+----
 oc get compliancescans -n openshift-compliance
-```
+----
 
 == Generate Remediation
-```sh
+[source,sh]
+----
 oc get complianceremediations -n openshift-compliance | grep tailored || head
-```
+----
 Apply one remediation (example):
-```sh
+[source,sh]
+----
 oc annotate complianceremediation <name> compliance.openshift.io/apply=true -n openshift-compliance
-```
+----
 
 == (Optional) AutoApply
 Enable auto-apply with caution in non-prod for iterative hardening.
 
 == Cleanup (Optional)
-```sh
+[source,sh]
+----
 oc delete compliancescans baseline-scan tailored-scan -n openshift-compliance --ignore-not-found
 oc delete tailoredprofile rhcos4-moderate-tailored -n openshift-compliance --ignore-not-found
-```
+----
 
 == Key Points
-- Tailoring removes noise → signal clarity
-- Separate baseline vs tailored scans shows effect of exclusions
-- Remediation CRs provide controlled hardening pipeline
+* Tailoring removes noise → signal clarity
+* Separate baseline vs tailored scans shows effect of exclusions
+* Remediation CRs provide controlled hardening pipeline

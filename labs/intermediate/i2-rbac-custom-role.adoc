@@ -28,13 +28,15 @@ Most real security incidents aren’t cinematic hacks—they’re ordinary crede
 Crafting a custom Role removes silent “just in case” powers. It converts vague responsibility (“Dev team rights”) into precise intent (“May adjust non-sensitive app configuration values and rotate one secret”). That precision speeds investigations and compliance reviews.
 
 == Understanding the Attack Surface
-| Area | Risk with Broad Role | Reduced Risk with Custom Role |
-|------|---------------------|--------------------------------|
-| Workload Mutation | Can create/replace pods for persistence | Cannot create pods -> persistence blocked |
-| Secret Exposure | Lists all secrets in namespace | Only reads designated ones |
-| Privilege Escalation | Can bind new roles / clusterroles | RBAC mutation verbs absent |
-| Lateral Movement | Wildcard verbs reveal resources to pivot | Minimal verbs limit enumeration |
-| Audit Clarity | Hard to explain necessity of powers | Role name + verbs tell the story |
+[options="header"]
+|===
+| Area | Risk with Broad Role | Reduced Risk with Custom Role
+| Workload Mutation | Can create/replace pods for persistence | Cannot create pods -> persistence blocked
+| Secret Exposure | Lists all secrets in namespace | Only reads designated ones
+| Privilege Escalation | Can bind new roles / clusterroles | RBAC mutation verbs absent
+| Lateral Movement | Wildcard verbs reveal resources to pivot | Minimal verbs limit enumeration
+| Audit Clarity | Hard to explain necessity of powers | Role name + verbs tell the story
+|===
 
 == How to Secure (Lifecycle View)
 * Build: Document the exact API objects the app truly needs to touch (often ConfigMaps + one Secret). Avoid “future proofing.”
@@ -43,31 +45,36 @@ Crafting a custom Role removes silent “just in case” powers. It converts vag
 * Runtime: Periodically script `oc auth can-i --as <identity>` over a small verb/resource matrix; alert on unexpected “yes.”
 
 == How to Try It
-1. Create a lab namespace:
+. Create a lab namespace:
++
 [source,sh]
 ----
 oc new-project i2-rbac-lab
 ----
-2. Create a minimal Role (include patch so modern tooling works):
+. Create a minimal Role (include patch so modern tooling works):
++
 [source,sh]
 ----
 oc create role config-secret-updater \
   --verb=get --verb=list --verb=update --verb=patch \
   --resource=configmaps,secrets
 ----
-3. Bind the Role to a (demo) user:
+. Bind the Role to a (demo) user:
++
 [source,sh]
 ----
 oc create rolebinding updater-binding \
   --role=config-secret-updater --user=devuser
 ----
-4. Seed sample objects:
+. Seed sample objects:
++
 [source,sh]
 ----
 oc create configmap app-config --from-literal=flag=on
 oc create secret generic db-creds --from-literal=password=Initial123!
 ----
-5. Show allowed operations:
+. Show allowed operations:
++
 [source,sh]
 ----
 oc auth can-i list configmaps --as devuser
@@ -75,7 +82,8 @@ oc auth can-i update secret/db-creds --as devuser
 oc patch configmap app-config -p '{"data":{"flag":"off"}}' --type=merge --as devuser
 oc patch secret db-creds -p '{"stringData":{"password":"Rotated456!"}}' --type=merge --as devuser
 ----
-6. Show explicit denials (proof of least privilege):
+. Show explicit denials (proof of least privilege):
++
 [source,sh]
 ----
 oc auth can-i create pods --as devuser
@@ -85,7 +93,8 @@ oc create rolebinding bogus --clusterrole=view --user=devuser --as devuser || ec
 oc auth can-i delete secret/db-creds --as devuser
 oc delete secret db-creds --as devuser || echo DENIED
 ----
-7. Service Account variant (typical for automation):
+. Service Account variant (typical for automation):
++
 [source,sh]
 ----
 oc create sa app-sa
@@ -95,12 +104,14 @@ oc create rolebinding sa-updater \
 oc auth can-i patch configmap/app-config \
   --as system:serviceaccount:i2-rbac-lab:app-sa
 ----
-8. (Optional) Disable default token automount to shrink passive risk:
+. (Optional) Disable default token automount to shrink passive risk:
++
 [source,sh]
 ----
 oc patch sa app-sa -p '{"automountServiceAccountToken":false}'
 ----
-9. Cleanup when done:
+. Cleanup when done:
++
 [source,sh]
 ----
 oc delete project i2-rbac-lab --wait=false
@@ -125,29 +136,26 @@ flowchart LR
 * Periodic “Can-I” Matrix: Scripted regression test for privilege creep.
 
 == Summary Table
-| What to Secure | How to Secure It | Outcome |
-|----------------|------------------|---------|
-| Config change surface | Minimal Role (get,list,update,patch) | Reduced accidental damage |
-| Secret rotation | Scoped verbs on specific secrets | Limited credential exposure |
-| Pod creation path | Omit create/delete pods | Blocks persistence attempts |
-| RBAC mutation | Exclude role/rolebinding verbs | Stops privilege escalation |
-| Token exposure | Disable automount where unused | Smaller theft window |
+[options="header"]
+|===
+| What to Secure | How to Secure It | Outcome
+| Config change surface | Minimal Role (get,list,update,patch) | Reduced accidental damage
+| Secret rotation | Scoped verbs on specific secrets | Limited credential exposure
+| Pod creation path | Omit create/delete pods | Blocks persistence attempts
+| RBAC mutation | Exclude role/rolebinding verbs | Stops privilege escalation
+| Token exposure | Disable automount where unused | Smaller theft window
+|===
 
 == FAQs
-Q: Why include the `patch` verb?  
-A: Many controllers and CLI operations patch instead of full `update`; omitting it causes confusing denials.
+Q: Why include the `patch` verb?:: Many controllers and CLI operations patch instead of full `update`; omitting it causes confusing denials.
 
-Q: Should I ever allow `delete` here?  
-A: Only if the explicit job includes lifecycle cleanup. Add it intentionally—never “just in case.”
+Q: Should I ever allow `delete` here?:: Only if the explicit job includes lifecycle cleanup. Add it intentionally—never “just in case.”
 
-Q: How do I find unused Roles?  
-A: Correlate audit logs (no verb hits over a period) or use RHACS/RBAC reporting to flag dormant bindings.
+Q: How do I find unused Roles?:: Correlate audit logs (no verb hits over a period) or use RHACS/RBAC reporting to flag dormant bindings.
 
-Q: Is a ClusterRole ever required for this pattern?  
-A: Not for namespaced config objects. Prefer Role unless you truly need cluster‑scope resources.
+Q: Is a ClusterRole ever required for this pattern?:: Not for namespaced config objects. Prefer Role unless you truly need cluster‑scope resources.
 
-Q: Does this slow developers down?  
-A: Properly documented Roles speed them up—less fear of breaking unrelated resources.
+Q: Does this slow developers down?:: Properly documented Roles speed them up—less fear of breaking unrelated resources.
 
 == Closing Story
 Losing a broad credential is like misplacing the building master key. Losing a precise RBAC key is like misplacing the supply closet key—annoying, not catastrophic. Precision today is cheaper than forensics tomorrow.
