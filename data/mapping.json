@@ -177,40 +177,36 @@
       "responsibilities": ["R1", "R2", "R3", "R4", "R5", "R6", "R7", "R37"],
       "skills": {
         "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B9", "B10"],
-        "Intermediate": ["I5", "I6", "I11"],
-        "Advanced": ["A8"]
-      },
-      "allSkills": ["B0","B1","B2","B3","B4","B5","B6","B7","B9","B10","I5","I6","I11","I1","A8"]
+        "Intermediate": ["I1", "I5", "I6", "I11"],
+        "Advanced": []
+      }
     },
     "Platform Operator": {
       "description": "Operate and harden clusters: enforce policies, manage access, logging, compliance, quotas, and platform security posture.",
-      "responsibilities": ["R8", "R9", "R10", "R11", "R12", "R13", "R14", "R28", "R30", "R32", "R33", "R34", "R36"],
+      "responsibilities": ["R8", "R9", "R10", "R11", "R12", "R13", "R14", "R28", "R30", "R32"],
       "skills": {
         "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B7", "B8", "B9", "B10"],
         "Intermediate": ["I2", "I3", "I4", "I6", "I7", "I8", "I9", "I10"],
-        "Advanced": ["A1", "A3", "A4", "A7", "A8", "A9", "A10"]
-      },
-      "allSkills": ["B0","B1","B2","B3","B4","B5","B7","B8","B9","B10","I2","I3","I4","I6","I7","I8","I9","I10","A1","A3","A4","A7","A8","A9","A10"]
+        "Advanced": ["A1", "A7", "A8"]
+      }
     },
     "DevSecOps Engineer": {
       "description": "Embed security in pipelines, enforce policy gates, manage supply chain and runtime feedback loops.",
-      "responsibilities": ["R13", "R19", "R20", "R21", "R25", "R26", "R31", "R33", "R35"],
+      "responsibilities": ["R13", "R19", "R20", "R21", "R25", "R26", "R31", "R33"],
       "skills": {
         "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B9", "B10"],
         "Intermediate": ["I1", "I5", "I6", "I7", "I8", "I10", "I11"],
         "Advanced": ["A2", "A4", "A6", "A7", "A9", "A10"]
-      },
-      "allSkills": ["B0","B1","B2","B3","B4","B5","B6","B7","B9","B10","I1","I5","I6","I7","I8","I10","I11","A2","A4","A6","A7","A9","A10"]
+      }
     },
     "Security Architect": {
       "description": "Design platform security architecture, governance models, segmentation, compliance, and zero-trust strategy.",
-      "responsibilities": ["R6", "R12", "R15", "R16", "R17", "R18", "R21", "R27", "R29", "R30", "R31", "R32", "R34", "R35", "R36"],
+      "responsibilities": ["R6", "R12", "R15", "R16", "R17", "R18", "R21", "R27", "R29", "R34", "R35", "R36"],
       "skills": {
         "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B10"],
         "Intermediate": ["I1", "I2", "I4", "I8", "I9", "I10"],
         "Advanced": ["A1", "A2", "A3", "A5", "A6", "A7", "A8", "A9", "A10"]
-      },
-      "allSkills": ["B0","B1","B2","B3","B4","B5","B6","B7","B8","B10","I1","I2","I4","I8","I9","I10","A1","A2","A3","A5","A6","A7","A8","A9","A10"]
+      }
     },
     "Network & Infrastructure Engineer": {
       "description": "Specialized ownership of data plane security: advanced segmentation, secure service-to-service trust, encryption patterns, identity-aware routing, and traffic anomaly engineering.",
@@ -219,8 +215,7 @@
         "Basic": ["B4", "B7", "B10"],
         "Intermediate": ["I4", "I7", "I10"],
         "Advanced": ["A3", "A9", "A10"]
-      },
-      "allSkills": ["B4","B7","B10","I4","I7","I10","A3","A9","A10"]
+      }
     }
   }
 }
