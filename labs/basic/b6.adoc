@@ -1,0 +1,172 @@
+= Lab: Trusted Sources Only – Guardrails Against Unapproved Images
+:role: Beginner Supply Chain Security
+:skills: Trusted Registries, Image Hygiene, Admission Control, Basic Vulnerability Scanning Awareness
+:mitre: T1195 (Supply Chain Compromise), T1608 (Stage Capabilities), T1204 (User Execution), TA0001 (Initial Access), TA0005 (Defense Evasion)
+:mitre_mitigations: M1047 (Audit), M1050 (Exploit Protection)
+:compliance: CIS OCP 1.8 5.5.1 (Image Provenance)
+:labid: LAB-B6
+:toc:
+:sectnums:
+:icons: font
+
+== Skill
+Understand risk of unvetted registry images and enforce a trusted-source allow‑list in OpenShift.
+
+== Objective
+* Attempt deployment from unvetted source
+* Observe deny under allow‑list
+* Deploy trusted Red Hat UBI image
+* Verify provenance (host + digest)
+
+== Why it Matters
+Unknown registry images are like unlabeled packages at a loading dock. Allow‑lists enforce provenance and reduce CVE noise.
+
+== What it Solves
+* Accidental pulls from arbitrary public defaults
+* Image provenance ambiguity
+* Higher vulnerability noise baseline
+* Reproducibility issues with `:latest`
+
+== Understanding the Attack Surface
+[cols="1,2,2",options="header"]
+|===
+|Area | Risk If Ignored | Analogy
+|Unknown Registry Source | Malware / outdated libs | Unlabeled box left at dock
+|Unmaintained Base Image | CVE accumulation | Expired fire extinguisher
+|Implicit Tag (:latest) | Version drift | Moving target marker
+|No Allow-List Policy | Anything enters prod | Unlocked side entrance
+|Mixed Provenance Namespace | Hard incident scoping | Scrap + certified parts mixed
+|Direct External Pull | Outage / tampering risk | Single fragile bridge
+|Missing Signature / SBOM | Weak chain of custody | Broken package seal
+|===
+
+== How to Try It
+
+.Create & label project
+[source,sh]
+----
+oc new-project b6-trusted
+oc label namespace b6-trusted trusted-registry-enforce=true --overwrite
+----
+
+.Apply namespace-scoped allow‑list (cluster-admin)
+[source,yaml]
+----
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: allow-trusted-registries-pods
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    matchPolicy: Equivalent
+    resourceRules:
+    - apiGroups: [""]
+      apiVersions: ["v1"]
+      operations: ["CREATE","UPDATE"]
+      resources: [pods]
+  validations:
+  - expression: "object.spec.containers.all(c,\n        c.image.startsWith('registry.access.redhat.com') ||\n        c.image.startsWith('registry.redhat.io') ||\n        c.image.startsWith('quay.io') ||\n        c.image.startsWith('image-registry.openshift-image-registry.svc')\n     )"
+    message: "Pod rejected: only Red Hat registries, Quay.io, or internal registry images allowed."
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: trusted-images-only-pods
+spec:
+  policyName: allow-trusted-registries-pods
+  validationActions: ["Deny"]
+  matchResources:
+    namespaceSelector:
+      matchLabels:
+        trusted-registry-enforce: "true"
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: allow-trusted-registries-deployments
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    matchPolicy: Equivalent
+    resourceRules:
+    - apiGroups: ["apps"]
+      apiVersions: ["v1"]
+      operations: ["CREATE","UPDATE"]
+      resources: [deployments]
+  validations:
+  - expression: "object.spec.template.spec.containers.all(c,\n        c.image.startsWith('registry.access.redhat.com') ||\n        c.image.startsWith('registry.redhat.io') ||\n        c.image.startsWith('quay.io') ||\n        c.image.startsWith('image-registry.openshift-image-registry.svc')\n     )"
+    message: "Deployment rejected: only Red Hat registries, Quay.io, or internal registry images allowed."
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: trusted-images-only-deployments
+spec:
+  policyName: allow-trusted-registries-deployments
+  validationActions: ["Deny"]
+  matchResources:
+    namespaceSelector:
+      matchLabels:
+        trusted-registry-enforce: "true"
+----
+
+.Attempt disallowed image (expect deny)
+[source,sh]
+----
+oc -n b6-trusted create deployment bad --image=docker.io/library/nginx:latest || true
+----
+
+.Deploy trusted UBI image (should succeed)
+[source,sh]
+----
+oc -n b6-trusted create deployment good --image=registry.access.redhat.com/ubi9/ubi:latest -- sleep infinity
+oc -n b6-trusted wait --for=condition=Available deployment/good --timeout=60s
+----
+
+.Verify provenance
+[source,sh]
+----
+oc -n b6-trusted describe pod -l app=good | grep -E 'Image:|Image ID:'
+oc -n b6-trusted get deployment good -o yaml | grep -i 'image:'
+----
+
+.Cleanup (optional)
+[source,sh]
+----
+oc delete project b6-trusted --wait=false
+oc delete validatingadmissionpolicybinding trusted-images-only-pods || true
+oc delete validatingadmissionpolicybinding trusted-images-only-deployments || true
+oc delete validatingadmissionpolicy allow-trusted-registries-pods || true
+oc delete validatingadmissionpolicy allow-trusted-registries-deployments || true
+----
+
+== Summary Table
+[cols="1,2,2,2",options="header"]
+|===
+|Aspect | DockerHub nginx:latest (Blocked) | Red Hat UBI (Allowed) | Quay.io Org Image (Allowed)
+|Provenance | Unknown | Certified & curated | Org-governed
+|Patch Cadence | Unclear | Documented errata | Varies
+|Policy Result | Denied | Admitted | Admitted
+|Vulnerability Noise | Higher | Lower baseline | Medium
+|Default Hygiene | Often root | Non-root friendly | Varies
+|Audit Confidence | Weak | Strong | Moderate
+|===
+
+== FAQs
+Why block DockerHub?:: Default registry fallback; weaker provenance guarantees.
+Can I still use public images?:: Mirror/import them into a trusted registry first.
+How to add another internal registry?:: Extend the CEL expression with another `startsWith`.
+Why namespace label scoping?:: Progressive opt-in reduces outage risk.
+Where does Lab B1 fit?:: B1 covers runtime least privilege; B6 covers image provenance.
+
+== Closing Story
+Trusted registries act like approved aerospace suppliers: origin is verified, not guessed.
+
+== Next Step Ideas
+* Extend policy to StatefulSets & DaemonSets
+* Add warn-only binding for dev
+* Integrate signature (cosign) verification
+* Track denied attempts KPI
+
+

@@ -1,0 +1,179 @@
+= Lab: No Free Lunch – Controlling Resource Usage (Quotas & Limits)
+:role: Beginner Platform/App Resource Governance
+:skills: LimitRange, ResourceQuota, Capacity Planning, Multi-Tenancy
+:mitre: T1499 (Resource Hijacking), T1204 (User Execution), TA0040 (Impact), TA0002 (Execution)
+:mitre_mitigations: M1047 (Audit), M1030 (Network Segmentation), M1045 (Code Signing)
+:compliance: CIS OCP 1.8 5.2.7 (NET_RAW Capability), 5.2.8 (Added Capabilities), 5.2.9 (Capabilities Assigned)
+:labid: LAB-B3B
+:toc:
+:sectnums:
+:icons: font
+
+== Skill
+You’ll enforce per-container defaults and namespace resource ceilings to prevent noisy neighbors and accidental cost explosions.
+
+== Objective
+* Apply a LimitRange (defaults + min/max + maxLimitRequestRatio)
+* Apply a ResourceQuota (namespace aggregate ceilings)
+* Deploy a pod with no resources and verify injected defaults
+* Override resources within bounds (allowed)
+* Attempt to exceed max (admission rejection)
+* Attempt to scale beyond quota (quota denial event)
+* Read events / jsonpath outputs to confirm enforcement
+
+== Why it Matters
+Unbounded pods are like an open buffet with no portion sizes. They create starvation, evictions, and unpredictable spend. Defaults (LimitRange) + ceilings (ResourceQuota) deliver predictable tenancy and early saturation signals.
+
+== What it Solves
+* Eliminates silent resource starvation
+* Stops accidental over-scaling
+* Provides cost & capacity signal (events)
+* Sets baseline for autoscaling fairness
+
+== Understanding the Attack Surface
+[cols="1,2,2",options="header"]
+|===
+|Area | Risk If Ignored | Analogy
+|No Defaults | Unbounded grabs, neighbor starvation | Open buffet no portions
+|Inflated Limits vs Requests | Illusory capacity, waste | Reserved empty parking spots
+|Missing ResourceQuota | Single tenant monopolizes | One team books all rooms
+|Understated Requests | Over-density → throttling | Small room for big workshop
+|Overstated Requests | Fragmentation & waste | 20-seat room for 2 people
+|Ignoring Quota Events | Late saturation discovery | Ignoring low-fuel light
+|No Ratio Guard | Spiky bursts unfair | Hogging 5 treadmills
+|===
+
+== How to Secure (Lifecycle View)
+* Build: Annotate images with sizing guidance.
+* Registry: Store performance baseline docs.
+* Deploy: Enforce LimitRange early; quotas per env.
+* Runtime: Monitor denial events as leading signals.
+
+== How to Try It
+Namespace: `b3-resources-demo`. Image: UBI `sleep infinity`.
+
+NOTE: LimitRange & ResourceQuota creation usually needs elevated (cluster-admin or delegated) rights. Forbidden errors confirm RBAC boundaries.
+
+.Namespace setup
+[source,sh]
+----
+oc new-project b3-resources-demo
+oc project
+----
+
+.LimitRange (defaults + bounds + ratios)
+[source,yaml]
+----
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: default-limits
+  namespace: b3-resources-demo
+spec:
+  limits:
+  - type: Container
+    defaultRequest:
+      cpu: 100m
+      memory: 128Mi
+    default:
+      cpu: 500m
+      memory: 256Mi
+    min:
+      cpu: 50m
+      memory: 64Mi
+    max:
+      cpu: "1"
+      memory: 512Mi
+    maxLimitRequestRatio:
+      cpu: "5"
+      memory: "4"
+----
+.Verify
+[source,sh]
+----
+oc get limitrange default-limits -o jsonpath='{.spec.limits[0]}' | sed 's/,/\n/g'
+----
+
+.ResourceQuota (namespace ceilings)
+[source,sh]
+----
+oc create quota compute-quota \
+  --hard=requests.cpu=2 \
+  --hard=requests.memory=2Gi \
+  --hard=limits.cpu=4 \
+  --hard=limits.memory=4Gi \
+  --hard=pods=10
+oc describe quota compute-quota | sed -n '1,25p'
+----
+
+.Deploy unbounded workload (inherits defaults)
+[source,sh]
+----
+oc create deployment stress --image=registry.access.redhat.com/ubi9/ubi -- /bin/sh -c "sleep infinity"
+oc wait --for=condition=Available deployment/stress --timeout=90s
+oc get pod -l app=stress -o jsonpath='{.items[0].spec.containers[0].resources}{"\n"}'
+----
+Expected: requests 100m/128Mi; limits 500m/256Mi.
+
+.Override within bounds
+[source,sh]
+----
+oc set resources deploy/stress --requests=cpu=300m,memory=256Mi --limits=cpu=800m,memory=512Mi
+oc rollout restart deploy/stress
+oc wait --for=condition=Available deployment/stress --timeout=90s
+oc get pod -l app=stress -o jsonpath='{.items[0].spec.containers[0].resources}{"\n"}'
+----
+
+.Exceed max (admission rejects new pods)
+[source,sh]
+----
+oc set resources deployment/stress --limits=cpu=2,memory=1Gi
+oc rollout restart deploy/stress
+oc get deploy stress -o jsonpath='{range .status.conditions[*]}{.type}:{.reason}:{.message}{"\n"}{end}' | grep -i FailedCreate || true
+oc get pod -l app=stress -o jsonpath='{.items[0].spec.containers[0].resources}{"\n"}'
+oc get deploy stress -o jsonpath='{.spec.template.spec.containers[0].resources.limits}{"\n"}'
+----
+
+.Scale beyond quota (pods limit)
+[source,sh]
+----
+oc scale deployment stress --replicas=25 || true
+oc get events --sort-by=.lastTimestamp | grep -E 'FailedCreate.*compute-quota' | tail -1 || true
+oc get quota compute-quota
+----
+
+.Cleanup (optional)
+[source,sh]
+----
+oc delete project b3-resources-demo --wait=false
+----
+
+== Solutions / Controls
+* LimitRange: per-container defaults & bounds
+* ResourceQuota: namespace aggregate cap
+* Monitoring: watch denial events & saturation trends
+* Autoscaling: accurate requests enable fair scaling
+
+== Summary Table
+[cols="1,2,2",options="header"]
+|===
+|Control | Purpose | Outcome
+|LimitRange | Container defaults | Predictable scheduling
+|ResourceQuota | Namespace boundary | Fair multi-tenancy
+|Requests | Scheduler planning | Prevent overcommit illusions
+|Limits | Throttle ceiling | Contain noisy processes
+|===
+
+== FAQs
+Why set requests and limits—not just limits?:: Requests drive scheduling placement.
+Can limits harm performance?:: Too tight → throttling; measure realistic peaks.
+What if workload is bursty?:: Typical usage as request; safe burst upper bound as limit.
+
+== Closing Story
+Resource controls are the booking system preventing one team from reserving every room—fairness yields stability.
+
+== Next Step Ideas
+* Dashboards: top quota denial reasons
+* Script: detect unused pods holding quota
+* Pilot vertical pod autoscaler (recommendation mode)
+

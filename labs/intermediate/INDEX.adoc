@@ -1,0 +1,20 @@
+= Intermediate Labs Index (Skills I1–I10)
+:toc:
+:icons: font
+
+[cols="1,4,5,1",options="header"]
+|===
+| Skill | Lab File(s) | Title | Status
+| I1 | i1-threat-modeling.adoc | Threat Modeling & Control Mapping | Implemented
+| I2 | i2-rbac-custom-role.adoc | Write Your Own Keycard: Custom RBAC | Implemented
+| I3 | i3-workload-hardening.adoc | Custom SCC + Seccomp + SELinux Basics | Implemented
+| I4 | i4a-egressip.adoc, i4b-anp-tiers.adoc, i4c-udn.adoc, i4d-vlan-multus.adoc | Segmentation & Egress/Ingress Controls | Implemented
+| I5 | i5-shift-left-pipeline.adoc | CI/CD Scanning & Signing | Implemented
+| I6 | i6a-vault-csi.adoc, i6b-external-secrets.adoc | Secret Lifecycle Externalization | Implemented
+| I7 | i7-audit-monitoring-correlation.adoc, i7b-alertmanager-anomalies.adoc | Audit Correlation & Anomaly Alerts | Implemented
+| I8 | i8-compliance-tailoring.adoc | Scan, Remediate, Tailor (Compliance Operator) | Implemented
+| I9 | i9a-sandboxed-containers.adoc, i9b-spo-profiles.adoc | Advanced Workload Restriction | Implemented
+| I10 | i10-admission-governance.adoc | Admission / Policy Controllers | Implemented
+|===
+
+Legend: Implemented = fully written; Planned = initial content may need expansion.

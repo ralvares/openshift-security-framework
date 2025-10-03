@@ -1,0 +1,126 @@
+= OpenShift Security Principles: A Practical Guide
+:toc:
+:sectnums:
+:icons: font
+:description: Practical security principles mapped to OpenShift capabilities with rationale, stories, and organizational outcomes.
+
+[quote]
+____
+Audience: Architects, platform/SRE/security leads seeking clear security rationale without deep Kubernetes internals.
+____
+
+== 1. Defense in Depth
+
+=== What It Means
+Relying on a single control is risky. Software has flaws; people make mistakes. Layer safeguards so one failure degrades—not destroys—posture.
+
+=== Storytelling Example
+A deserialization flaw lets an attacker drop a crypto‑miner into one pod. Attempts: privilege escalation (host mount), list pods in finance/prod, lateral service probing. SCC denies privilege escalation, NetworkPolicies drop cross-namespace probes, RBAC denies API calls. Impact contained to transient CPU burn.
+
+=== How OpenShift Helps
+SCCs/PSA restrict escalation; NetworkPolicies segment traffic.
+
+=== Organizational Value
+Reduces catastrophic failure probability, lowers incident blast radius, supports resilience & regulatory expectations.
+
+== 2. Secure by Design
+
+=== What It Means
+Bake security into architecture: image-based hosts (RHCOS), signed releases, declarative reconciliation. Design prevents entire classes of failure before operations.
+
+=== Storytelling Example
+Hotfix via SSH modifies a systemd unit and disables update timer. MCO flags drift; node marked degraded. Team reverts via MachineConfig—change gains provenance & reversibility.
+
+=== How OpenShift Helps
+Signed RHCOS + Machine Config / Cluster Version Operators enforce intended state & provenance.
+
+=== Organizational Value
+Integrity lowers audit friction, speeds patch adoption, reduces time to restore trust.
+
+== 3. Secure by Default
+
+=== What It Means
+Out-of-the-box posture blocks high-risk patterns (root, privileged pods, unsafe syscalls) so new teams don't unknowingly deploy danger.
+
+=== Storytelling Example
+Log4Shell exploit lands code execution, but random non-root UID, default seccomp, and restricted egress neuter lateral & exfil attempts until rebuild.
+
+=== How OpenShift Helps
+Restricted SCC + default seccomp limit abuse pre-custom policy.
+
+=== Organizational Value
+Shrinks initial attack window; reduces onboarding risk and review backlog.
+
+== 4. Separation of Duty
+
+=== What It Means
+Critical changes require distinct proposer, reviewer, applier. Segregation catches mistakes and deters insider misuse.
+
+=== Storytelling Example
+MR wants unvetted personal registry image (mutable tag, unsinged). Reviewer rejects; RBAC + GitOps prevent direct live mutation. Unsafe image never deploys.
+
+=== How OpenShift Helps
+RBAC scopes verbs; operators reconcile only approved, versioned configs.
+
+=== Organizational Value
+Creates audit trails, satisfies governance (e.g., SOX), limits impact of compromised credentials.
+
+== 5. Least Privilege
+
+=== What It Means
+Grant only required permissions, capabilities, network paths, resources. Minimize authority to constrain blast radius.
+
+=== Storytelling Example
+Leaked CI token attempts secret list (403), privileged pod creation (denied), external curl (egress blocked). Containment triggers anomaly alerts quickly.
+
+=== How OpenShift Helps
+RBAC + SCC/PSA + NetworkPolicies curb horizontal and vertical escalation.
+
+=== Organizational Value
+Reduces regulatory exposure, narrows exfil paths, lowers incident response cost.
+
+== 6. Transparency
+
+=== What It Means
+Observability + signed artifacts replace guesswork with evidence.
+
+=== Storytelling Example
+OpenSSL CVE appears. Query SBOM + Quay manifests for vulnerable digests, patch base, rebuild dependents, produce evidence list same day.
+
+=== How OpenShift Helps
+Signed images, SBOM + VEX data, audit logs, upgrade provenance.
+
+=== Organizational Value
+Accelerates patch SLAs, strengthens trust, simplifies compliance evidence.
+
+== 7. Understand the Threat
+
+=== What It Means
+Focus on realistic attacker behavior (lateral movement, escalation, exfil). Detect early, mitigate precisely.
+
+=== Storytelling Example
+RCE exploited; attacker probes internal services, API, tokens, outbound channels. Audit + ACS detect reconnaissance; segmentation & least privilege block pivots; patched image rolls out swiftly.
+
+=== How OpenShift Helps
+Foundational visibility (audit, events) + enforcement (RBAC, SCC, NetPol) + ACS deep scanning & behavioral analytics.
+
+=== Organizational Value
+Earlier detection shortens dwell time and reduces impact.
+
+== Principles × Capabilities Matrix
+[cols="1,1,1,1,1,1,1,1",options="header"]
+|===
+|Capability / Feature | Defense in Depth | Secure by Design | Secure by Default | Separation of Duty | Least Privilege | Transparency | Understand the Threat
+|RHCOS (Image-based Host OS) | ✅ | ✅ | ✅ |  |  |  |  
+|RBAC | ✅ |  |  | ✅ | ✅ |  | ✅
+|SCCs / PSA | ✅ |  | ✅ |  | ✅ |  | ✅
+|NetworkPolicies / AdminNetworkPolicies | ✅ |  |  |  | ✅ |  | ✅
+|ACS (Advanced Cluster Security) | ✅ |  | ✅ |  | ✅ | ✅ | ✅
+|Operators (CVO / MCO) | ✅ | ✅ | ✅ | ✅ |  |  |  
+|Compliance Operator |  | ✅ |  |  |  | ✅ |  
+|Audit & Observability | ✅ |  |  | ✅ |  | ✅ | ✅
+|Red Hat Signed Images & Digests | ✅ | ✅ | ✅ |  |  | ✅ | ✅
+|===
+
+== Closing Message
+Security strength emerges from deliberate layering: signed foundations, enforced runtime constraints, scoped authority, segmented networks, and runtime behavioral insight (native audit + ACS analytics). These complementary capabilities shift teams from reactive hardening to proactive, evidence-backed resilience—reducing risk while sustaining delivery speed.

@@ -1,0 +1,205 @@
+= Lab: Putting Guardrails to Work – Workload Hardening (Custom SCC, Seccomp, SELinux)
+:role: Intermediate Runtime Security
+:skills: SCC Hardening, Capability Reduction, seccomp, SELinux Contexts
+:mitre: T1611 (Escape to Host), T1068 (Privilege Escalation), T1548 (Abuse Elevation Control Mechanisms)
+:compliance: NIST 800-53 CM-6 / SC-7, CIS Kubernetes 5.x, ISO 27001 A.12, PCI DSS 6.5
+:labid: LAB-I3
+
+== Skill
+You’ll author and apply a hardened SecurityContextConstraints object, combine it with seccomp and SELinux context discipline, and prove it works through positive and negative deployment tests.
+
+== Objective
+* Clone & minimize an SCC
+* Enforce non-root UID range & drop all capabilities
+* Apply seccomp runtime/default (or custom) profile
+* Validate enforcement via negative tests
+
+== Why it Matters
+Default settings are like issuing every warehouse worker a multi‑tool with blades, saws, and pry hooks when they only needed a flat screwdriver. Extra capabilities become unintended weapons if someone misuses or compromises the account. Hardened runtime boundaries (SCC + seccomp + SELinux) strip the “just in case” powers that attackers love to discover after a simple pod foothold. Business outcome: lower chance a minor pod compromise escalates into node‑level panic, plus clearer evidence of least privilege for auditors.
+
+== What it Solves
+Broad SCC usage silently enables:
+* Leftover Linux capabilities (each one is an exploration vector)
+* Accidental root UID usage (scripts work as root, drift ignored)
+* Looser SELinux contexts (more permissive file/process access)
+* Unfiltered syscalls (toolbox open for exploitation chains)
+
+Hardening prunes that list down to essentials. Negative tests (deliberate failing pods) ensure protections aren’t theoretical.
+
+== Understanding the Attack Surface
+| Element | Over-Broad Posture Risk | Hardened Outcome |
+|---------|-------------------------|------------------|
+| Capabilities | Kernel abuse primitives available | ALL dropped; add none |
+| Root UID | Direct escalation stepping stone | Enforced non-root range |
+| SELinux Context | Ambient cross-label access | Predictable confined label |
+| Syscalls | Escape / privilege chain surface | Minimal allow list |
+| Priv Escalation | `allowPrivilegeEscalation=true` defaults | Explicitly false by default |
+
+== How to Secure (Lifecycle View)
+* Build: Refactor apps so they do not require legacy capabilities (replace ping with HTTP health, etc.).
+* Registry: Label images that (temporarily) still need elevated SCC—create a burn‑down list.
+* Deploy: Bind hardened SCC only where required; default others to restricted.
+* Runtime: Alert when a hardened namespace pod is scheduled under an unexpected SCC annotation.
+
+== How to Try It
+1. Inspect baseline:
+[source,sh]
+----
+oc get scc restricted -o yaml | head -n 40
+----
+2. Create hardened SCC:
+[source,sh]
+----
+oc apply -f - <<'EOF'
+apiVersion: security.openshift.io/v1
+kind: SecurityContextConstraints
+metadata:
+  name: hardened-nonroot
+allowPrivilegedContainer: false
+allowHostDirVolumePlugin: false
+allowHostIPC: false
+allowHostNetwork: false
+allowHostPID: false
+allowHostPorts: false
+allowedCapabilities: []
+defaultAllowPrivilegeEscalation: false
+requiredDropCapabilities: ["ALL"]
+runAsUser:
+  type: MustRunAsRange
+  uidRangeMin: 1000660000
+  uidRangeMax: 1000669999
+fsGroup:
+  type: MustRunAs
+  ranges:
+  - min: 1000660000
+    max: 1000669999
+seLinuxContext:
+  type: MustRunAs
+  seLinuxOptions:
+    level: s0:c26,c30
+seccompProfiles:
+  - runtime/default
+volumes:
+  - configMap
+  - emptyDir
+  - projected
+  - secret
+  - downwardAPI
+users: []
+priority: 10
+EOF
+----
+3. Namespace + bind SCC:
+[source,sh]
+----
+oc new-project i3-harden
+oc adm policy add-scc-to-group hardened-nonroot system:serviceaccounts:i3-harden
+----
+4. Valid pod (should Run):
+[source,sh]
+----
+oc apply -n i3-harden -f - <<'EOF'
+apiVersion: v1
+kind: Pod
+metadata:
+  name: good
+  annotations:
+    seccomp.security.alpha.kubernetes.io/pod: runtime/default
+spec:
+  securityContext:
+    runAsUser: 1000660001
+    fsGroup: 1000660001
+  containers:
+  - name: app
+  image: registry.access.redhat.com/ubi9/ubi
+    command: ["sh","-c","id; sleep 1000"]
+    securityContext:
+      allowPrivilegeEscalation: false
+EOF
+oc get pod good -n i3-harden -o jsonpath='{.metadata.annotations.openshift\.io/scc}{"\n"}'
+----
+5. Negative test – disallowed capability:
+[source,sh]
+----
+oc apply -n i3-harden -f - <<'EOF'
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bad-cap
+spec:
+  containers:
+  - name: app
+  image: registry.access.redhat.com/ubi9/ubi
+    command: ["sh","-c","sleep 1000"]
+    securityContext:
+      capabilities:
+        add: ["NET_RAW"]
+EOF
+oc describe pod bad-cap -n i3-harden | grep -i deni || true
+----
+6. Negative test – root UID:
+[source,sh]
+----
+oc apply -n i3-harden -f - <<'EOF'
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bad-uid
+spec:
+  securityContext:
+    runAsUser: 0
+  containers:
+  - name: app
+  image: registry.access.redhat.com/ubi9/ubi
+    command: ["sh","-c","sleep 1000"]
+EOF
+----
+Expected rejection / scheduling failure.
+7. (Optional) Seccomp check:
+[source,sh]
+----
+oc exec good -- unshare -m true || echo "Blocked or not permitted (expected)"
+----
+8. (Optional) Cleanup:
+[source,sh]
+----
+oc delete project i3-harden --wait=false
+----
+
+== Solutions/Controls
+* Hardened SCC: Governs UID ranges, privilege escalation, allowed volumes.
+* Seccomp (runtime/default or SPO profile): Removes unused syscall gadgets.
+* Capability Drop (ALL): Eliminates latent kernel features.
+* SELinux Mandatory Context: Enforces multi‑category separation.
+* RHACS Policy: Detect unexpected added caps or privileged pods.
+
+== Summary Table
+| What to Secure | How | Outcome |
+|----------------|-----|---------|
+| UID / Priv Esc | SCC MustRunAsRange + no escalation | Stops silent root runs |
+| Kernel Capabilities | requiredDrop=ALL | Strips abuse primitives |
+| Syscalls | Seccomp runtime/default or minimal | Smaller exploit chain surface |
+| SELinux Domain | Fixed context | Predictable isolation |
+| Drift | Audit SCC annotation & RHACS alerts | Early detection |
+
+== FAQs
+Q: Why a UID range instead of a single UID?  
+A: Provides diversity (harder to predict) while constraining to an acceptable bucket.
+
+Q: When NOT to create a custom SCC?  
+A: If the built‑in restricted SCC already denies what you don’t need—avoid duplicating for vanity.
+
+Q: How do I know if an app still “needs” a capability?  
+A: Run without it and observe failures; then redesign the feature rather than granting the capability.
+
+Q: How do I detect privilege drift?  
+A: Daily export of SCC assignments + RHACS policy on unexpected elevated privileges.
+
+== Closing Story
+Generic armor protects, but tailored armor removes gaps a spear tip could find. Hardened runtime policy is that tailoring—subtle adjustments that make a huge difference when stress hits.
+
+== Next Step Ideas
+* Admission: reject pods in “critical” namespaces not using hardened SCC.
+* SPO record/enforce cycle to craft a truly minimal seccomp profile.
+* RHACS policy: alert if any new capability appears in hardened namespaces.
+

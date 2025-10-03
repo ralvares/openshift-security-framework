@@ -1,0 +1,230 @@
+= Network Segmentation & Policy Patterns
+:toc:
+:sectnums:
+:icons: font
+:description: Practical rationale and patterns for OpenShift / Kubernetes network segmentation with NetworkPolicies.
+
+== Why Segregation and Network Segmentation Matter — A Short Story
+I once sat in a room where an engineer and a regulator tried to describe the same system and kept talking past each other. The engineer saw pods, services, and APIs. The regulator saw data flows, responsibilities, and risk boundaries. What neither of them could afford was ambiguity: Where is the sensitive data? Who can access it? What happens if an internet-facing component is compromised?
+
+Segregation answers those questions.
+
+Imagine your platform as a small city. Streets are the network, buildings are workloads, and gates control who enters neighborhoods. Without gates and clear neighborhoods, any intruder who sneaks in can wander from the market to the bank.
+
+Standards like IEC 62443 and PCI don’t prescribe your architecture—they demand outcomes: zones of control, documented flows, and proven enforcement. Network segmentation is the practical way to deliver those outcomes. It limits blast radius, makes inspections possible, and turns vague risk into auditable controls.
+
+=== Why Compute Pools?
+Separating workloads onto different node pools (DMZ, general, secured) gives both technical and operational separation. You can run ingress controllers in a DMZ pool that faces the internet, keep critical services in a hardened secured pool, and use general pools for less sensitive apps. Labels, taints, and nodeSelectors become the street signs that keep traffic on the right roads.
+
+=== Why Default-Deny Networking?
+By default, Kubernetes lets pods talk freely. Convenient for early development—risky at scale. Flip the model: deny by default, allow explicitly. Now every conversation between services is intentional, reviewed, and recorded—a huge win for security and compliance.
+
+=== Practical Benefits
+* Containment: A compromised internet-facing service in the DMZ cannot freely talk to secured payroll or control systems.
+* Traceability: Allowed paths are represented in version-controlled NetworkPolicy manifests.
+* Flexibility: Tune controls per zone (strict for critical systems, lighter for public services) without re-architecting the whole cluster.
+
+=== Telling the Story to Customers / Auditors
+Lead with outcomes: reduced risk, auditability, operational clarity. Then show the city map (compute pools + ingress diagram below) and map each lane and gate to policy or control. Name the standards (IEC 62443, PCI, NIS2) as drivers; keep architecture and enforcement the star.
+
+== Cluster Architecture: Compute Pools & Ingress Layout
+This diagram shows a typical OpenShift deployment where separate compute node pools (DMZ, general-purpose, secured) segregate workloads and network exposure. We explain architecture first so the NetworkPolicy examples have context—placement and ingress controller topology influence policy scope.
+
+[mermaid]
+----
+flowchart LR
+  Internet --> EdgeLB[External load balancer]
+  EdgeLB --> IngressDMZ[Ingress traffic to DMZ pool]
+  EdgeLB --> IngressA[Ingress traffic to general pool]
+  EdgeLB --> IngressB[Ingress traffic to secured pool]
+  subgraph OpenShift Cluster
+    direction LR
+    subgraph Control_Planes
+      CP[Control planes]
+    end
+    subgraph Compute_Pools
+      direction LR
+      subgraph DMZ_Pool[DMZ pool]
+        IC_DMZ[Ingress controller - DMZ]
+        D1[Workload DMZ1]
+        D2[Workload DMZ2]
+      end
+      subgraph General_Pool[General-purpose pool]
+        ICA[Ingress controller - general]
+        A1[Workload G1]
+        A2[Workload G2]
+      end
+      subgraph Secured_Pool[Secured pool]
+        ICB[Ingress controller - secured]
+        B1[Workload S1]
+        B2[Workload S2]
+      end
+    end
+  end
+  IngressDMZ --> IC_DMZ
+  IC_DMZ --> D1
+  IC_DMZ --> D2
+  IngressA --> ICA
+  ICA --> A1
+  ICA --> A2
+  IngressB --> ICB
+  ICB --> B1
+  ICB --> B2
+  Bastion[Bastion host] --> CP
+  ExternalServices[External services]
+  D1 --> ExternalServices
+  D2 --> ExternalServices
+  A1 --> ExternalServices
+  A2 --> ExternalServices
+  B1 --> ExternalServices
+  B2 --> ExternalServices
+----
+
+Why it matters for NetworkPolicies:
+* Node pool segmentation changes exposure: ingress controllers in DMZ receive external traffic; secured pool workloads should not.
+* NetworkPolicies are namespace/pod scoped; combine workload labels with placement (taints/tolerations) for clarity.
+* Architecture overview helps map each later policy diagram to where it is intended to run.
+
+== Pattern Format
+Each pattern includes: Explanation, Use Case, Risk (Why it matters), Implementation Checklist, Quick Validation steps.
+
+== Pattern: DENY All Non-Whitelisted Traffic to a Namespace
+[mermaid]
+----
+flowchart LR
+  subgraph ns_other ["namespace other"]
+    Blog[app=blog]
+  end
+  subgraph ns_default ["namespace default"]
+    API[app=api]
+    Guest[app=guestbook]
+  end
+  Blog -.-> Guest
+  Blog -. ❌ .-> API
+  API -. ❌ .-> Guest
+----
+
+Explanation:: Only approved cross-namespace flow (blog -> guestbook) is permitted; other cross or internal flows are blocked.
+Use Case:: Multi-tenant cluster; restrict which external namespace may call a frontend.
+Why it Matters:: Reduces lateral movement between namespaces.
+Implementation Checklist::
+* NetworkPolicy selecting protected pods (e.g. guestbook)
+* Ingress rules with `from` including `namespaceSelector + podSelector` for allowed source
+* Specify ports
+* `policyTypes: [Ingress]`
+
+== Pattern: LIMIT Traffic to an Application
+[mermaid]
+----
+flowchart LR
+  Coffee[app=coffeeshop\\nrole=api]
+  BookAPI[app=bookstore\\nrole=api]
+  BookFE[app=bookstore\\nrole=frontend]
+  BookAPI -.-> BookFE
+  Coffee -. ❌ .-> BookAPI
+----
+Explanation:: Frontend (role=frontend) may call bookstore API; other APIs denied.
+Use Case:: Enforce intra-namespace microservice boundaries.
+Why it Matters:: Prevents accidental/malicious service calls to internal APIs.
+Implementation Checklist:: podSelector for API pods; ingress from frontend label; restrict ports; `policyTypes: [Ingress]`.
+
+== Pattern: DENY All Traffic from Other Namespaces
+[mermaid]
+----
+flowchart LR
+  subgraph ns_foo ["namespace: foo"]
+    FooPod[Any Pod]
+  end
+  subgraph ns_default ["namespace: default"]
+    Web[app=web]
+    DB[app=db]
+  end
+  subgraph ns_bar ["namespace: bar"]
+    BarPod[Any Pod]
+  end
+  Web -.-> DB
+  DB -.-> Web
+  FooPod -. ❌ .-> Web
+  FooPod -. ❌ .-> DB
+  BarPod -. ❌ .-> Web
+  BarPod -. ❌ .-> DB
+----
+Explanation:: Only internal namespace communication is permitted.
+Use Case:: Tenant isolation; environment boundary.
+Why it Matters:: Prevents privilege creep and meets audit separation requirements.
+Implementation Checklist:: Policy selecting web & db; ingress limited to same-namespace (no namespaceSelectors) OR selective addition for trusted namespaces.
+
+== Pattern: ALLOW Traffic Only to a Metrics Port
+[mermaid]
+----
+flowchart LR
+  Prom[app=prometheus\\nrole=monitoring]
+  subgraph API ["app=api"]
+    Metrics[":5000 (metrics)"]
+    HTTP[":8000 (http)"]
+  end
+  Prom -.-> Metrics
+  Prom -. ❌ .-> HTTP
+----
+Explanation:: Prometheus may scrape metrics port; general HTTP port is blocked.
+Use Case:: Observability access minimization.
+Why it Matters:: Reduces exposure of non-observability endpoints to monitoring credentials.
+Implementation Checklist:: Ingress from monitoring pods; allow port 5000 only.
+
+== Pattern: DENY External Egress Traffic
+[mermaid]
+----
+flowchart LR
+  subgraph ns_default ["namespace: default"]
+    App1[app=web]
+    App2[app=db]
+  end
+  External[External services / Internet]
+  App1 -.-> App2
+  App2 -.-> App1
+  App1 -. ❌ .-> External
+  App2 -. ❌ .-> External
+----
+Explanation:: Internal communication allowed; outbound to external networks denied.
+Use Case:: Regulated workloads (PCI, OT) requiring strict egress control.
+Why it Matters:: Prevents data exfiltration and command-and-control callbacks.
+Implementation Checklist:: Egress policy; allow only explicit internal destinations (DNS, logging, etc.); `policyTypes: [Egress]`.
+
+== Pattern: DENY All Inbound to an Application (Except Specific Source)
+[mermaid]
+----
+flowchart LR
+  subgraph ns_default ["namespace: default"]
+    Web[app=web]
+  end
+  subgraph ns_foo ["namespace: foo"]
+    FooPod[Any Pod]
+  end
+  AnyOther[Any Pod]
+  FooPod -.-> Web
+  Web -.-> AnyOther
+  Web -. ❌ .-> FooPod
+  Web -. ❌ .-> AnyOther
+----
+Explanation:: Web can make outbound calls but only FooPod can reach it inbound.
+Use Case:: Backend reachable only via controlled proxy or connector.
+Why it Matters:: Prevents accidental exposure and narrows attack surface.
+Implementation Checklist:: Policy selecting web; ingress rule permitting only proxy label; add `policyTypes: [Ingress,Egress]` if controlling both directions.
+
+== Operational Notes
+* Selection Principle: Pods not selected by any policy remain open (all ingress/egress allowed). Once selected, only explicitly allowed traffic passes.
+* Namespace Scope: Policies do not cross namespaces without `namespaceSelector`.
+* Default Deny Strategy: Add an empty (or minimal) policy selecting pods to shift them into deny-by-default, then add granular policies.
+
+== Next Steps & Enhancements
+Want YAML manifests and test harness? Provide preferred namespace & labels and we can generate ready-to-apply examples plus validation scripts (curl / netcat / exec loops).
+
+== Appendix: Validation Snippets
+[source,sh]
+----
+# Test an allowed path
+oc exec pod/frontend -- curl -s -o /dev/null -w '%{http_code}\n' http://api:8080
+
+# Test a blocked path with timeout fallback
+oc exec pod/untrusted -- curl -s --max-time 3 http://api:8080 || echo BLOCKED
+----

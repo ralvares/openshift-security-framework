@@ -1,0 +1,141 @@
+= Lab: Secure by Design – Rebuilding Images for OpenShift
+:role: Beginner Image Hardening & Supply Chain
+:skills: Dockerfile Hardening, Non-Root Execution, UBI Base Adoption, Port Selection
+:mitre: T1611 (Escape to Host), T1068 (Exploitation for Privilege Escalation), T1195 (Supply Chain Compromise), TA0004 (Privilege Escalation), TA0005 (Defense Evasion)
+:mitre_mitigations: M1050 (Exploit Protection), M1038 (Execution Prevention)
+:compliance: CIS OCP 1.8 5.2.1 (Privileged Containers), 5.2.6 (Root Containers), 5.2.7 (NET_RAW Capability), 5.2.10 (Privileged SCC Access)
+:labid: LAB-B9
+:toc:
+:sectnums:
+:icons: font
+
+== Skill
+Rebuild an insecure image so it runs under the restricted SCC without special privileges.
+
+== Objective
+* Use trusted UBI base
+* Create non-root user / correct perms
+* Use high unprivileged port
+* Build & deploy via OpenShift
+* Confirm no elevated SCC required
+
+== Why it Matters
+“Requires root” is future security debt. Rebuilding converts exceptions into design-time hygiene.
+
+== What it Solves
+* Root-only service → escalation path
+* Fixed ownership mismatch → UID failure
+* Privileged port dependency → root need
+* Unknown base provenance → hidden CVEs
+
+== Understanding the Attack Surface
+[cols="1,2,2",options="header"]
+|===
+|Weak Pattern | Risk | Hardened Alternative
+|USER root | Host probing | Non-root user + restrictive perms
+|Port 80 binding | Needs root | Use 8080+
+|Writable root filesystem | Tamper persistence | Minimal write paths
+|Unknown base image | Hidden CVEs | UBI base + scanning
+|===
+
+== How to Secure (Lifecycle View)
+* Build: Multi-stage; drop root early; fix permissions.
+* Registry: Only signed/scanned images.
+* Deploy: Restricted SCC success baseline.
+* Runtime: RHACS alert on root/capability reintroduction.
+
+== How to Try It
+
+.Project setup
+[source,sh]
+----
+oc new-project b9-rebuild
+----
+
+.Build context (UBI httpd runtime)
+[source,sh]
+----
+mkdir -p build && cd build
+cat > Dockerfile <<'EOF'
+FROM registry.access.redhat.com/ubi9/httpd-24:latest
+COPY index.html /var/www/html/index.html
+EXPOSE 8080
+EOF
+cat > index.html <<'EOF'
+<html><body><h1>Secure UBI httpd App</h1></body></html>
+EOF
+----
+
+.Build with OpenShift
+[source,sh]
+----
+oc new-build --name secure-app --binary --strategy=docker
+oc start-build secure-app --from-dir=. --follow
+och get is
+----
+
+.Deploy
+[source,sh]
+----
+oc create deployment secure-app --image=image-registry.openshift-image-registry.svc:5000/b9-rebuild/secure-app:latest
+oc rollout status deployment/secure-app
+----
+
+.Verify UID & SCC
+[source,sh]
+----
+oc exec deploy/secure-app -- id -u
+oc get pod -l app=secure-app -o jsonpath='{.items[0].metadata.annotations.openshift\.io/scc}{"\n"}'
+----
+Should show `restricted`.
+
+.Expose via Route
+[source,sh]
+----
+oc expose deployment secure-app --port=8080 --target-port=8080
+oc expose service secure-app
+ROUTE=$(oc get route secure-app -o jsonpath='{.spec.host}')
+curl -s http://$ROUTE | head -3
+----
+
+NOTE: Keep project for LAB-B10 (TLS). Delete only if done.
+
+.Cleanup (optional)
+[source,sh]
+----
+oc delete project b9-rebuild --wait=false
+----
+
+== Solutions / Controls
+* UBI base (maintained)
+* Non-root execution
+* High port selection
+* RHACS root/capability policies
+* GitOps Dockerfile history
+
+== Summary Table
+[cols="1,2,2,2",options="header"]
+|===
+|Design Element | Insecure Form | Secure Form | Benefit
+|User | root | non-root (random UID) | Reduced escalation
+|Port | 80 | 8080 | No privileged need
+|Base Image | Unknown | UBI Micro | Maintained & scanned
+|File Ownership | root-only | root:0 with g+rw | Random UID compat
+|===
+
+== FAQs
+Why not just grant anyuid?:: Short-term speed, long-term security debt.
+Do I need fixed UID 1001?:: Random UID capability is more flexible.
+Is UBI required?:: No, but offers predictable updates & support.
+How small should images be?:: Smaller surface → fewer CVEs & faster pulls.
+
+== Closing Story
+Rebuilding is embedding security into the product lifecycle—fewer exceptions, faster approvals.
+
+== Next Step Ideas
+* Pipeline check: fail if USER root in final layer
+* Image signing before deployment
+* Compare CVE count before vs after
+
+
+

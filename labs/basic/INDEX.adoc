@@ -1,0 +1,19 @@
+== Basic Labs Index (Skills B1–B10)
+
+[cols="1,2,3,1",options="header"]
+|===
+|Skill | Lab File | Title | Status
+|B1 | b1.adoc | It Works on My Laptop (Default Secure Behavior) | Implemented
+|B2 | b2.adoc | Who Really Has Access? (RBAC Basics) | Implemented
+|B3 | b3.adoc | SCC Limits & Resource Guardrails (Part A) | Implemented
+|B3B | b3a.adoc | Resource Usage (Quotas & Limits) (Part B) | Implemented
+|B4 | b4.adoc | You Shall Not Pass – NetworkPolicy Basics | Implemented
+|B5 | b5.adoc | Don’t Hardcode – Managing Secrets Properly | Implemented
+|B6 | b6.adoc | Trusted Sources Only – Image Provenance Guardrails | Implemented
+|B7 | b7.adoc | Logs Don’t Lie – Audit & Exec Events | Implemented
+|B8 | b8.adoc | Security & Compliance Add‑Ons Overview | Implemented
+|B9 | b9.adoc | Secure by Design – Rebuilding Images | Implemented
+|B10 | b10.adoc | Enforcing TLS on Routes | Implemented
+|===
+
+Legend: Implemented = fully written. Future enhancements: add estimated duration, prerequisites, cross-links.

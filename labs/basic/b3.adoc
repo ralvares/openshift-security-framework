@@ -1,0 +1,145 @@
+= Lab: Why This Third-Party App Fails (SCC & Non-Root Realities)
+:role: Beginner Platform/App Security
+:skills: SCC, UID Strategy, Image Hardening, Principle of Least Privilege
+:mitre: T1611 (Escape to Host - Privilege Escalation), T1068 (Exploitation for Privilege Escalation), TA0004 (Privilege Escalation)
+:mitre_mitigations: M1040 (Behavior Prevention on Endpoint), M1050 (Exploit Protection) (refine)
+:compliance: CIS OCP 1.8 (Workload Security Controls) (refine section)
+:labid: LAB-B3A
+:toc:
+:sectnums:
+:icons: font
+
+== Skill
+Diagnose why an image that runs fine elsewhere fails on OpenShift, and learn correct remediation (rebuild image) instead of weakening security (granting anyuid).
+
+== Objective
+* Attempt to run a container binding privileged port 80 and observe failure
+* Attempt to force root (runAsUser=0) and see SCC block it
+* Grant anyuid and observe the container now runs as root on port 80
+* Explain why this is insecure and what the proper alternative would be (change the workload, not the SCC)
+
+== Why it Matters
+Using an image that insists on a fixed user or root is like a touring band demanding to rewire your venue’s electrical system before playing. You could say yes (faster “win”)—but you inherit fire risk, insurance issues, and future lock-in. Granting anyuid is the platform equivalent: a convenience that normalizes bypassing guardrails.
+
+OpenShift injects a random non-root UID so containers can’t rely on root. Images built without flexible ownership (root:0 with group write) break, flushing out insecure design early. The business upside: fewer “surprise” escalations, simpler compliance (“all workloads non-root by default”), and faster production readiness.
+
+NOTE: Permission Requirements for This Lab
+Most steps require only project-level access. Granting the `anyuid` SCC needs cluster-admin (or delegated). Forbidden errors are expected guardrails.
+
+== What it Solves
+* Eliminates silent privilege creep (running as root “just because”)
+* Discourages shipping rigid vendor images with hard-coded UIDs
+* Prevents broad SCC sprawl (exception fatigue)
+* Forces reusable, multi-tenant safe image patterns
+
+Attackers look for root-running containers or SCC exceptions. By refusing them upfront, you reduce accessible pathways before an exploit even runs.
+
+== Understanding the Attack Surface
+[cols="1,2,2",options="header"]
+|===
+|Area | Risk If Ignored | Analogy
+|Privileged Port (80) Requirement | Forces elevation; encourages anyuid grant | Band demands rewiring venue power
+|Hard-Coded Root Expectation | Normalizes high-privilege baseline | Always giving guests master keys
+|Fixed UID Ownership in Image | Leads to permission hacks / SCC exceptions | Furniture bolted for one resident
+|Granting anyuid Broadly | Expands blast radius for compromise | Removing door locks for convenience
+|Missing Writable Group Ownership | Ops weaken guardrails to “make it work” | Disabling smoke alarm to stop beeping
+|Running as Root + Writable FS | Host / kernel probing path | Car left idling with doors unlocked
+|Lack of Audit on SCC Exceptions | Drift accumulates | Untracked temporary badges pile up
+|No Education on High Ports | Repeated privileged port asks | Insisting on vault door, not side entrance
+|===
+
+== How to Secure (Lifecycle View)
+* Build: Ensure writable dirs are group-writable; avoid USER root in final stage.
+* Registry: Store only images passing a non-root readiness check.
+* Deploy: Rely on restricted SCC; track anyuid grants via GitOps.
+* Runtime: RHACS policy flags root or privileged UID usage.
+
+== How to Try It
+
+.Project
+[source,sh]
+----
+oc new-project b3-scc-demo
+----
+
+.Deploy (attempting privileged port 80)
+[source,sh]
+----
+oc create deployment vendor-app --image=registry.access.redhat.com/ubi9/python-311 -- python3 -m http.server 80
+oc logs -l app=vendor-app --tail=50
+----
+Expected: CrashLoopBackOff with PermissionError (binding port 80).
+
+.Attempt to force root (runAsUser=0) – expect denial
+[source,sh]
+----
+oc patch deployment vendor-app --type='json' -p='[{"op":"add","path":"/spec/template/spec/securityContext","value":{"runAsUser":0}}]'
+oc rollout restart deployment/vendor-app
+oc get events --sort-by=.lastTimestamp | grep vendor-app | tail -n 5 || true
+----
+Look for invalid UID range / runAsUser errors.
+
+.Grant anyuid (anti-pattern, requires cluster-admin)
+[source,sh]
+----
+oc adm policy add-scc-to-user anyuid -z default || echo 'Expected Forbidden if not admin'
+oc rollout restart deployment/vendor-app
+oc exec deploy/vendor-app -- id -u || true
+oc logs -l app=vendor-app --tail=10 || true
+----
+If succeeded (not recommended): id -u = 0 and server listens on 80.
+
+.Proper fix (do this instead)
+Use a high port (8080) & flexible permissions; rebuild image rather than broad SCC.
+
+.Cleanup (optional)
+[source,sh]
+----
+oc delete project b3-scc-demo --wait=false
+----
+
+== Solutions / Controls
+* Restricted SCC dominance
+* Controlled anyuid exceptions with review
+* Image hardening pipelines (fail on USER root)
+* RHACS detection of root / capability drift
+
+== Summary Table
+[cols="1,2,2",options="header"]
+|===
+|Issue | Bad Shortcut | Secure Fix
+|Privileged port 80 fails | Grant anyuid | Use high port (8080)
+|Writable dirs missing | chmod at runtime | Fix ownership during build
+|Legacy root-only startup | Persist anyuid exception | Refactor image / entrypoint
+|===
+
+== Error Interpretation Cheat Sheet
+[cols="1,2,1,2,2",options="header"]
+|===
+|Phase | Symptom | Source | Meaning | Right Response
+|Port 80 start | PermissionError 13 | App log | Non-root blocked on privileged port | Change to high port
+|runAsUser=0 patch | SecurityContext warnings | PodSecurity | Harden settings not declared | Informational
+|runAsUser=0 patch | FailedCreate UID invalid | SCC | UID 0 outside allowed range | Drop root attempt
+|After anyuid | id -u = 0 on 80 | anyuid SCC | Guardrail bypassed | Revert and refactor
+|===
+
+== FAQs
+Why random UID instead of a fixed one?:: Prevents brittle assumptions; enforces portability.
+Is anyuid always bad?:: Not inherently—broad usage is.
+Can SELinux cause similar failures?:: Yes; rule out UID/perm design first, then inspect AVC denials.
+
+== Closing Story
+Granting anyuid because an image fails is like removing a seatbelt because it’s “too tight.” Fix the workload; keep the safety system.
+
+== Next Step Ideas
+* Add CI linting: warn on USER root
+* Inventory existing anyuid bindings
+
+== Comparison (Before vs After Behavior)
+[cols="2,1,1,1,2",options="header"]
+|===
+|Image + Command | Runs As (SCC) | Port | Result | Why
+|ubi9/python-311 + http.server 80 | random non-root (restricted) | 80 | Fails | Privileged port
+|ubi9/python-311 + http.server 8080 | random non-root (restricted) | 8080 | Succeeds | High port
+|(Anti-pattern) same + anyuid | root (anyuid) | 80 | Succeeds | Guardrail removed
+|===

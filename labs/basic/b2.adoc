@@ -1,0 +1,160 @@
+= Lab: Who Really Has Access? (Default RBAC in Action)
+:role: Beginner Platform/App Security
+:skills: RBAC, Least Privilege, Access Review, Authorization Testing
+:mitre: T1078 (Valid Accounts), T1098 (Account Manipulation), TA0001 (Initial Access), TA0004 (Privilege Escalation)
+:mitre_mitigations: M1026 (Privileged Account Management)
+:compliance: CIS OCP 1.8 5.1.1 (Limit cluster-admin Use), 5.1.2 (Minimize Access to Secrets), 5.1.3 (Minimize Wildcards), 5.1.4 (Minimize Create Pod Access), 5.1.5 (Restrict Default Service Accounts), 5.1.6 (Limit SA Token Mounting)
+:labid: LAB-B2
+:toc:
+:sectnums:
+:icons: font
+
+== Skill
+Understand and practically test ONLY the built‑in (default) OpenShift roles (no custom Roles): what each grants, how to move from view → edit → admin safely, and how to validate access without creating real user accounts.
+
+== Objective
+* Use ONLY default ClusterRoles: view, edit, admin (plus a peek at basic-user & cluster-admin context)
+* Observe permission differences (read vs mutate vs manage RBAC)
+* Use impersonation (`--as`) to test quickly—no custom identities or new Roles
+* See how default roles map to least privilege patterns
+* Avoid the “just bind cluster-admin” anti-pattern
+
+== Why it Matters
+Imagine an office where every visitor is handed the master key “to avoid delays.” Things go fine—until something disappears or a server closet is “accidentally reorganized.” Most security incidents in access control aren’t brilliant attacks; they’re ordinary over-permission. The default OpenShift roles exist so you do NOT have to invent one-off policies for common personas—and so you avoid reflexively binding cluster-admin.
+
+Using built-in roles: (1) speeds onboarding (“Give them view only”), (2) clarifies escalation paths (progress view → edit → admin), and (3) reduces audit friction (“We rely on documented platform defaults, not bespoke YAML sprawl”). Guardrails work best when widely understood; this lab makes the built-in role intent obvious.
+
+== What it Solves
+Teams often jump straight to cluster-admin or craft ad hoc Roles because they aren’t sure what the defaults already deliver. That leads to:
+* Wide blast radius (cluster-admin “temporarily” bound forever)
+* Hard-to-review custom Role YAML duplicates (inconsistent patterns)
+* CI/CD identities holding more verbs than needed (mutation + RBAC management)
+* Confusion over “Why can’t view see secret data?” or “Why can edit not alter RoleBindings?”
+
+Built-in roles encode sane boundaries:
+* view: Read most namespaced objects (NOT secret contents, NOT RBAC objects) → safe for dashboards & troubleshooting.
+* edit: All typical app mutation (deployments, configmaps, services) but still cannot change RBAC → prevents silent privilege extension.
+* admin: Full namespace stewardship including Role/RoleBinding management (but not cluster-scoped ownership) → local ‘tenant admin’. 
+* basic-user: Lets a user get info about themselves and basic project discovery.
+* cluster-admin (reference only): Superuser; bypasses almost all policy—should remain a rare operational break-glass identity.
+
+By adopting existing defaults, you eliminate redundant YAML, ease training, and reduce accidental overreach.
+
+== Understanding the Attack Surface
+[cols="1,2,2",options="header"]
+|===
+|Vector | Over-Permission Risk | Example Outcome
+|Human User | Namespace deletion, secret exposure | Accidental wipe of workloads
+|Service Account | Silent privilege creep | Backdoor pod / lateral move
+|CI/CD Identity | Supply chain tampering | Deploys unsigned image
+|RoleBinding Sprawl | Hidden stale grants | Former contractor retains edit
+|cluster-admin Overuse | Full cluster blast radius | Global outage from one command
+|===
+
+== How to Secure (Lifecycle View)
+* Build: CI service accounts: just what’s needed to apply manifests (often edit) — never admin.
+* Registry: Quay robot accounts limited to push OR pull (not both) to prevent repurposing.
+* Deploy: Prefer binding built-in ClusterRoles (view/edit/admin) at namespace scope rather than authoring custom Roles prematurely.
+* Runtime: Monitor audit logs or RHACS for privilege jumps (view → admin unexpectedly) and new RoleBindings.
+* Governance: Periodically export bindings; compare against team roster. Remove drift quickly.
+
+== How to Try It
+We will impersonate a fictitious user name `dev-user` and only bind built-in ClusterRoles in a single namespace.
+
+. Create sandbox project:
+[source,sh]
+----
+oc new-project b2-rbac
+----
+
+. Bind view (read-most objects, no writes, no RBAC changes):
+[source,sh]
+----
+oc create rolebinding dev-view --clusterrole=view --user=dev-user
+oc auth can-i get pods --as=dev-user
+oc auth can-i create deployment --as=dev-user
+oc auth can-i get secret/mysecret --as=dev-user || true
+----
+Expected: get pods = yes; create deployment = no; secret access should fail (cannot read secret contents).
+
+. Escalate to edit (can mutate workloads, still cannot edit RBAC):
+[source,sh]
+----
+oc delete rolebinding dev-view
+oc create rolebinding dev-edit --clusterrole=edit --user=dev-user
+oc auth can-i create deployment --as=dev-user
+oc auth can-i create rolebinding --as=dev-user
+----
+Expected: create deployment = yes; create rolebinding = no.
+
+. Escalate to admin (full namespace administration including RBAC objects):
+[source,sh]
+----
+oc delete rolebinding dev-edit
+oc create rolebinding dev-admin --clusterrole=admin --user=dev-user
+oc auth can-i create rolebinding --as=dev-user
+oc auth can-i delete secret --as=dev-user
+----
+Expected: both now permitted (RBAC + secret mutation) within the namespace.
+
+. Workload check under edit/admin:
+[source,sh]
+----
+oc create deployment sample --image=registry.access.redhat.com/ubi9/ubi -- sleep infinity
+oc get deploy --as=dev-user
+----
+
+. ServiceAccount conservative default:
+[source,sh]
+----
+oc create sa app-sa
+oc auth can-i list secrets --as=system:serviceaccount:b2-rbac:app-sa
+----
+Expected: denied until explicitly bound (shows default restraint for service accounts).
+
+. (Optional) Cleanup:
+[source,sh]
+----
+oc delete project b2-rbac --wait=false
+----
+
+== Solutions / Controls
+[cols="1,2,2",options="header"]
+|===
+|Control | Purpose | Analogy
+|Built-in view/edit/admin | Standardized least privilege tiers | Pre-printed ID badge levels
+|RoleBinding per namespace | Limits scope & improves audit clarity | Key to a single floor
+|Avoid cluster-admin bindings | Shrinks blast radius | Master key in vault, not on lanyard
+|RHACS & Audit Logs | Detect unexpected verb usage | Security cameras + access logs
+|GitOps-managed RBAC | Versioned, reviewable changes | Change tickets for keys
+|Periodic Binding Review | Remove stale access | Quarterly key audit
+|===
+
+== Summary Table
+[cols="1,2,2,2,2",options="header"]
+|===
+|Built-in Role | Grants | Excludes | Primary Use | Risk If Overused
+|view | Read/list most objects | Mutations, RBAC mgmt, secret data | Observability / dashboards | False sense secrets are readable
+|edit | Create/update/delete app resources | RBAC changes, some cluster ops | Dev & CI workload changes | Accidental destructive edits
+|admin | All namespace + RBAC mgmt | Cluster-wide operations | Namespace owner / team lead | Local “root” misuse
+|basic-user | Self & project discovery | Workload mutation | User info queries | Minimal risk
+|cluster-admin (avoid) | Everything | — | Break-glass ops only | Total cluster compromise
+|===
+
+== FAQs
+How do I quickly test a permission?:: `oc auth can-i <verb> <resource> --as=<user>` (add `-n <ns>` if needed).
+Why use ClusterRole (view/edit/admin) instead of writing a Role?:: They are predefined, maintained by the platform, and widely recognized—fewer bespoke policies to audit.
+Why can’t view read secret contents?:: Protects sensitive configuration; grant only when necessary.
+Why can edit not change RBAC?:: Prevents silent privilege elevation by identities that can already mutate apps.
+When is admin appropriate?:: When a team needs full stewardship of its namespace including RoleBindings—but still not cluster-wide control.
+Should I ever bind cluster-admin to a user?:: Avoid; reserve for break-glass operations with logging and time-bound justification.
+Does RBAC replace vulnerability management?:: No; it limits blast radius after compromise.
+
+== Closing Story
+Default RBAC roles are the building’s standard badge templates. Consistency shrinks review effort, prevents “temporary” superuser drift, and turns access audits from archaeology into a glance.
+
+== Next Step Ideas
+* Script a periodic “can-i” matrix for critical identities
+* Enforce a rule: no direct ClusterRoleBinding unless justified in Git
+* Add RHACS policy: alert when service account gains admin-level verbs
+

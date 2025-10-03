@@ -1,0 +1,114 @@
+= Lab: Security & Compliance Add‑Ons – Building the Layered Defense
+:role: Beginner Platform Security & Compliance
+:skills: Compliance Operator, SPO, RHACS, SCC/PSA, Policy Automation
+:mitre: T1529 (System Shutdown/Restart), T1068 (Exploitation for Privilege Escalation), TA0003 (Persistence), TA0004 (Privilege Escalation), TA0005 (Defense Evasion)
+:mitre_mitigations: M1050 (Exploit Protection), M1048 (Application Isolation and Sandboxing)
+:compliance: CIS OCP 1.8 5.2.1 (Privileged Containers), 5.2.5 (Privilege Escalation), 5.2.6 (Root Containers)
+:labid: LAB-B8
+:toc:
+:sectnums:
+:icons: font
+
+== Skill
+Map how OpenShift security add-ons combine for scanning, hardening, detection, and compliance evidence.
+
+== Objective
+* Identify component roles
+* Run (or simulate) a benchmark scan
+* Discover SPO runtime hardening options
+* Place RHACS across build→runtime
+
+== Why it Matters
+Platform defaults are locks & walls; add-ons become cameras, inspectors, detectors, and auto-remediators—shrinking time-to-detect and audit friction.
+
+== What it Solves
+* Manual ad hoc audit prep
+* Inconsistent seccomp/SELinux usage
+* Late discovery of vulnerable images
+* Missed lateral or API misuse
+
+== Understanding the Ecosystem
+[cols="1,2,2,2",options="header"]
+|===
+|Component | Primary Focus | Analogy | Outcome
+|Compliance Operator | Benchmark scanning & remediation | Building inspector | Evidence-backed posture
+|Security Profiles Operator (SPO) | Seccomp/SELinux profile lifecycle | Tailored safety harness | Minimal syscall set
+|RHACS | Image + runtime + network security | Security operations center | Policy-driven gating & detection
+|SCC / PSA | Admission privilege guardrails | Door lock policies | Unsafe specs blocked
+|GitOps (Argo CD) | Drift & desired state | Blueprint repository | Trustworthy change trail
+|===
+
+== How to Secure (Lifecycle View)
+* Build: RHACS scan + policy score gates; SPO profile recording.
+* Registry: Signed & scanned images (Quay+RHACS).
+* Deploy: SCC/PSA + admission policies; scheduled Compliance scans.
+* Runtime: RHACS anomaly + network; SPO enforced profiles.
+
+== How to Try It (Exploration)
+
+.Compliance Operator presence
+[source,sh]
+----
+oc get pods -n openshift-compliance 2>/dev/null || echo 'Compliance Operator not installed'
+----
+.List profiles
+[source,sh]
+----
+oc get profiles.compliance.openshift.io -A 2>/dev/null || true
+----
+.Sample scan (adjust names if exist)
+[source,yaml]
+----
+apiVersion: compliance.openshift.io/v1alpha1
+kind: ComplianceSuite
+metadata:
+  name: cis-scan
+spec:
+  schedule: "0 1 * * *"
+  scans:
+  - name: cis
+    profile: rhcos4-moderate
+    content: rhcos4
+    scanType: Platform
+----
+
+.View results later
+[source,sh]
+----
+oc get compliancecheckresults.compliance.openshift.io | head
+----
+
+NOTE: SPO manages recording & enforcing seccomp / SELinux profiles; deeper commands appear in advanced labs.
+
+== Solutions / Controls
+* Continuous scanning & remediation
+* Hardened runtime via seccomp/SELinux
+* Policy gates pre-runtime
+* Drift detection with GitOps
+* Correlated analytics (process, network, API)
+
+== Summary Table
+[cols="1,2,2",options="header"]
+|===
+|Goal | Tooling | Business Benefit
+|Regulatory Evidence | Compliance Operator | Faster audits
+|Syscall Least Privilege | SPO | Reduced kernel surface
+|Vulnerability Gate | RHACS + Quay | Blocks known-bad deploys
+|Privilege Enforcement | SCC/PSA | Fewer escalation paths
+|Change Traceability | GitOps | Accountability & rollback clarity
+|===
+
+== FAQs
+Do I need everything day one?:: Start with RBAC/SCC/NetworkPolicies; add scanning & compliance iteratively.
+How do SPO profiles get created?:: Recorded baselines or curated templates.
+Difference between Compliance vs RHACS scan?:: Benchmark config vs image/runtime risk & behavior.
+Are scans disruptive?:: Low-impact; schedule off-peak for large estates.
+
+== Closing Story
+The cluster is a campus: locks (SCC), guards (RHACS), inspectors (Compliance), custom gear (SPO). Overlapping layers prevent single-point failure.
+
+== Next Step Ideas
+* Weekly scan diff reporting
+* Enforce signed images only (cosign + admission)
+* Gradual seccomp rollout starting with low-risk apps
+

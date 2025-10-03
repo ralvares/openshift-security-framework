@@ -1,0 +1,86 @@
+ = Lab: Not All Pods Are Equal – Running Sandboxed Workloads (Kata)
+:role: Intermediate Runtime Isolation
+:skills: Kata Containers, RuntimeClass, Sandboxed Workloads
+:labid: LAB-I9A
+:toc:
+:sectnums:
+:icons: font
+
+== Skill
+Advanced workload restriction (runtime isolation enhancements).
+
+== Scenario
+Untrusted or high-risk code (plugins, user uploads) should execute in stronger isolation. Sandboxed Containers (Kata) run pods inside lightweight VMs while retaining Kubernetes orchestration semantics.
+
+== Objectives
+* Verify / install Sandboxed Containers Operator
+* Ensure `RuntimeClass` for kata exists
+* Deploy standard vs kata pod and compare runtime isolation
+* Confirm SCC + non-root still enforced
+
+== Prerequisites
+* Worker nodes with virtualization support (VT-x/AMD-V)
+* Cluster admin permissions
+
+== Operator Presence
+```sh
+oc get csv -n openshift-sandboxed-containers 2>/dev/null | grep -i sandbox || echo "Install Sandboxed Containers Operator from OperatorHub"
+```
+
+== RuntimeClass
+```sh
+oc get runtimeclass | grep -i kata || cat <<'EOF' | oc apply -f -
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: kata
+handler: kata
+EOF
+```
+
+== Namespace & Baseline Pod
+```sh
+oc new-project i9-sandbox
+oc run regular --image=registry.access.redhat.com/ubi9/ubi -- sleep 3600
+```
+
+== Kata Pod
+```sh
+oc apply -f - <<'EOF'
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kata-pod
+spec:
+  runtimeClassName: kata
+  containers:
+  - name: app
+  image: registry.access.redhat.com/ubi9/ubi
+    command: ["sh","-c","uname -a; ps -ef; sleep 3600"]
+EOF
+```
+
+== Compare Isolation
+```sh
+oc exec regular -- ps -ef | head
+oc exec kata-pod -- ps -ef | head
+```
+Kata pod process list should show fewer host processes; underlying hypervisor isolation applies.
+
+Check SCC annotation:
+```sh
+oc get pod kata-pod -o jsonpath='{.metadata.annotations.openshift\.io/scc}{"\n"}'
+```
+
+== (Optional) Performance Consideration
+Measure startup time or simple CPU benchmark difference for awareness.
+
+== Cleanup
+```sh
+oc delete project i9-sandbox --wait=false
+```
+
+== Key Points
+- Kata adds VM boundary to container security model
+- Still benefits from SCC, seccomp, quotas, NetworkPolicy
+- Use selectively (higher overhead) for high-risk workloads

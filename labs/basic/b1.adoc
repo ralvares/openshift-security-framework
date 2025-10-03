@@ -1,0 +1,131 @@
+= Lab: Least Privilege in Action (Why "It Works on My Laptop" Fails Here)
+:role: Beginner Platform/App Security
+:skills: SCC, Non-root Containers, Least Privilege, Image Hygiene
+:mitre: T1611 (Escape to Host), T1078 (Valid Accounts), T1098 (Account Manipulation), T1068 (Exploitation for Privilege Escalation), T1222 (File & Directory Permissions Modification), TA0001 (Initial Access), TA0003 (Persistence), TA0004 (Privilege Escalation), TA0005 (Defense Evasion)
+:mitre_mitigations: M1048 (Application Isolation and Sandboxing), M1030 (Network Segmentation), M1038 (Execution Prevention), M1026 (Privileged Account Management), M1050 (Exploit Protection)
+:compliance: CIS OCP 1.8 5.2.1 (Privileged Containers), 5.2.2 (Host PID Namespace), 5.2.5 (Privilege Escalation), 5.2.6 (Root Containers), 5.2.7 (NET_RAW Capability), 5.2.10 (Privileged SCC Access)
+:labid: LAB-B1
+:toc:
+:sectnums:
+:icons: font
+
+== Skill
+You’ll understand why OpenShift deliberately applies security guardrails (like SCCs) that assume a workload was NOT built with security best practices, and how choosing or building the right image (non-root, high port) removes friction while strengthening safety.
+
+== Objective
+* Deploy a public Docker Hub `httpd` image (implicit root + port 80) and observe failure under default guardrails
+* Read logs to identify privileged port + ownership assumptions
+* Redeploy using a trusted Red Hat UBI `httpd` image (non-root friendly, high port) and observe success without escalation
+* Expose the working service via a Route
+* Compare external vs curated image from security, reliability, and compliance perspectives
+
+== Why it Matters
+Imagine an office tower where the building management assumes every new tenant forgot to set up internal badge rules. Instead of trusting everyone, doors default to locked, access is scoped, and reception screens visitors. That’s OpenShift: it does NOT assume developers applied security best practices—it assumes the opposite and installs guardrails to compensate. A container that “just worked” on a laptop (root + port 80) collides with these controls and fails fast. That failure isn’t punishment; it’s feedback. It prevents: unnecessary root power, accidental data exposure, shortened attacker dwell time, and audit headaches.
+
+Business value: guardrails turn silent risk into visible learning. Non-root + high-port norms reduce exploit blast radius, simplify compliance evidence (“all workloads run non-root”), and strengthen customer trust. Most security incidents aren’t cinematic hacks—they’re misconfigurations and permissive defaults. OpenShift converts risky assumptions into an engineered safety net.
+
+== What it Solves
+This lab exposes a chain of quiet assumptions: “root is fine,” “port 80 is normal,” “logs can write to root-owned directories,” “public images are good enough.” On a laptop these blend into the background because the environment is single-tenant and permissive. In a shared platform every one of those assumptions widens attack surface or slows audits. Attackers don’t need brilliance when defaults gift them privileges; they only need one container running as root or one mis-owned directory to pivot. OpenShift breaks this chain by injecting a random non-root UID and refusing privileged binds—forcing images to be explicit about what they truly need. The failure of the external `httpd` image is a design review in disguise. The success of the UBI variant demonstrates that secure defaults (non-root user, high port readiness, sane permissions) remove friction rather than add it.
+
+== Understanding the Attack Surface
+[cols="1,2,2",options="header"]
+|===
+|Area | Risk If Misconfigured | Analogy
+|Root User in Container | Rapid escalation path to node | Guest given master key
+|Privileged Port (80) | Forces elevation / capability grants | Only main lobby door allowed
+|Fixed UID / Ownership | Leads to “just grant anyuid” drift | Furniture bolted for one person
+|Unvetted External Image | Unknown vulns / supply chain gaps | Unsealed package from street vendor
+|Broad Exceptions (anyuid) | Normalizes long-term risk | Leaving fire door propped open
+|===
+
+== How to Try It
+Narrative: One deployment. First it fails (external image expecting root + port 80). We replace the image with a trusted UBI variant (non‑root, high port) and it succeeds—no privilege grants needed.
+
+.Create a project
+[source,sh]
+----
+oc new-project b1-httpd-demo
+----
+
+.Deploy external image (will fail under restricted SCC)
+[source,sh]
+----
+oc create deployment web --image=httpd
+oc logs -l app=web --tail=40 || true
+----
+Expected failure snippet:
+[source,text]
+----
+AH00558: httpd: Could not reliably determine the server's fully qualified domain name, using 10.128.2.191. Set the 'ServerName' directive globally to suppress this message
+(13)Permission denied: AH00072: make_sock: could not bind to address [::]:80
+(13)Permission denied: AH00072: make_sock: could not bind to address 0.0.0.0:80
+no listening sockets available, shutting down
+AH00015: Unable to open logs
+----
+Reason: Port 80 requires elevated privileges + root-owned log dirs + random non-root UID injection.
+
+.Replace the image in-place with trusted UBI httpd (listens on 8080)
+[source,sh]
+----
+oc set image deployment/web *=registry.access.redhat.com/ubi9/httpd-24
+oc rollout status deployment/web
+oc logs -l app=web --tail=10 || true
+oc exec deploy/web -- id -u
+----
+Expect: Random non-root UID; container stable.
+
+.Comparison
+[cols="1,2,1,1,1,2",options="header"]
+|===
+|Scenario | Image | Port | UID | Result | Reason
+|Laptop local (implicit root) | docker.io/httpd:latest | 80 | 0 | Works | Root + privileged bind allowed
+|OpenShift (before swap) | docker.io/httpd:latest | 80 | random | Fails | Guardrails block privileged assumptions
+|OpenShift (after swap) | registry.access.redhat.com/ubi9/httpd-24 | 8080 | random | Succeeds | Built for non-root + high port
+|===
+
+.Cleanup
+[source,sh]
+----
+oc delete project b1-httpd-demo --wait=false
+----
+
+== Solutions / Controls
+[cols="1,2",options="header"]
+|===
+|Control | Purpose (Analogy)
+|SCC (restricted) | Enforces least privilege (locked interior doors)
+|UBI Base Images | Curated foundations (certified building materials)
+|High Port Usage | Removes need for elevation (use side entrance instead of main vault door)
+|Image Scanning / Signing | Provenance + integrity (seal + manifest)
+|RHACS Policies | Continuous watch (security concierge)
+|Digest Pinning | Immutable versioning (invoice number vs vague description)
+|===
+
+== Summary Table
+[cols="1,2,2",options="header"]
+|===
+|What to Secure | Problem If Ignored | How to Secure
+|Container User | Root misuse risk | Accept random non-root; avoid anyuid
+|Listening Port | Privileged bind needs root | Use 8080+
+|File Ownership | Crash / log failures | Pre-create + group-write dirs
+|Image Provenance | Hidden vulns/backdoors | Curated UBI + scanning/signing
+|Version Drift | Inconsistent rollbacks | Pin image digests
+|Privilege Exceptions | Normalized risk | Track & review exceptions
+|===
+
+== FAQs
+Why did it work locally?:: Your local environment let the container run as root and bind port 80—no guardrails.
+Does OpenShift “distrust” my image?:: It assumes nothing was hardened yet and applies defaults that are safe even for naive builds.
+Isn’t granting anyuid easier?:: Short term yes; long term it expands audit scope and risk. Fix the image instead.
+Why avoid privileged ports?:: They require elevation; high ports remove the need entirely and simplify compliance evidence.
+How do curated images help?:: They bake in sane permissions and are maintained—reducing unknown vulnerabilities and operational toil.
+What if I must run root?:: Create a documented exception with justification, scope, and expiration. Treat it like a temporary safety override.
+
+== Closing Story
+OpenShift’s model is “secure-by-default through skepticism.” It behaves like a facilities team that locks doors and limits master keys because experience shows not every tenant configures safety correctly the first time. By embracing those guardrails—rather than bypassing them—you convert invisible risk into durable engineering hygiene.
+
+== Next Step Ideas
+* Add pipeline policy: reject Dockerfiles ending with USER 0
+* Integrate cosign + RHACS to enforce signature presence
+* Track KPIs: % non-root, % digest-pinned, mean time to remediate root exceptions
+

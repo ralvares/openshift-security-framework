@@ -1,0 +1,152 @@
+ = Lab: Wired for Trust – Binding VLAN Networks to Dedicated Nodes (Multus)
+:role: Intermediate Network Segmentation
+:skills: Multus, VLAN Isolation, Node Affinity, NetworkAttachmentDefinition
+:labid: LAB-I4D
+:toc:
+:sectnums:
+:icons: font
+
+== Skill
+Network segmentation (multi-network & physical VLAN isolation).
+
+== Scenario
+Sensitive workloads must attach to a secure VLAN reachable only from specific nodes. Use node labeling + (optional) taints plus Multus NetworkAttachmentDefinition to ensure only authorized pods get the interface.
+
+== Objectives
+* Label & (optionally) taint a VLAN-capable node
+* Create VLAN NAD
+* Deploy pod with attachment on labeled node
+* Attempt on unlabeled node (fail to schedule or reject)
+
+== Prerequisites
+* Multus (default in OpenShift)
+* Node interface (e.g., eth1) trunking VLAN 200
+* DHCP or static IPAM strategy for VLAN network
+
+## 1. Identify Node
+== Identify Node
+[source,sh]
+----
+oc get nodes -o wide
+NODE=<vlan-node>
+----
+Label & taint (optional):
+Label & taint (optional):
+[source,sh]
+----
+oc label node $NODE vlan200=yes --overwrite
+oc adm taint nodes $NODE vlan=restricted:NoSchedule
+----
+
+## 2. Namespace
+== Namespace
+[source,sh]
+----
+oc new-project i4-vlan
+----
+
+## 3. VLAN NetworkAttachmentDefinition
+Adjust `master` and `vlan` as needed:
+== VLAN NetworkAttachmentDefinition
+Adjust `master` and `vlan` as needed:
+[source,sh]
+----
+oc apply -f - <<'EOF'
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: vlan200-net
+spec:
+  config: |
+    {
+      "cniVersion": "0.4.0",
+      "type": "macvlan",
+      "master": "eth1",
+      "mode": "bridge",
+      "ipam": { "type": "dhcp" },
+      "vlan": 200
+    }
+EOF
+```
+
+## 4. Authorized Pod
+```sh
+oc apply -f - <<'EOF'
+apiVersion: v1
+kind: Pod
+metadata:
+  name: vlan-app
+  annotations:
+    k8s.v1.cni.cncf.io/networks: vlan200-net
+spec:
+  nodeSelector:
+    vlan200: "yes"
+  ----
+  - key: vlan
+    operator: Equal
+  == Authorized Pod
+  [source,sh]
+  ----
+    effect: NoSchedule
+  containers:
+  - name: app
+  ----
+    command: ["sh","-c","ip -o addr; sleep 3600"]
+  Check interface:
+  [source,sh]
+  ----
+```
+  ----
+Check interface:
+```sh
+oc exec vlan-app -- ip link
+```
+  == Unlabeled Node Attempt
+  [source,sh]
+  ----
+
+## 5. Unlabeled Node Attempt
+```sh
+  ----
+apiVersion: v1
+  Describe for scheduling/taint messages:
+  [source,sh]
+  ----
+metadata:
+  ----
+  name: unprivileged
+  annotations:
+  == Security Considerations
+  * Limit who can create NADs via RBAC
+  * Combine with NetworkPolicies for in-cluster restrictions
+  * Monitor NAD usage via audit / cluster metrics
+  - name: app
+  image: registry.access.redhat.com/ubi9/ubi
+  == Cleanup
+  [source,sh]
+  ----
+EOF
+```
+Describe for scheduling/taint messages:
+  ----
+```sh
+oc describe pod unprivileged | egrep -i 'taint|Warning' || true
+  == Key Points
+  * Physical VLAN + node pinning gives strong isolation boundary
+  * Multus enables fine-grained multi-network attachment
+  * Complement with admission controls to prevent unauthorized attachment
+- Limit who can create NADs via RBAC
+- Combine with NetworkPolicies for in-cluster restrictions
+- Monitor NAD usage via audit / cluster metrics
+
+## 7. Cleanup
+```sh
+oc delete project i4-vlan --wait=false
+oc adm taint nodes $NODE vlan=restricted:NoSchedule- || true
+oc label node $NODE vlan200- || true
+```
+
+## Key Points
+- Physical VLAN + node pinning gives strong isolation boundary
+- Multus enables fine-grained multi-network attachment
+- Complement with admission controls to prevent unauthorized attachment

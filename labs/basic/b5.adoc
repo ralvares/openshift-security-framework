@@ -1,0 +1,137 @@
+= Lab: Don’t Hardcode – Managing Secrets the Right Way
+:role: Beginner Application Security
+:skills: Kubernetes Secrets, Secret Rotation, Least Exposure, Configuration Hygiene
+:mitre: T1552 (Unsecured Credentials), T1555 (Credentials from Password Stores), TA0006 (Credential Access)
+:mitre_mitigations: M1027 (Password Policies), M1047 (Audit)
+:compliance: CIS OCP 1.8 5.4.1 (Secrets as Files), 5.4.2 (External Secret Storage)
+:labid: LAB-B5
+:toc:
+:sectnums:
+:icons: font
+
+== Skill
+Remove passwords from manifests, store them as Secrets, inject safely, rotate cleanly.
+
+== Objective
+* Insecure hardcoded credential
+* Refactor to Secret env var
+* Refactor to Secret file mount
+* Rotate and compare behaviors
+
+== Why it Matters
+Hardcoding credentials is writing the PIN on the ATM. Secrets reduce casual exposure and support rotation & compliance.
+
+== What it Solves
+* Git history leakage
+* Rotation friction
+* Broad manifest visibility
+* Credential reuse temptation
+
+== Understanding the Attack Surface
+[cols="1,2,2",options="header"]
+|===
+|Weak Practice | Risk | Exploitable Outcome
+|Plaintext in Git | Persistent disclosure | Former employees retain copies
+|Shared Across Apps | Lateral compromise | One breach unlocks many
+|No Rotation | Long lifetime | Credential stuffing success
+|Env Only Rotation | Missed restart | Stale secret in use
+|===
+
+== How to Secure (Lifecycle View)
+* Build: Never bake secrets in images.
+* Registry: Keep only non-sensitive config baked.
+* Deploy: Use Secrets + least privilege RBAC.
+* Runtime: Rotate high-value secrets; monitor access.
+
+== How to Try It
+
+.Project
+[source,sh]
+----
+oc new-project b5-secrets
+----
+
+.Insecure deployment (hardcoded credential)
+[source,sh]
+----
+oc create deployment insecure-app --image=registry.access.redhat.com/ubi9/ubi -- sleep infinity
+oc set env deployment/insecure-app DB_PASSWORD=SuperSecret123
+oc get deploy insecure-app -o yaml | grep -n 'SuperSecret'
+----
+
+.Remove insecure workload
+[source,sh]
+----
+oc delete deployment insecure-app
+----
+
+.Create a Secret
+[source,sh]
+----
+oc create secret generic db-credentials --from-literal=DB_PASSWORD=SuperSecret123
+----
+
+.Deployment using env var from Secret
+[source,sh]
+----
+oc create deployment secure-app-env --image=registry.access.redhat.com/ubi9/ubi -- sleep infinity
+och set env deployment/secure-app-env --from=secret/db-credentials
+och exec deploy/secure-app-env -- printenv | grep DB_PASSWORD
+oc get deploy secure-app-env -o yaml | grep -n 'SuperSecret'
+----
+
+.Deployment mounting Secret as file
+[source,sh]
+----
+oc create deployment secure-app-file --image=registry.access.redhat.com/ubi9/ubi -- sleep infinity
+och set volume deployment/secure-app-file --add --name=creds --type=secret --secret-name=db-credentials --mount-path=/opt/creds --read-only
+och exec deploy/secure-app-file -- ls /opt/creds
+och exec deploy/secure-app-file -- cat /opt/creds/DB_PASSWORD
+----
+
+.Rotate secret (mount auto-updates, env needs restart)
+[source,sh]
+----
+oc create secret generic db-credentials --from-literal=DB_PASSWORD=NewValue456 -o yaml --dry-run=client | oc apply -f -
+och exec deploy/secure-app-file -- cat /opt/creds/DB_PASSWORD
+oc rollout restart deployment/secure-app-env
+och exec deploy/secure-app-env -- printenv | grep DB_PASSWORD
+----
+
+.Cleanup (optional)
+[source,sh]
+----
+oc delete project b5-secrets --wait=false
+----
+
+== Solutions / Controls
+* Kubernetes Secrets abstraction
+* Etcd encryption-at-rest
+* External KMS integration
+* RBAC limiting secret get/list
+* RHACS anomaly & secret mount policies
+
+== Summary Table
+[cols="1,2,2",options="header"]
+|===
+|Method | Pros | Cons
+|Hardcoded Env | Fast demo | Insecure, unrotatable
+|Secret as Env Var | Simple | Restart on rotation
+|Secret as File | Seamless rotation | Slightly more app logic
+|External KMS | Stronger key custody | Extra setup
+|===
+
+== FAQs
+Are Secrets encrypted by default?:: Base64 only—enable etcd encryption.
+Env var or file better?:: File for rotation agility; env for simplicity.
+Commit example secrets?:: Use placeholders only.
+Do Secrets stop exfiltration?:: Reduce accidental exposure; still need RBAC & network controls.
+
+== Closing Story
+Treat secrets like house keys: stored & rotated intentionally, never glued to the door.
+
+== Next Step Ideas
+* Periodic rotation pipeline
+* External KMS provider integration
+* Repo scanning (gitleaks, truffleHog)
+

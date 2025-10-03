@@ -1,0 +1,111 @@
+= Lab: Friends Don’t Let Friends Use HTTP – Enforcing TLS End-to-End
+:role: Beginner Network/Application Security
+:skills: TLS Termination, Route Security, Encryption in Transit, Redirect Policy
+:mitre: T1557 (Adversary-in-the-Middle), T1040 (Network Sniffing), T1552 (Unsecured Credentials), TA0006 (Credential Access), TA0007 (Discovery)
+:mitre_mitigations: M1030 (Network Segmentation), M1037 (Filter Network Traffic), M1047 (Audit)
+:compliance: CIS OCP 1.8 1.2.29 (Encryption Providers), 1.2.30 (Strong Cryptographic Ciphers), 5.4.1 (Secrets as Files)
+:labid: LAB-B10
+:toc:
+:sectnums:
+:icons: font
+
+== Skill
+Secure application access with TLS, enforce HTTPS-only behavior, choose edge vs re-encrypt termination.
+
+== Objective
+* Expose over HTTP
+* Add TLS (edge) + redirect
+* Validate HTTPS & cert
+* Understand re-encrypt vs passthrough
+
+== Why it Matters
+HTTP is a postcard; TLS is a sealed envelope. Encrypted transit preserves confidentiality and integrity.
+
+== What it Solves
+* Credential theft
+* Session hijacking
+* Compliance failures
+* Undetectable tampering
+
+== Understanding the Attack Surface
+[cols="1,2,2",options="header"]
+|===
+|Area | Risk Without TLS | Mitigation
+|Login Forms | Credential sniffing | HTTPS + redirect/HSTS
+|API Payloads | Data manipulation | Integrity via TLS
+|Session Cookies | Replay / theft | Secure + encrypted path
+|Internal Service Calls | Lateral snooping | Re-encrypt/passthrough
+|===
+
+== How to Secure (Lifecycle View)
+* Build: Avoid embedding secrets in query strings.
+* Registry: Base images with current TLS libs.
+* Deploy: Routes with TLS + redirect; manage cert rotation.
+* Runtime: Monitor expiry & cipher posture.
+
+== How to Try It
+Prereq: LAB-B9 `b9-rebuild` project with `secure-app` exists.
+
+.Switch project & get host
+[source,sh]
+----
+oc project b9-rebuild
+HOST=$(oc get route secure-app -o jsonpath='{.spec.host}' 2>/dev/null)
+echo $HOST
+----
+
+.Baseline HTTP
+[source,sh]
+----
+curl http://$HOST
+----
+
+.Replace route with HTTPS (edge + redirect)
+[source,sh]
+----
+oc delete route secure-app
+oc create route edge secure-app --service=secure-app --port=8080 --insecure-policy=Redirect
+----
+
+.Test HTTPS
+[source,sh]
+----
+curl -k https://$HOST
+----
+
+.(Optional) Cleanup
+[source,sh]
+----
+oc delete project b9-rebuild --wait=false
+----
+
+== Solutions / Controls
+* Route TLS termination
+* Redirect policy enforcement
+* Re-encrypt mode for internal leg confidentiality
+* Passthrough when app handles TLS (mTLS/SNI logic)
+* Cert rotation automation
+
+== Summary Table
+[cols="1,2,2,2",options="header"]
+|===
+|Mode | Encrypts Client→Router | Encrypts Router→Pod | Use Case
+|Edge | Yes | No | Simplicity; trusted internal network
+|Re-encrypt | Yes | Yes (router re-issues) | Protect internal segment
+|Passthrough | Yes (app terminates) | App handles | Custom protocols / mTLS end-to-end
+|===
+
+== FAQs
+Is edge termination secure enough?:: Often yes for trusted internal networks; use re-encrypt if stricter confidentiality needed.
+Why enforce redirect?:: Prevent accidental plaintext & downgrade attacks.
+Manage cert renewals manually?:: Cluster certs rotate automatically; custom certs need process (e.g., cert-manager).
+Re-encrypt vs passthrough difference?:: Re-encrypt terminates then re-establishes TLS; passthrough leaves TLS untouched to app.
+
+== Closing Story
+Enabling TLS + redirect is installing automatic door closers—connections don’t stay ajar.
+
+== Next Step Ideas
+* Deny non-TLS routes in prod via policy
+* Implement HSTS headers
+* Cert age monitoring & renewal alerts
+
