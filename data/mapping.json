@@ -2,11 +2,11 @@
   "skills": {
     "B0": {
       "desc": "Understand container security fundamentals: how containers work, shared responsibility, and common risks.",
-      "relevance": "Container isolation, images vs runtime, basic Kubernetes architecture, typical threats (privilege escalation, vulnerable images)."
+      "relevance": "Container isolation concepts, image vs runtime distinction, core orchestration primitives, common threat patterns (privilege escalation, vulnerable base images)."
     },
     "B1": {
       "desc": "Recognize default OpenShift platform security layers that protect workloads by default.",
-      "relevance": "RHCOS immutability, default hardened configuration, platform-managed updates."
+      "relevance": "Immutable OS / control plane hardening layers, managed lifecycle updates, built‑in default security posture."
     },
     "B2": {
       "desc": "Grasp basic access control: users, groups, and simple RBAC role bindings.",
@@ -14,11 +14,11 @@
     },
     "B3": {
       "desc": "Understand default workload guardrails limiting container permissions and resources.",
-      "relevance": "Default SCC behavior, Pod Security Admission (baseline/restricted), ResourceQuotas, LimitRanges (concept only)."
+      "relevance": "Default workload permission boundaries, pod security policy tiers, resource quota and limit range concepts."
     },
     "B4": {
       "desc": "Explain basic in-cluster network isolation using NetworkPolicies.",
-      "relevance": "Kubernetes/ OpenShift NetworkPolicies (allow/deny patterns), default allow/deny concepts."
+      "relevance": "Network segmentation policies (allow/deny patterns), namespace isolation, baseline ingress/egress concepts."
     },
     "B5": {
       "desc": "Know how Secrets store sensitive values and basic protection expectations.",
@@ -26,15 +26,15 @@
     },
     "B6": {
       "desc": "Identify trusted image sources and perform basic vulnerability scanning awareness.",
-      "relevance": "Trusted registries (Quay, Red Hat), base image hygiene, high-level image scanning."
+      "relevance": "Trusted image source curation, base image hygiene, introductory image vulnerability awareness."
     },
     "B7": {
       "desc": "Understand the purpose of audit and cluster logs for accountability.",
-      "relevance": "API audit logs, cluster logging basics, forwarding concept to SIEM."
+      "relevance": "Control plane / workload audit events, centralized log aggregation patterns, forwarding to monitoring / analytics platforms."
     },
     "B8": {
       "desc": "Be aware of built-in security extension operators (what they do, not how to configure).",
-      "relevance": "Compliance Operator, Security Profiles Operator (SPO), Advanced Cluster Security (ACS) high-level purpose."
+      "relevance": "Security extension capabilities: compliance scanning, workload profile enforcement, runtime security visibility (high-level only)."
     },
     "B9": {
       "desc": "Explain least privilege for workloads: non-root, minimal capabilities, limited namespaces.",
@@ -42,11 +42,11 @@
     },
     "B10": {
       "desc": "Understand basic encryption protections for data in transit and at rest.",
-      "relevance": "TLS for API/Routes, route termination modes (edge/passthrough/reencrypt)."
+      "relevance": "Transport encryption fundamentals, termination patterns, basic at-rest encryption concepts."
     },
     "I1": {
       "desc": "Apply practical threat modeling to applications and workloads deployed on OpenShift.",
-      "relevance": "Data flow mapping, attack surface review using RBAC/SCC/NetworkPolicy context, ACS policy insights."
+      "relevance": "Data flow mapping, attack surface review using access, security, and network controls context, policy insight interpretation."
     },
     "I2": {
       "desc": "Implement advanced RBAC and service account security including token hardening.",
@@ -58,31 +58,35 @@
     },
     "I4": {
       "desc": "Design network segmentation and implement egress/ingress controls across namespaces.",
-      "relevance": "Advanced NetworkPolicies, egress rules, Egress IP, Multus/UDN basics, firewall integration."
+      "relevance": "Advanced segmentation policies, egress governance patterns, multi-network attachment concepts, perimeter / firewall integration."
     },
     "I5": {
       "desc": "Integrate security scanning and policy checks into CI/CD pipelines.",
-      "relevance": "OpenShift Pipelines, image scanning gates, policy-as-code (OPA/Conftest), build-time checks."
+      "relevance": "Pipeline-integrated scanning gates, policy-as-code engines, build-time compliance and configuration checks."
     },
     "I6": {
       "desc": "Manage secret lifecycle: rotation, external encryption, and controlled distribution.",
-      "relevance": "Secret rotation workflows, external KMS integration basics, Sealed Secrets / External Secrets patterns."
+      "relevance": "Secret rotation workflows, external key management integration, encrypted distribution abstractions."
     },
     "I7": {
       "desc": "Correlate audit logs and monitoring signals to detect suspicious activity.",
-      "relevance": "Audit log parsing, cluster logging queries (Loki/EFK), runtime event correlation (ACS runtime)."
+      "relevance": "Audit log parsing, centralized log querying patterns, runtime telemetry correlation for anomaly detection."
     },
     "I8": {
       "desc": "Automate compliance assessments and remediation workflows.",
-      "relevance": "Compliance Operator tailoring, CIS benchmark scans, ACS compliance dashboards, auto-remediation scripts."
+      "relevance": "Compliance scan tailoring, security benchmark execution, compliance dashboard interpretation, automated remediation scripting."
     },
     "I9": {
       "desc": "Apply advanced workload restriction profiles for tighter isolation.",
-      "relevance": "Security Profiles Operator (SPO) custom seccomp/SELinux/AppArmor profiles, syscall minimization."
+      "relevance": "Custom workload restriction profiles (seccomp, MAC policies), syscall minimization strategies."
     },
     "I10": {
       "desc": "Govern resource and security posture with admission and policy controllers.",
-      "relevance": "Gatekeeper/OPA constraints, RHACM policy sets, OpenShift admission webhooks."
+      "relevance": "Admission / policy controller constraints, aggregated policy set management, custom admission extension patterns."
+    },
+    "I11": {
+      "desc": "Build secure, minimal, and reproducible container images with basic signing & attestation integration.",
+      "relevance": "Dockerfile/Build strategy hardening (least packages, non-root, multi-stage), reproducible builds, embedding metadata (labels/SBOM), basic artifact signing and attestation generation/verification in the development workflow."
     },
     "A1": {
       "desc": "Lead platform-wide security governance and multi-team architecture decisions.",
@@ -98,7 +102,7 @@
     },
     "A4": {
       "desc": "Engineer runtime threat detection pipelines and integrate them into response workflows.",
-      "relevance": "ACS runtime detections, streaming log enrichment, alert routing, pre-incident playbooks."
+      "relevance": "Runtime detection rulesets, streaming telemetry enrichment, alert routing design, pre-incident response playbooks."
     },
     "A5": {
       "desc": "Lead coordinated incident response and forensic investigation on the platform.",
@@ -106,11 +110,11 @@
     },
     "A6": {
       "desc": "Establish end-to-end supply chain integrity and artifact provenance.",
-      "relevance": "Sigstore/cosign signing, SBOM generation & attestation, SLSA levels, ACS supply chain policies."
+      "relevance": "Artifact signing frameworks, SBOM generation & attestation, supply chain assurance levels, supply chain policy enforcement."
     },
     "A7": {
       "desc": "Automate remediation and policy enforcement using controllers and operators.",
-      "relevance": "Custom controllers/operators, Gatekeeper mutation, RHACM remediation actions."
+      "relevance": "Custom controller/operator patterns, policy mutation strategies, automated remediation actions."
     },
     "A8": {
       "desc": "Drive security culture, coaching teams and maturing practices.",
@@ -118,11 +122,11 @@
     },
     "A9": {
       "desc": "Design advanced cryptography, observability, and encryption strategies.",
-      "relevance": "KMS integration (envelope encryption), mesh mTLS architecture, audit pipeline design."
+      "relevance": "Key management integration, service-to-service encryption architecture, observability and audit telemetry pipeline design."
     },
     "A10": {
       "desc": "Implement zero-trust workload identity and confidential computing.",
-      "relevance": "SPIFFE/SPIRE identities, Confidential Containers, Kata Containers, hardware attestation."
+      "relevance": "Workload identity frameworks, confidential execution runtimes, hardware-backed attestation mechanisms."
     }
   },
   
@@ -156,54 +160,67 @@
   "R27": "Manage OpenShift security infrastructure including Identity and Access Management (IAM), SIEM, EDR, and policy enforcement.",
   "R28": "Maintain and update security policies and documentation, ensuring operational security and compliance.",
   "R29": "Coordinate with Product Lifecycle Management to align security initiatives with product goals.",
-  "R30": "Define and manage ResourceQuotas and LimitRanges per project to prevent resource exhaustion and enforce platform guardrails."
+  "R30": "Define and manage ResourceQuotas and LimitRanges per project to prevent resource exhaustion and enforce platform guardrails.",
+  "R31": "Maintain artifact signing and attestation verification gates across build and deployment workflows.",
+  "R32": "Define and automate secret lifecycle processes including rotation, revocation, and external secret backend integration.",
+  "R33": "Engineer and tune runtime detection rules and telemetry pipelines for actionable alerts.",
+  "R34": "Orchestrate multi-cluster security and compliance policy propagation and consistency.",
+  "R35": "Govern temporary security control exceptions with approval, tracking, and expiry enforcement.",
+  "R36": "Implement and govern workload identity issuance and trust policies (identity-based authorization).",
+  "R37": "Produce secure, minimal, reproducible container images and apply basic signing/attestation in the build workflow.",
+  "R41": "Engineer secure service-to-service trust fabric (mesh policy layering, identity-based routing, egress/ingress governance)."
 }
   ,
   "roles": {
     "Application Developer": {
       "description": "Build secure containerized applications focusing on fundamentals, trusted images, secrets, and integrating baseline security into delivery.",
-      "responsibilities": ["R1", "R2", "R3", "R4", "R5", "R6", "R7"],
+      "responsibilities": ["R1", "R2", "R3", "R4", "R5", "R6", "R7", "R37"],
       "skills": {
         "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B9", "B10"],
-        "Intermediate": ["I5", "I6"],
-        "Advanced": []
-      }
+        "Intermediate": ["I5", "I6", "I11"],
+        "Advanced": ["A8"]
+      },
+      "allSkills": ["B0","B1","B2","B3","B4","B5","B6","B7","B9","B10","I5","I6","I11","I1","A8"]
     },
     "Platform Operator": {
       "description": "Operate and harden clusters: enforce policies, manage access, logging, compliance, quotas, and platform security posture.",
-      "responsibilities": ["R8", "R9", "R10", "R11", "R12", "R13", "R14", "R28", "R30"],
+      "responsibilities": ["R8", "R9", "R10", "R11", "R12", "R13", "R14", "R28", "R30", "R32", "R33", "R34", "R36"],
       "skills": {
         "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B7", "B8", "B9", "B10"],
         "Intermediate": ["I2", "I3", "I4", "I6", "I7", "I8", "I9", "I10"],
         "Advanced": ["A1", "A3", "A4", "A7", "A8", "A9", "A10"]
-      }
+      },
+      "allSkills": ["B0","B1","B2","B3","B4","B5","B7","B8","B9","B10","I2","I3","I4","I6","I7","I8","I9","I10","A1","A3","A4","A7","A8","A9","A10"]
     },
     "DevSecOps Engineer": {
       "description": "Embed security in pipelines, enforce policy gates, manage supply chain and runtime feedback loops.",
-      "responsibilities": ["R13", "R19", "R20", "R21", "R25", "R26"],
+      "responsibilities": ["R13", "R19", "R20", "R21", "R25", "R26", "R31", "R33", "R35"],
       "skills": {
         "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B9", "B10"],
-        "Intermediate": ["I1", "I5", "I6", "I7", "I8", "I10"],
+        "Intermediate": ["I1", "I5", "I6", "I7", "I8", "I10", "I11"],
         "Advanced": ["A2", "A4", "A6", "A7", "A9", "A10"]
-      }
+      },
+      "allSkills": ["B0","B1","B2","B3","B4","B5","B6","B7","B9","B10","I1","I5","I6","I7","I8","I10","I11","A2","A4","A6","A7","A9","A10"]
     },
     "Security Architect": {
       "description": "Design platform security architecture, governance models, segmentation, compliance, and zero-trust strategy.",
-      "responsibilities": ["R6", "R12", "R15", "R16", "R17", "R18", "R21", "R27", "R29", "R30"],
+      "responsibilities": ["R6", "R12", "R15", "R16", "R17", "R18", "R21", "R27", "R29", "R30", "R31", "R32", "R34", "R35", "R36"],
       "skills": {
         "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B10"],
         "Intermediate": ["I1", "I2", "I4", "I8", "I9", "I10"],
         "Advanced": ["A1", "A2", "A3", "A5", "A6", "A7", "A8", "A9", "A10"]
-      }
+      },
+      "allSkills": ["B0","B1","B2","B3","B4","B5","B6","B7","B8","B10","I1","I2","I4","I8","I9","I10","A1","A2","A3","A5","A6","A7","A8","A9","A10"]
     },
     "Network & Infrastructure Engineer": {
-      "description": "Engineer resilient networking, segmentation, encryption, traffic governance, and observability foundations.",
-      "responsibilities": ["R14", "R22", "R23", "R24"],
+      "description": "Specialized ownership of data plane security: advanced segmentation, secure service-to-service trust, encryption patterns, identity-aware routing, and traffic anomaly engineering.",
+      "responsibilities": ["R22", "R23", "R24", "R34", "R36", "R41"],
       "skills": {
-        "Basic": ["B0", "B3", "B4", "B7", "B10"],
-        "Intermediate": ["I2", "I4", "I7", "I8", "I10"],
-        "Advanced": ["A3", "A9"]
-      }
+        "Basic": ["B4", "B7", "B10"],
+        "Intermediate": ["I4", "I7", "I10"],
+        "Advanced": ["A3", "A9", "A10"]
+      },
+      "allSkills": ["B4","B7","B10","I4","I7","I10","A3","A9","A10"]
     }
   }
 }
