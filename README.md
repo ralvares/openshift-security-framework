@@ -87,35 +87,73 @@ Each role is mapped to relevant responsibilities and skill levels.
 Below is the concise intent of each role after applying the “cleaner ownership” model (reduced overlap, clearer accountability). Overlaps that remain are intentional for hand‑off points.
 
 ### Application Developer
-Purpose: Build and ship secure workloads; integrate day‑one security hygiene (least privilege, secrets handling, secure image construction).
-Responsibilities (IDs): R1, R2, R3, R4, R5, R6, R7, R37  
-Focus Themes: Threat modeling at app scope (I1), secret usage (B5), secure/reproducible image builds & basic signing (I11), baseline security guardrails (B3/B9).  
-Not Expected: Platform governance, runtime detection tuning, policy exception governance (kept out to minimize cognitive load).  
-Advanced Skills: None (by design) – escalation path is usually into DevSecOps or Architecture for advanced domains.
+Purpose: Build and ship secure workloads; integrate day‑one security hygiene (least privilege, proper secret handling, secure and reproducible image construction).
+Core Responsibilities:
+- Perform lightweight threat modeling for applications and workloads.
+- Implement role and service account access controls.
+- Use and reference secrets safely; enable encryption features where appropriate.
+- Integrate security scanning and testing into the build pipeline.
+- Keep dependencies and base images current.
+- Apply platform-recommended security posture in workloads (non-root, resource limits, network scoping, minimal base images).
+- Collaborate on interpreting audit and application logs for security signals.
+- Produce minimal, secure, reproducible container images and apply basic image signing.
+Out of Scope: Designing platform governance, tuning runtime detection systems, or managing security policy exceptions (kept out to reduce cognitive load).  
+Advanced Scope: Intentionally none—advanced responsibilities shift to DevSecOps or Architecture as a growth path.
 
 ### Platform Operator
 Purpose: Operate, harden, and maintain compliant OpenShift clusters; enforce day‑to‑day platform guardrails.
-Responsibilities: R8, R9, R10, R11, R12, R13, R14, R28, R30, R32  
-Focus Themes: Node hardening, admission of trusted artifacts (indirect via pipelines), audit/log integration, compliance scans, quota & secret lifecycle operations.  
-Advanced Scope: Limited to A1 (governance participation), A7 (automation/remediation), A8 (enablement). Strategic multi‑cluster & identity architecture moved to Architect.
+Core Responsibilities:
+- Configure pod security, role-based access, and baseline network segmentation policies.
+- Harden and patch nodes and core cluster components.
+- Aggregate and forward audit logs to enterprise logging and analytics.
+- Run vulnerability scans on platform-scoped images and remediate findings.
+- Automate compliance scanning and interpret/remediate results.
+- Embed baseline guardrails into shared build/deploy flows (with DevSecOps collaboration).
+- Provide security-oriented platform documentation and training.
+- Maintain authoritative written security standards and policy documents.
+- Define and manage resource quotas, limits, and guardrails.
+- Execute operational secret rotation and integration tasks.
+Advanced (limited): Participate in governance, build automation/remediation workflows, enable consumers—without designing multi‑cluster or identity architecture (handled by Architecture).
 
 ### DevSecOps Engineer
-Purpose: Embed security in delivery workflows; enforce policy gates; provide feedback loops from runtime to build; own supply chain policy execution.
-Responsibilities: R13, R19, R20, R21, R25, R26, R31, R33  
-Focus Themes: Secure pipelines (I5), artifact signing gates (R31), admission / policy controller implementations (R21), runtime detection rule tuning (R33), shift‑left threat modeling alignment (I1), infrastructure as code security (R20).  
-Boundary: Does not own exception governance (R35) or platform quota/secret governance (R30/R32).
+Purpose: Embed security in delivery workflows; enforce policy gates; provide feedback loops from runtime back to build; own software supply chain control execution.
+Core Responsibilities:
+- Build and evolve secure CI/CD pipelines.
+- Secure infrastructure-as-code and deployment automation artifacts.
+- Implement and maintain admission and related policy enforcement controllers.
+- Facilitate collaborative threat modeling and feed outcomes into runtime monitoring and incident response playbooks.
+- Implement workload isolation and zero trust patterns in delivery workflows.
+- Operate artifact signing and attestation verification gates.
+- Tune runtime detection rules and telemetry to improve signal quality.
+- Feed production security learnings back into build, test, and release processes.
+Boundary: Does not govern formal policy exceptions or manage platform quotas and secret rotation—those sit with Architecture and Platform respectively.
 
 ### Security Architect
-Purpose: Set platform-wide security strategy, governance, multi‑cluster posture, identity, and exception processes.
-Responsibilities: R6, R12, R15, R16, R17, R18, R21, R27, R29, R34, R35, R36  
-Focus Themes: Governance & policy definition, architectural threat modeling patterns, multi‑cluster policy orchestration, workload identity design, exception lifecycle, organizational enablement.  
-Operational items (quotas, secret rotation execution, supply chain gate operation) deliberately removed to reduce overlap.
+Purpose: Define platform-wide security strategy: governance, multi‑cluster posture, identity architecture, and exception lifecycle.
+Core Responsibilities:
+- Provide architectural patterns for secure platform deployment and evolution.
+- Lead governance and zero trust policy definition.
+- Guide automation strategy for vulnerability assessment and assurance workflows.
+- Mentor and uplift teams’ security maturity.
+- Define advanced policy constructs and admission control strategy.
+- Curate and align the portfolio of security infrastructure (identity, logging/analytics, runtime security, policy engines).
+- Align security roadmaps with product and delivery goals.
+- Orchestrate multi‑cluster security and compliance policy propagation.
+- Govern security control exceptions (criteria, approval, expiration, review).
+- Design and oversee workload identity and trust issuance.
+- Ensure workload-level best practices are reflected in platform standards (without owning daily execution).
+Excluded Operational Tasks: Routine secret rotations, quota management, and hands‑on operation of supply chain enforcement gates—delegated to Platform and DevSecOps.
 
 ### Network & Infrastructure Engineer (Specialized / Optional)
-Purpose: Engineer the secure data plane: segmentation, encryption patterns, trust fabric, identity‑aware routing, traffic anomaly foundations.
-Responsibilities: R22, R23, R24, R34, R36, R41  
-Focus Themes: Advanced network segmentation & egress/ingress governance (I4/A3), encryption architecture implementation (B10/A9), workload/service identity runtime integration (A10), trust fabric engineering (R41).  
-Not Owning: Compliance automation (R12), supply chain gates (R31), artifact provenance policy design (A6) – those stay with DevSecOps / Architect.
+Purpose: Engineer the secure data plane: segmentation strategy, encryption patterns, trust fabric, identity‑aware routing, and traffic anomaly detection foundations.
+Core Responsibilities:
+- Design and implement advanced network segmentation, ingress, and egress governance boundaries.
+- Implement encryption for data in transit and at rest according to organizational standards.
+- Monitor for and help mitigate anomalous or denial‑style traffic patterns.
+- Contribute to multi‑cluster security and compliance posture from the network perspective.
+- Implement runtime workload and service identity trust integration.
+- Engineer the service‑to‑service trust fabric (identity exchange, mutual TLS layering, certificate/key lifecycle automation).
+Not Owning: Compliance scanning automation, supply chain validation gates, or organization‑wide artifact provenance governance—those remain with Platform, DevSecOps, and Architecture.
 
 ---
 
@@ -230,11 +268,11 @@ Naming guidance:
 
 ## Example: Gap Analysis Walkthrough
 
-Goal: “Do we have coverage for workload identity (R36)?”  
-1. Find R36 in responsibilities → definition.  
-2. Roles owning it: Security Architect, Network & Infrastructure Engineer.  
-3. If neither role exists in your org, decide: elevate Platform Operator (add R36 + A10) or create specialization.  
-4. Check skills: A10 present only where identity design is expected.  
+Goal: “Do we have coverage for designing and issuing workload identities and related trust policies?”  
+1. Locate the responsibility description for workload identity and trust design in the reference table.  
+2. Primary owners here: Security Architect and (where present) Network & Infrastructure Engineer.  
+3. If neither role exists, decide whether to expand the Platform Operator’s remit (adding advanced identity design capability) or introduce a specialized role.  
+4. Confirm that advanced identity / trust architecture expertise actually exists before assigning ownership.  
 Outcome: Clear staffing or enablement decision.
 
 ---
