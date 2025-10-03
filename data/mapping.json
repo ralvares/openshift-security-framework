@@ -136,7 +136,7 @@
   "R3": "Store secrets securely using OpenShift Secrets and enable encryption.",
   "R4": "Integrate vulnerability scanning and security testing in CI/CD pipelines using OpenShift Pipelines.",
   "R5": "Keep dependencies and container images updated to fix vulnerabilities and avoid deprecated software.",
-  "R6": "Follow OpenShift security best practices, such as running non-root containers and applying network policies.",
+  "R6": "Design workloads for non-root / least privilege (avoid unnecessary capabilities and permissions).",
   "R7": "Collaborate with security teams on auditing, monitoring, and responding to security events.",
   "R8": "Configure Security Context Constraints (SCCs), RBAC, and Network Policies to enforce cluster security.",
   "R9": "Harden OpenShift nodes and perform patch management using OpenShift tooling.",
@@ -168,13 +168,14 @@
   "R35": "Govern temporary security control exceptions with approval, tracking, and expiry enforcement.",
   "R36": "Implement and govern workload identity issuance and trust policies (identity-based authorization).",
   "R37": "Produce secure, minimal, reproducible container images and apply basic signing/attestation in the build workflow.",
-  "R41": "Engineer secure service-to-service trust fabric (mesh policy layering, identity-based routing, egress/ingress governance)."
+  "R41": "Engineer secure service-to-service trust fabric (mesh policy layering, identity-based routing, egress/ingress governance).",
+  "R42": "Validate security control enforcement using audit and cluster logs, correlating pipeline policy outcomes with runtime events."
 }
   ,
   "roles": {
     "Application Developer": {
       "description": "Build secure containerized applications focusing on fundamentals, trusted images, secrets, and integrating baseline security into delivery.",
-      "responsibilities": ["R1", "R2", "R3", "R4", "R5", "R6", "R7", "R37"],
+  "responsibilities": ["R1", "R2", "R3", "R4", "R5", "R6", "R37"],
       "skills": {
         "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8"],
         "Intermediate": ["I1", "I6", "I7", "I8"],
@@ -183,7 +184,7 @@
     },
     "Platform Operator": {
       "description": "Operate and harden clusters: enforce policies, manage access, logging, compliance, quotas, and platform security posture.",
-      "responsibilities": ["R8", "R9", "R10", "R11", "R12", "R13", "R14", "R28", "R30", "R32"],
+  "responsibilities": ["R8", "R9", "R10", "R11", "R12", "R14", "R28", "R30", "R32"],
       "skills": {
         "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9", "B10"],
         "Intermediate": ["I2", "I3", "I4", "I5", "I8", "I9", "I10", "I11"],
@@ -192,16 +193,16 @@
     },
     "DevSecOps Engineer": {
       "description": "Embed security in pipelines, enforce policy gates, manage supply chain and runtime feedback loops.",
-      "responsibilities": ["R13", "R19", "R20", "R21", "R25", "R26", "R31", "R33"],
+  "responsibilities": ["R13", "R19", "R20", "R21", "R25", "R26", "R31", "R33", "R42"],
       "skills": {
-        "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8"],
+        "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9"],
         "Intermediate": ["I1", "I2", "I3", "I6", "I7", "I8", "I9", "I10", "I11"],
         "Advanced": ["A2", "A4", "A6", "A7", "A9", "A10"]
       }
     },
     "Security Architect": {
       "description": "Design platform security architecture, governance models, segmentation, compliance, and zero-trust strategy.",
-      "responsibilities": ["R6", "R12", "R15", "R16", "R17", "R18", "R21", "R27", "R29", "R34", "R35", "R36"],
+  "responsibilities": ["R12", "R15", "R16", "R17", "R18", "R21", "R27", "R29", "R34", "R35", "R36"],
       "skills": {
         "Basic": ["B0", "B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9", "B10"],
         "Intermediate": ["I1", "I2", "I4", "I5", "I8", "I9", "I10", "I11"],
