@@ -1,0 +1,140 @@
+= Lab: Declarative Distribution – External Secrets Operator (ESO)
+:role: Intermediate Secret Management
+:skills: External Secrets Operator, Secret Sync, Rotation
+:labid: LAB-I6B
+:toc:
+:sectnums:
+:icons: font
+
+== Skill
+Secret lifecycle (externalization & controlled distribution).
+
+== Scenario
+Use External Secrets Operator (ESO) to sync a remote secret (Vault / AWS SM / other backend) into a Kubernetes Secret with reconciliation and rotation.
+
+== Objectives
+* Verify ESO installation
+* Create SecretStore referencing provider
+* Define ExternalSecret mapping remote key to local Secret
+* Observe rotation by updating remote value
+
+== Prerequisites
+* ESO operator installed (CRDs: SecretStore, ExternalSecret)
+* Backing secret provider reachable & credential configured
+
+== Namespace
+[source,sh]
+----
+oc new-project i6-external
+----
+
+== SecretStore (Vault Example)
+[source,sh]
+----
+oc apply -n i6-external -f - <<'EOF'
+apiVersion: external-secrets.io/v1beta1
+kind: SecretStore
+metadata:
+  name: vault-store
+spec:
+  provider:
+    vault:
+      server: https://vault.example.internal:8200
+      path: secret
+      version: v2
+      auth:
+        tokenSecretRef:
+          name: vault-token
+          key: token
+EOF
+----
+Assumes a `vault-token` Secret exists with access rights.
+
+== ExternalSecret
+[source,sh]
+----
+oc apply -n i6-external -f - <<'EOF'
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: db-password
+spec:
+  refreshInterval: 1m
+  secretStoreRef:
+    name: vault-store
+    kind: SecretStore
+  target:
+    name: app-db
+    creationPolicy: Owner
+    template:
+      type: Opaque
+  data:
+  - secretKey: password
+    remoteRef:
+      key: app/db
+      property: password
+EOF
+----
+
+== Verify Creation
+[source,sh]
+----
+oc get externalsecret db-password -n i6-external -o yaml | grep -i status -n || true
+oc get secret app-db -n i6-external -o jsonpath='{.data.password}' | base64 -d; echo
+----
+
+== Rotation Test
+Update remote secret (outside cluster):
+[source,sh]
+----
+vault kv put secret/app/db password=NextP@55
+----
+Wait refreshInterval then:
+[source,sh]
+----
+oc get secret app-db -n i6-external -o jsonpath='{.data.password}' | base64 -d; echo
+----
+Value should match updated remote entry.
+
+== Pod Consumption
+[source,sh]
+----
+oc apply -n i6-external -f - <<'EOF'
+apiVersion: v1
+kind: Pod
+metadata:
+  name: consumer
+spec:
+  containers:
+  - name: app
+    image: registry.access.redhat.com/ubi9/ubi
+    env:
+    - name: DB_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: app-db
+          key: password
+    command: ["sh","-c","echo $DB_PASSWORD; sleep 300"]
+EOF
+----
+Check logs for password value (avoid in production—demo only):
+[source,sh]
+----
+oc logs consumer -n i6-external --tail=1
+----
+
+== Security Considerations
+* Fine-grained Vault policies restrict accessible paths
+* Short refreshInterval balances rotation vs API load
+* Avoid logging secret values in real workloads
+
+== Cleanup
+[source,sh]
+----
+oc delete project i6-external --wait=false
+----
+
+== Key Points
+* ESO: declarative mapping remote → Kubernetes Secret
+* Facilitates rotation without pipeline rebuilds
+* Complements CSI ephemeral approach (I6a) for apps requiring native Secret objects

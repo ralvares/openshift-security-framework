@@ -1,5 +1,9 @@
 = Lab: Secure by Design – Rebuilding Images for OpenShift
 :labid: LAB-B9
+:cis-summary: "Build images to run non-root on high ports with correct ownership—no special SCC required."
+:mitre-summary: "Prevents privilege escalation and drift by rebuilding images to run non-root on high ports under restricted SCC."
+:audit-evidence: "Rebuilt UBI image deploys under restricted SCC; id shows random non-root UID; service exposed without anyuid exception."
+:cis-mitre-codes: '{"cisMapping":{"primary":["5.2.6"],"related":["5.2.5"]},"mitre":{"techniques":["T1611"],"tactics":["TA0004"],"mitigations":["M1026","M1048"]}}'
 :toc:
 :sectnums:
 :icons: font
@@ -8,6 +12,7 @@
 Rebuild an insecure image so it runs under the restricted SCC without special privileges.
 
 == Objective
+
 * Use trusted UBI base
 * Create non-root user / correct perms
 * Use high unprivileged port
@@ -18,6 +23,7 @@ Rebuild an insecure image so it runs under the restricted SCC without special pr
 “Requires root” is future security debt. Rebuilding converts exceptions into design-time hygiene.
 
 == What it Solves
+
 * Root-only service → escalation path
 * Fixed ownership mismatch → UID failure
 * Privileged port dependency → root need
@@ -102,6 +108,7 @@ oc delete project b9-rebuild --wait=false
 ----
 
 == Solutions / Controls
+
 * UBI base (maintained)
 * Non-root execution
 * High port selection
@@ -128,6 +135,7 @@ How small should images be?:: Smaller surface → fewer CVEs & faster pulls.
 Rebuilding is embedding security into the product lifecycle—fewer exceptions, faster approvals.
 
 == Next Step Ideas
+
 * Pipeline check: fail if USER root in final layer
 * Image signing before deployment
 * Compare CVE count before vs after

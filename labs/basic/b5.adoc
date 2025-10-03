@@ -1,5 +1,9 @@
 = Lab: Don’t Hardcode – Managing Secrets the Right Way
 :labid: LAB-B5
+:cis-summary: "Store credentials as Secrets (files or env) instead of hardcoding; support rotation."
+:mitre-summary: "Prevents credential exposure by replacing hardcoded values with scoped Secrets and enabling rotation paths."
+:audit-evidence: "Hardcoded env var visible in manifest; refactored to Secret env/file; file mount updates after rotation while env requires restart."
+:cis-mitre-codes: '{"cisMapping":{"primary":["5.4.1"],"related":[]},"mitre":{"techniques":["T1552"],"tactics":["TA0006"],"mitigations":["M1026"]}}'
 :toc:
 :sectnums:
 :icons: font
@@ -8,6 +12,7 @@
 Remove passwords from manifests, store them as Secrets, inject safely, rotate cleanly.
 
 == Objective
+
 * Insecure hardcoded credential
 * Refactor to Secret env var
 * Refactor to Secret file mount
@@ -17,6 +22,7 @@ Remove passwords from manifests, store them as Secrets, inject safely, rotate cl
 Hardcoding credentials is writing the PIN on the ATM. Secrets reduce casual exposure and support rotation & compliance.
 
 == What it Solves
+
 * Git history leakage
 * Rotation friction
 * Broad manifest visibility
@@ -100,6 +106,7 @@ oc delete project b5-secrets --wait=false
 ----
 
 == Solutions / Controls
+
 * Kubernetes Secrets abstraction
 * Etcd encryption-at-rest
 * External KMS integration
@@ -126,6 +133,7 @@ Do Secrets stop exfiltration?:: Reduce accidental exposure; still need RBAC & ne
 Treat secrets like house keys: stored & rotated intentionally, never glued to the door.
 
 == Next Step Ideas
+
 * Periodic rotation pipeline
 * External KMS provider integration
 * Repo scanning (gitleaks, truffleHog)

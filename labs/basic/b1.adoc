@@ -1,5 +1,9 @@
 = Lab: Least Privilege in Action (Why "It Works on My Laptop" Fails Here)
 :labid: LAB-B1
+:cis-summary: "Run containers as non-root and avoid privileged/low ports to enforce least privilege."
+:mitre-summary: "Prevents container-to-host escalation by enforcing non-root execution and avoiding privileged port binds."
+:audit-evidence: "Root-based httpd on port 80 fails; UBI httpd on 8080 runs with random non-root UID and accessible route."
+:cis-mitre-codes: '{"cisMapping":{"primary":["5.2.6"],"related":["5.2.5"]},"mitre":{"techniques":["T1611"],"tactics":["TA0004"],"mitigations":["M1026","M1048"]}}'
 :toc:
 :sectnums:
 :icons: font
@@ -8,6 +12,7 @@
 You’ll understand why OpenShift deliberately applies security guardrails (like SCCs) that assume a workload was NOT built with security best practices, and how choosing or building the right image (non-root, high port) removes friction while strengthening safety.
 
 == Objective
+
 * Deploy a public Docker Hub `httpd` image (implicit root + port 80) and observe failure under default guardrails
 * Read logs to identify privileged port + ownership assumptions
 * Redeploy using a trusted Red Hat UBI `httpd` image (non-root friendly, high port) and observe success without escalation
@@ -120,6 +125,7 @@ What if I must run root?:: Create a documented exception with justification, sco
 OpenShift’s model is “secure-by-default through skepticism.” It behaves like a facilities team that locks doors and limits master keys because experience shows not every tenant configures safety correctly the first time. By embracing those guardrails—rather than bypassing them—you convert invisible risk into durable engineering hygiene.
 
 == Next Step Ideas
+
 * Add pipeline policy: reject Dockerfiles ending with USER 0
 * Integrate cosign + RHACS to enforce signature presence
 * Track KPIs: % non-root, % digest-pinned, mean time to remediate root exceptions

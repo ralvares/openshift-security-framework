@@ -1,0 +1,125 @@
+= Lab: Secrets Without Static Copies – Vault CSI Integration
+:role: Intermediate Secret Management
+:skills: Vault CSI, Dynamic Secrets, Rotation
+:labid: LAB-I6A
+:toc:
+:sectnums:
+:icons: font
+
+== Skill
+Secret lifecycle (external encryption & controlled distribution).
+
+== Scenario
+Move a database password from a native Kubernetes Secret to dynamic retrieval via Vault CSI provider so rotation happens centrally without redeploying pods.
+
+== Objectives
+* Prepare namespace & Vault secret (simulated path)
+* Define SecretProviderClass (Vault CSI)
+* Mount secret into pod and verify file materialization
+* Rotate value in Vault and confirm updated projection
+
+== Prerequisites
+* Vault deployed & configured with Kubernetes auth (or simulate by describing expected manifests)
+* Vault Agent Injector NOT required (using CSI driver)
+
+== Namespace
+[source,sh]
+----
+oc new-project i6-secrets
+----
+
+== (Concept) Vault KV Write (outside cluster)
+[source,sh]
+----
+vault kv put secret/app/db username=dbuser password=initialP@55
+----
+Token / role mapping already established (assumed).
+
+== SecretProviderClass
+[source,sh]
+----
+oc apply -n i6-secrets -f - <<'EOF'
+apiVersion: secrets-store.csi.x-k8s.io/v1
+kind: SecretProviderClass
+metadata:
+  name: vault-db-creds
+spec:
+  provider: vault
+  parameters:
+    roleName: db-app
+    vaultAddress: https://vault.example.internal:8200
+    objects: |
+      - objectName: db-creds
+        secretPath: secret/data/app/db
+        secretKey: password
+    # optional: caCertSecret
+  secretObjects:
+  - secretName: db-password-sync
+    type: Opaque
+    data:
+      - objectName: db-creds
+        key: password
+EOF
+----
+Creates both ephemeral mount & synced Kubernetes Secret.
+
+== Pod Using CSI Volume
+[source,sh]
+----
+oc apply -n i6-secrets -f - <<'EOF'
+apiVersion: v1
+kind: Pod
+metadata:
+  name: app
+spec:
+  serviceAccountName: default
+  volumes:
+  - name: vault-secrets
+    csi:
+      driver: secrets-store.csi.k8s.io
+      readOnly: true
+      volumeAttributes:
+        secretProviderClass: vault-db-creds
+  containers:
+  - name: demo
+    image: registry.access.redhat.com/ubi9/ubi
+    command: ["sh","-c","echo Mounted: $(ls /vault) && cat /vault/db-creds || sleep 3600"]
+    volumeMounts:
+    - name: vault-secrets
+      mountPath: /vault
+      readOnly: true
+EOF
+----
+Check log:
+[source,sh]
+----
+oc logs app -n i6-secrets --tail=5
+----
+
+== Rotation in Vault
+[source,sh]
+----
+vault kv put secret/app/db username=dbuser password=rotatedP@55
+----
+Force refresh (depends on sync interval or pod restart). If sync secret used:
+[source,sh]
+----
+oc get secret db-password-sync -n i6-secrets -o jsonpath='{.data.password}' | base64 -d
+----
+Compare to old value.
+
+== Security Considerations
+* Projected file never stored in etcd (unless synced option used)
+* Limit role policies to exact secret path
+* Short TTL tokens improve blast radius if compromised
+
+== Cleanup
+[source,sh]
+----
+oc delete project i6-secrets --wait=false
+----
+
+== Key Points
+* External secrets reduce long-lived copies in etcd
+* Rotation managed externally → lower redeploy burden
+* Sync optional; prefer ephemeral if apps can read file directly

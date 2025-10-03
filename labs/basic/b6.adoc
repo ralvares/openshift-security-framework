@@ -1,5 +1,9 @@
 = Lab: Trusted Sources Only – Guardrails Against Unapproved Images
 :labid: LAB-B6
+:cis-summary: "Enforce trusted image sources and allow only approved registries/signature origins."
+:mitre-summary: "Prevents untrusted supply chain and initial access risks by enforcing trusted, vetted image sources only."
+:audit-evidence: "Policy denies docker.io nginx; UBI image admitted and provenance (Image and digest) verified."
+:cis-mitre-codes: '{"cisMapping":{"primary":["5.5.1"],"related":[]},"mitre":{"techniques":["T1195"],"tactics":["TA0001","TA0003"],"mitigations":["M1016"]}}'
 :toc:
 :sectnums:
 :icons: font
@@ -8,6 +12,7 @@
 Understand risk of unvetted registry images and enforce a trusted-source allow‑list in OpenShift.
 
 == Objective
+
 * Attempt deployment from unvetted source
 * Observe deny under allow‑list
 * Deploy trusted Red Hat UBI image
@@ -17,6 +22,7 @@ Understand risk of unvetted registry images and enforce a trusted-source allow�
 Unknown registry images are like unlabeled packages at a loading dock. Allow‑lists enforce provenance and reduce CVE noise.
 
 == What it Solves
+
 * Accidental pulls from arbitrary public defaults
 * Image provenance ambiguity
 * Higher vulnerability noise baseline
@@ -159,6 +165,7 @@ Where does Lab B1 fit?:: B1 covers runtime least privilege; B6 covers image prov
 Trusted registries act like approved aerospace suppliers: origin is verified, not guessed.
 
 == Next Step Ideas
+
 * Extend policy to StatefulSets & DaemonSets
 * Add warn-only binding for dev
 * Integrate signature (cosign) verification

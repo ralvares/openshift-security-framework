@@ -1,0 +1,78 @@
+= Lab: Catch the Oddities – Anomaly & Alerting Rules
+:role: Intermediate Detection & Response
+:skills: Prometheus, Alerting, Anomaly Detection, Correlation
+:labid: LAB-I7B
+:toc:
+:sectnums:
+:icons: font
+
+== Skill
+Detection via monitoring anomalies.
+
+== Scenario
+Use cluster monitoring stack to create a synthetic alert when container CPU spike deviates from baseline and pair it with audit exec anomaly concept. Demonstrates layered signal approach.
+
+== Objectives
+* Deploy low-CPU baseline pod
+* Create PrometheusRule for sustained spike
+* Stress pod to trigger alert
+* (Concept) Combine with audit exec for compound condition
+
+== Prerequisites
+* User can create PrometheusRule in monitored namespace (`openshift-user-workload-monitoring` enabled)
+
+== Namespace & Baseline Pod
+[source,sh]
+----
+oc new-project i7-anomaly
+oc run baseline --image=registry.access.redhat.com/ubi9/ubi -- limits='cpu=200m,memory=128Mi' -- sleep 10000
+----
+
+== PrometheusRule
+[source,sh]
+----
+oc apply -n i7-anomaly -f - <<'EOF'
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: cpu-anomaly
+spec:
+  groups:
+  - name: anomaly.rules
+    rules:
+    - alert: ContainerCPUSpike
+      expr: sum by (pod) (rate(container_cpu_usage_seconds_total{namespace="i7-anomaly", pod="baseline"}[2m])) > 0.15
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: CPU spike in baseline pod
+        description: Sustained CPU usage above 150m for >2m.
+EOF
+----
+
+== Stress Pod
+[source,sh]
+----
+oc exec baseline -- sh -c 'yes > /dev/null &'
+----
+Monitor alert (may take a few minutes):
+[source,sh]
+----
+oc get --raw /api/v1/namespaces/openshift-user-workload-monitoring/services/prometheus-operated:9090/proxy/api/v1/alerts | jq '.data.alerts[] | select(.labels.alertname=="ContainerCPUSpike")'
+----
+
+== (Concept) Compound Correlation
+SIEM / rule engine logic:
+IF Alert(ContainerCPUSpike) AND Audit(exec to same pod within 5m) THEN escalate severity=high.
+
+== Cleanup
+[source,sh]
+----
+oc delete project i7-anomaly --wait=false
+----
+
+== Key Points
+* Simple numeric threshold forms baseline anomaly detection
+* Richer methods: z-score vs historical window, ACS behavioral models
+* Multi-signal correlation reduces false positives

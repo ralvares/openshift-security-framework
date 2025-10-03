@@ -1,5 +1,9 @@
 = Lab: No Free Lunch – Controlling Resource Usage (Quotas & Limits)
 :labid: LAB-B3B
+:cis-summary: "Set default container requests/limits and namespace quotas to cap usage and prevent noisy neighbors."
+:mitre-summary: "Prevents resource exhaustion and noisy-neighbor denial by enforcing default requests and namespace quotas."
+:audit-evidence: "LimitRange injects default requests/limits; quota denies excessive replicas and oversized limits with observable FailedCreate/quota events."
+:cis-mitre-codes: '{"cisMapping":{"primary":["4.2.8"],"related":[]},"mitre":{"techniques":["T1499"],"tactics":["TA0040"],"mitigations":["M1037"]}}'
 :toc:
 :sectnums:
 :icons: font
@@ -8,6 +12,7 @@
 You’ll enforce per-container defaults and namespace resource ceilings to prevent noisy neighbors and accidental cost explosions.
 
 == Objective
+
 * Apply a LimitRange (defaults + min/max + maxLimitRequestRatio)
 * Apply a ResourceQuota (namespace aggregate ceilings)
 * Deploy a pod with no resources and verify injected defaults
@@ -20,6 +25,7 @@ You’ll enforce per-container defaults and namespace resource ceilings to preve
 Unbounded pods are like an open buffet with no portion sizes. They create starvation, evictions, and unpredictable spend. Defaults (LimitRange) + ceilings (ResourceQuota) deliver predictable tenancy and early saturation signals.
 
 == What it Solves
+
 * Eliminates silent resource starvation
 * Stops accidental over-scaling
 * Provides cost & capacity signal (events)
@@ -144,6 +150,7 @@ oc delete project b3-resources-demo --wait=false
 ----
 
 == Solutions / Controls
+
 * LimitRange: per-container defaults & bounds
 * ResourceQuota: namespace aggregate cap
 * Monitoring: watch denial events & saturation trends
@@ -168,6 +175,7 @@ What if workload is bursty?:: Typical usage as request; safe burst upper bound a
 Resource controls are the booking system preventing one team from reserving every room—fairness yields stability.
 
 == Next Step Ideas
+
 * Dashboards: top quota denial reasons
 * Script: detect unused pods holding quota
 * Pilot vertical pod autoscaler (recommendation mode)

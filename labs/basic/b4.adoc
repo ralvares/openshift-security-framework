@@ -1,5 +1,9 @@
 = Lab: You Shall Not Pass – Segmenting Pod Traffic with NetworkPolicies
 :labid: LAB-B4
+:cis-summary: "Apply NetworkPolicies so namespaces default deny and only intended pod traffic is allowed."
+:mitre-summary: "Prevents lateral movement and internal scanning via default deny plus narrowly scoped allow rules."
+:audit-evidence: "Default connectivity works; default-deny blocks both clients; allow policy restores access only for labeled allowed client (200 vs timeout)."
+:cis-mitre-codes: '{"cisMapping":{"primary":["5.3.2"],"related":["5.3.1"]},"mitre":{"techniques":["T1046"],"tactics":["TA0007"],"mitigations":["M1030","M1042"]}}'
 :toc:
 :sectnums:
 :icons: font
@@ -8,6 +12,7 @@
 Shrink lateral movement by moving from implicit allow-all networking to explicit allow rules via NetworkPolicies.
 
 == Objective
+
 * Observe default pod-to-pod connectivity
 * Enforce namespace-level default deny
 * Create targeted allow policy for one client
@@ -17,6 +22,7 @@ Shrink lateral movement by moving from implicit allow-all networking to explicit
 Flat networks amplify compromise. NetworkPolicies introduce interior doors—intent over assumption—reducing scan surface and compliance risk.
 
 == What it Solves
+
 * Prevents every compromised pod becoming a pivot
 * Reduces accidental exposure of internal services
 * Eases incident scoping (“what could it reach?”)
@@ -115,6 +121,7 @@ oc delete project b4-netpol-demo --wait=false
 ----
 
 == Solutions / Controls
+
 * NetworkPolicies for microsegmentation
 * Standard labels as controlled vocabulary
 * RHACS network graph for visualization
@@ -158,6 +165,7 @@ How to avoid label sprawl mistakes?:: Minimal taxonomy: app, role, tier, env.
 Segmentation converts a wide-open warehouse into purposeful rooms; movement remains—but intentional.
 
 == Next Step Ideas
+
 * Add egress example (allow DNS, block external)
 * Bundle policies into a single manifest
 * Visualize flows pre/post with RHACS

@@ -1,0 +1,272 @@
+The following are Controls from NIST SP 800-53 MODERATE baseline that are NOT mapped to CIS Controls v8.1,,,,
+,,,,
+Control Identifier,Control (or Control Enhancement) Name,Control Text,,
+AC-2(2),Account Management | Automated Temporary and Emergency Account Management,Automatically [Selection: remove; disable] temporary and emergency accounts after [Assignment: organization-defined time period for each type of account].,,
+AC-2(4),Account Management | Automated Audit Actions,"Automatically audit account creation, modification, enabling, disabling, and removal actions.",,
+AC-2(13),Account Management | Disable Accounts for High-risk Individuals,Disable accounts of individuals within [Assignment: organization-defined time period] of discovery of [Assignment: organization-defined significant risks].,,
+AC-6(10),Least Privilege | Prohibit Non-privileged Users from Executing Privileged Functions,Prevent non-privileged users from executing privileged functions.,,
+AC-12,Session Termination,Automatically terminate a user session after [Assignment: organization-defined conditions or trigger events requiring session disconnect].,,
+AC-17(4),Remote Access | Privileged Commands and Access,"(a) Authorize the execution of privileged commands and access to security-relevant information via remote access only in a format that provides assessable evidence and for the following needs: [Assignment: organization-defined needs]; and
+(b) Document the rationale for remote access in the security plan for the system.",,
+CA-2(1),Control Assessments | Independent Assessors,Employ independent assessors or assessment teams to conduct control assessments.,,
+CA-7(1),Continuous Monitoring | Independent Assessment,Employ independent assessors or assessment teams to monitor the controls in the system on an ongoing basis.,,
+CM-2(2),Baseline Configuration | Automation Support for Accuracy and Currency,"Maintain the currency, completeness, accuracy, and availability of the baseline configuration of the system using [Assignment: organization-defined automated mechanisms].",,
+CM-2(3),Baseline Configuration | Retention of Previous Configurations,Retain [Assignment: organization-defined number] of previous versions of baseline configurations of the system to support rollback.,,
+CM-2(7),Baseline Configuration | Configure Systems and Components for High-risk Areas,"(a) Issue [Assignment: organization-defined systems or system components] with [Assignment: organization-defined configurations] to individuals traveling to locations that the organization deems to be of significant risk; and
+(b) Apply the following controls to the systems or components when the individuals return from travel: [Assignment: organization-defined controls].",,
+CM-3,Configuration Change Control,"a. Determine and document the types of changes to the system that are configuration-controlled;
+b. Review proposed configuration-controlled changes to the system and approve or disapprove such changes with explicit consideration for security and privacy impact analyses;
+c. Document configuration change decisions associated with the system;
+d. Implement approved configuration-controlled changes to the system;
+e. Retain records of configuration-controlled changes to the system for [Assignment: organization-defined time period];
+f. Monitor and review activities associated with configuration-controlled changes to the system; and
+g. Coordinate and provide oversight for configuration change control activities through [Assignment: organization-defined configuration change control element] that convenes [Selection (one or more): [Assignment: organization-defined frequency]; when [Assignment: organization-defined configuration change conditions]].",,
+CM-3(2),"Configuration Change Control | Testing, Validation, and Documentation of Changes","Test, validate, and document changes to the system before finalizing the implementation of the changes.",,
+CM-3(4),Configuration Change Control | Security and Privacy Representatives,Require [Assignment: organization-defined security and privacy representatives] to be members of the [Assignment: organization-defined configuration change control element].,,
+CP-2(1),Contingency Plan | Coordinate with Related Plans,Coordinate contingency plan development with organizational elements responsible for related plans.,,
+CP-2(3),Contingency Plan | Resume Mission and Business Functions,Plan for the resumption of [Selection: all; essential] mission and business functions within [Assignment: organization-defined time period] of contingency plan activation.,,
+CP-2(8),Contingency Plan | Identify Critical Assets,Identify critical system assets supporting [Selection: all; essential] mission and business functions.,,
+CP-4(1),Contingency Plan Testing | Coordinate with Related Plans,Coordinate contingency plan testing with organizational elements responsible for related plans.,,
+CP-6(3),Alternate Storage Site | Accessibility,Identify potential accessibility problems to the alternate storage site in the event of an area-wide disruption or disaster and outline explicit mitigation actions.,,
+CP-7(1),Alternate Processing Site | Separation from Primary Site,Identify an alternate processing site that is sufficiently separated from the primary processing site to reduce susceptibility to the same threats.,,
+CP-7(2),Alternate Processing Site | Accessibility,Identify potential accessibility problems to alternate processing sites in the event of an area-wide disruption or disaster and outlines explicit mitigation actions.,,
+CP-7(3),Alternate Processing Site | Priority of Service,Develop alternate processing site agreements that contain priority-of-service provisions in accordance with availability requirements (including recovery time objectives).,,
+CP-8(1),Telecommunications Services | Priority of Service Provisions,"(a) Develop primary and alternate telecommunications service agreements that contain priority-of-service provisions in accordance with availability requirements (including recovery time objectives); and
+(b) Request Telecommunications Service Priority for all telecommunications services used for national security emergency preparedness if the primary and/or alternate telecommunications services are provided by a common carrier.",,
+CP-8(2),Telecommunications Services | Single Points of Failure,Obtain alternate telecommunications services to reduce the likelihood of sharing a single point of failure with primary telecommunications services.,,
+CP-10(2),System Recovery and Reconstitution | Transaction Recovery,Implement transaction recovery for systems that are transaction-based.,,
+IA-3,Device Identification and Authentication,Uniquely identify and authenticate [Assignment: organization-defined devices and/or types of devices] before establishing a [Selection (one or more): local; remote; network] connection.,,
+IA-4(4),Identifier Management | Identify User Status,Manage individual identifiers by uniquely identifying each individual as [Assignment: organization-defined characteristic identifying individual status].,,
+IA-5(2),Authenticator Management | Public Key-based Authentication,"(a) For public key-based authentication:
+(1) Enforce authorized access to the corresponding private key; and
+(2) Map the authenticated identity to the account of the individual or group; and
+(b) When public key infrastructure (PKI) is used:
+(1) Validate certificates by constructing and verifying a certification path to an accepted trust anchor, including checking certificate status information; and
+(2) Implement a local cache of revocation data to support path discovery and validation.",,
+IA-5(6),Authenticator Management | Protection of Authenticators,Protect authenticators commensurate with the security category of the information to which use of the authenticator permits access.,,
+IA-12,Identity Proofing,"a. Identity proof users that require accounts for logical access to systems based on appropriate identity assurance level requirements as specified in applicable standards and guidelines; 
+b. Resolve user identities to a unique individual; and
+c. Collect, validate, and verify identity evidence.",,
+IA-12(2),Identity Proofing | Identity Evidence,Require evidence of individual identification be presented to the registration authority.,,
+IA-12(3),Identity Proofing | Identity Evidence Validation and Verification,Require that the presented identity evidence be validated and verified through [Assignment: organizational defined methods of validation and verification].,,
+IA-12(5),Identity Proofing | Address Confirmation,Require that a [Selection: registration code; notice of proofing] be delivered through an out-of-band channel to verify the users address (physical or digital) of record.,,
+IR-3(2),Incident Response Testing | Coordination with Related Plans,Coordinate incident response testing with organizational elements responsible for related plans.,,
+IR-7(1),Incident Response Assistance | Automation Support for Availability of Information and Support,Increase the availability of incident response information and support using [Assignment: organization-defined automated mechanisms].,,
+MA-3(1),Maintenance Tools | Inspect Tools,Inspect the maintenance tools used by maintenance personnel for improper or unauthorized modifications.,,
+MA-3(2),Maintenance Tools | Inspect Media,Check media containing diagnostic and test programs for malicious code before the media are used in the system.,,
+MA-3(3),Maintenance Tools | Prevent Unauthorized Removal,"Prevent the removal of maintenance equipment containing organizational information by:
+(a) Verifying that there is no organizational information contained on the equipment;
+(b) Sanitizing or destroying the equipment;
+(c) Retaining the equipment within the facility; or
+(d) Obtaining an exemption from [Assignment: organization-defined personnel or roles] explicitly authorizing removal of the equipment from the facility.",,
+MA-6,Timely Maintenance,Obtain maintenance support and/or spare parts for [Assignment: organization-defined system components] within [Assignment: organization-defined time period] of failure.,,
+MP-3,Media Marking,"a. Mark system media indicating the distribution limitations, handling caveats, and applicable security markings (if any) of the information; and
+b. Exempt [Assignment: organization-defined types of system media] from marking if the media remain within [Assignment: organization-defined controlled areas].",,
+MP-4,Media Storage,"a. Physically control and securely store [Assignment: organization-defined types of digital and/or non-digital media] within [Assignment: organization-defined controlled areas]; and
+b. Protect system media types defined in MP-4a until the media are destroyed or sanitized using approved equipment, techniques, and procedures.",,
+PE-4,Access Control for Transmission,Control physical access to [Assignment: organization-defined system distribution and transmission lines] within organizational facilities using [Assignment: organization-defined security controls].,,
+PE-5,Access Control for Output Devices,Control physical access to output from [Assignment: organization-defined output devices] to prevent unauthorized individuals from obtaining the output.,,
+PE-6(1),Monitoring Physical Access | Intrusion Alarms and Surveillance Equipment,Monitor physical access to the facility where the system resides using physical intrusion alarms and surveillance equipment.,,
+PE-9,Power Equipment and Cabling,Protect power equipment and power cabling for the system from damage and destruction.,,
+PE-10,Emergency Shutoff,"a. Provide the capability of shutting off power to [Assignment: organization-defined system or individual system components] in emergency situations;
+b. Place emergency shutoff switches or devices in [Assignment: organization-defined location by system or system component] to facilitate access for authorized personnel; and
+c. Protect emergency power shutoff capability from unauthorized activation.",,
+PE-11,Emergency Power,Provide an uninterruptible power supply to facilitate [Selection (one or more): an orderly shutdown of the system; transition of the system to long-term alternate power] in the event of a primary power source loss.,,
+PE-13(1),Fire Protection | Detection Systems — Automatic Activation and Notification,Employ fire detection systems that activate automatically and notify [Assignment: organization-defined personnel or roles] and [Assignment: organization-defined emergency responders] in the event of a fire.,,
+PE-17,Alternate Work Site,"a. Determine and document the [Assignment: organization-defined alternate work sites] allowed for use by employees;
+b. Employ the following controls at alternate work sites: [Assignment: organization-defined controls];
+c. Assess the effectiveness of controls at alternate work sites; and
+d. Provide a means for employees to communicate with information security and privacy personnel in case of incidents.",,
+PM-1,Information Security Program Plan,"a. Develop and disseminate an organization-wide information security program plan that:
+1. Provides an overview of the requirements for the security program and a description of the security program management controls and common controls in place or planned for meeting those requirements;
+2. Includes the identification and assignment of roles, responsibilities, management commitment, coordination among organizational entities, and compliance;
+3. Reflects the coordination among organizational entities responsible for information security; and
+4. Is approved by a senior official with responsibility and accountability for the risk being incurred to organizational operations (including mission, functions, image, and reputation), organizational assets, individuals, other organizations, and the Nation;
+b. Review and update the organization-wide information security program plan [Assignment: organization-defined frequency] and following [Assignment: organization-defined events]; and
+c. Protect the information security program plan from unauthorized disclosure and modification.",,
+PM-2,Information Security Program Leadership Role,"Appoint a senior agency information security officer with the mission and resources to coordinate, develop, implement, and maintain an organization-wide information security program.",,
+PM-3,Information Security and Privacy Resources,"a. Include the resources needed to implement the information security and privacy programs in capital planning and investment requests and document all exceptions to this requirement;
+b. Prepare documentation required for addressing information security and privacy programs in capital planning and investment requests in accordance with applicable laws, executive orders, directives, policies, regulations, standards; and
+c. Make available for expenditure, the planned information security and privacy resources.",,
+PM-4,Plan of Action and Milestones Process,"a. Implement a process to ensure that plans of action and milestones for the information security, privacy, and supply chain risk management programs and associated organizational systems:
+1. Are developed and maintained;
+2. Document the remedial information security, privacy, and supply chain risk management actions to adequately respond to risk to organizational operations and assets, individuals, other organizations, and the Nation; and
+3. Are reported in accordance with established reporting requirements.
+b. Review plans of action and milestones for consistency with the organizational risk management strategy and organization-wide priorities for risk response actions.",,
+PM-6,Measures of Performance,"Develop, monitor, and report on the results of information security and privacy measures of performance.",,
+PM-7(1),Enterprise Architecture | Offloading,"Offload [Assignment: organization-defined non-essential functions or services] to other systems, system components, or an external provider.",,
+PM-8,Critical Infrastructure Plan,"Address information security and privacy issues in the development, documentation, and updating of a critical infrastructure and key resources protection plan.",,
+PM-9,Risk Management Strategy,"a. Develops a comprehensive strategy to manage:
+1. Security risk to organizational operations and assets, individuals, other organizations, and the Nation associated with the operation and use of organizational systems; and
+2. Privacy risk to individuals resulting from the authorized processing of personally identifiable information;
+b. Implement the risk management strategy consistently across the organization; and
+c. Review and update the risk management strategy [Assignment: organization-defined frequency] or as required, to address organizational changes.",,
+PM-10,Authorization Process,"a. Manage the security and privacy state of organizational systems and the environments in which those systems operate through authorization processes;
+b. Designate individuals to fulfill specific roles and responsibilities within the organizational risk management process; and
+c. Integrate the authorization processes into an organization-wide risk management program.",,
+PM-11,Mission and Business Process Definition,"a. Define organizational mission and business processes with consideration for information security and privacy and the resulting risk to organizational operations, organizational assets, individuals, other organizations, and the Nation; and
+b. Determine information protection and personally identifiable information processing needs arising from the defined mission and business processes; and
+c. Review and revise the mission and business processes [Assignment: organization-defined frequency].",,
+PM-12,Insider Threat Program,Implement an insider threat program that includes a cross-discipline insider threat incident handling team.,,
+PM-14,"Testing, Training, and Monitoring","a. Implement a process for ensuring that organizational plans for conducting security and privacy testing, training, and monitoring activities associated with organizational systems:
+1. Are developed and maintained; and
+2. Continue to be executed; and
+b. Review testing, training, and monitoring plans for consistency with the organizational risk management strategy and organization-wide priorities for risk response actions.",,
+PM-15,Security and Privacy Groups and Associations,"Establish and institutionalize contact with selected groups and associations within the security and privacy communities:
+a. To facilitate ongoing security and privacy education and training for organizational personnel;
+b. To maintain currency with recommended security and privacy practices, techniques, and technologies; and
+c. To share current security and privacy information, including threats, vulnerabilities, and incidents.",,
+PM-16,Threat Awareness Program,Implement a threat awareness program that includes a cross-organization information-sharing capability for threat intelligence.,,
+PM-16(1),Threat Awareness Program | Automated Means for Sharing Threat Intelligence,Employ automated mechanisms to maximize the effectiveness of sharing threat intelligence information.,,
+PM-18,Privacy Program Plan,"a. Develop and disseminate an organization-wide privacy program plan that provides an overview of the agency’s privacy program, and:
+1. Includes a description of the structure of the privacy program and the resources dedicated to the privacy program;
+2. Provides an overview of the requirements for the privacy program and a description of the privacy program management controls and common controls in place or planned for meeting those requirements;
+3. Includes the role of the senior agency official for privacy and the identification and assignment of roles of other privacy officials and staff and their responsibilities;
+4. Describes management commitment, compliance, and the strategic goals and objectives of the privacy program;
+5. Reflects coordination among organizational entities responsible for the different aspects of privacy; and
+6. Is approved by a senior official with responsibility and accountability for the privacy risk being incurred to organizational operations (including mission, functions, image, and reputation), organizational assets, individuals, other organizations, and the Nation; and 
+b. Update the plan [Assignment: organization-defined frequency] and to address changes in federal privacy laws and policy and organizational changes and problems identified during plan implementation or privacy control assessments.",,
+PM-19,Privacy Program Leadership Role,"Appoint a senior agency official for privacy with the authority, mission, accountability, and resources to coordinate, develop, and implement, applicable privacy requirements and manage privacy risks through the organization-wide privacy program.",,
+PM-20,Dissemination of Privacy Program Information,"Maintain a central resource webpage on the organization’s principal public website that serves as a central source of information about the organization’s privacy program and that:
+a. Ensures that the public has access to information about organizational privacy activities and can communicate with its senior agency official for privacy;
+b. Ensures that organizational privacy practices and reports are publicly available; and
+c. Employs publicly facing email addresses and/or phone lines to enable the public to provide feedback and/or direct questions to privacy offices regarding privacy practices.",,
+PM-20(1),"Dissemination of Privacy Program Information | Privacy Policies on Websites, Applications, and Digital Services","Develop and post privacy policies on all external-facing websites, mobile applications, and other digital services, that:
+(a) Are written in plain language and organized in a way that is easy to understand and navigate;
+(b) Provide information needed by the public to make an informed decision about whether and how to interact with the organization; and
+(c) Are updated whenever the organization makes a substantive change to the practices it describes and includes a time/date stamp to inform the public of the date of the most recent changes.",,
+PM-21,Accounting of Disclosures,"a. Develop and maintain an accurate accounting of disclosures of personally identifiable information, including:
+1. Date, nature, and purpose of each disclosure; and
+2. Name and address, or other contact information of the individual or organization to which the disclosure was made;
+b. Retain the accounting of disclosures for the length of the time the personally identifiable information is maintained or five years after the disclosure is made, whichever is longer; and
+c. Make the accounting of disclosures available to the individual to whom the personally identifiable information relates upon request.",,
+PM-22,Personally Identifiable Information Quality Management,"Develop and document organization-wide policies and procedures for:
+a. Reviewing for the accuracy, relevance, timeliness, and completeness of personally identifiable information across the information life cycle; 
+b. Correcting or deleting inaccurate or outdated personally identifiable information;
+c. Disseminating notice of corrected or deleted personally identifiable information to individuals or other appropriate entities; and
+d. Appeals of adverse decisions on correction or deletion requests.",,
+PM-23,Data Governance Body,Establish a Data Governance Body consisting of [Assignment: organization-defined roles] with [Assignment: organization-defined responsibilities].,,
+PM-24,Data Integrity Board,"Establish a Data Integrity Board to:
+a. Review proposals to conduct or participate in a matching program; and
+b. Conduct an annual review of all matching programs in which the agency has participated.",,
+PM-25,"Minimization of Personally Identifiable Information Used in Testing, Training, and Research","a. Develop, document, and implement policies and procedures that address the use of personally identifiable information for internal testing, training, and research;
+b. Limit or minimize the amount of personally identifiable information used for internal testing, training, and research purposes;
+c. Authorize the use of personally identifiable information when such information is required for internal testing, training, and research; and
+d. Review and update policies and procedures [Assignment: organization-defined frequency].",,
+PM-26,Complaint Management,"Implement a process for receiving and responding to complaints, concerns, or questions from individuals about the organizational security and privacy practices that includes:
+a. Mechanisms that are easy to use and readily accessible by the public;
+b. All information necessary for successfully filing complaints;
+c. Tracking mechanisms to ensure all complaints received are reviewed and addressed within [Assignment: organization-defined time period];
+d. Acknowledgement of receipt of complaints, concerns, or questions from individuals within [Assignment: organization-defined time period]; and
+e. Response to complaints, concerns, or questions from individuals within [Assignment: organization-defined time period].",,
+PM-27,Privacy Reporting,"a. Develop [Assignment: organization-defined privacy reports] and disseminate to:
+1. [Assignment: organization-defined oversight bodies] to demonstrate accountability with statutory, regulatory, and policy privacy mandates; and
+2. [Assignment: organization-defined officials] and other personnel with responsibility for monitoring privacy program compliance; and
+b. Review and update privacy reports [Assignment: organization-defined frequency].",,
+PM-28,Risk Framing,"a. Identify and document:
+1. Assumptions affecting risk assessments, risk responses, and risk monitoring;
+2. Constraints affecting risk assessments, risk responses, and risk monitoring;
+3. Priorities and trade-offs considered by the organization for managing risk; and
+4. Organizational risk tolerance;
+b. Distribute the results of risk framing activities to [Assignment: organization-defined personnel]; and
+c. Review and update risk framing considerations [Assignment: organization-defined frequency].",,
+PM-29,Risk Management Program Leadership Roles,"a. Appoint a Senior Accountable Official for Risk Management to align organizational information security and privacy management processes with strategic, operational, and budgetary planning processes; and
+b. Establish a Risk Executive (function) to view and analyze risk from an organization-wide perspective and ensure management of risk is consistent across the organization.",,
+PM-31,Continuous Monitoring Strategy,"Develop an organization-wide continuous monitoring strategy and implement continuous monitoring programs that include:
+a. Establishing the following organization-wide metrics to be monitored: [Assignment: organization-defined metrics];
+b. Establishing [Assignment: organization-defined frequencies] for monitoring and [Assignment: organization-defined frequencies] for assessment of control effectiveness;
+c. Ongoing monitoring of organizationally-defined metrics in accordance with the continuous monitoring strategy;
+d. Correlation and analysis of information generated by control assessments and monitoring;
+e. Response actions to address results of the analysis of control assessment and monitoring information; and
+f. Reporting the security and privacy status of organizational systems to [Assignment: organization-defined personnel or roles] [Assignment: organization-defined frequency].",,
+PM-32,Purposing,Analyze [Assignment: organization-defined systems or systems components] supporting mission essential services or functions to ensure that the information resources are being used consistent with their intended purpose.,,
+PT-1,Policy and Procedures,"a. Develop, document, and disseminate to [Assignment: organization-defined personnel or roles]:
+1. [Selection (one or more): Organization-level; Mission/business process-level; System-level] personally identifiable information processing and transparency policy that:
+(a) Addresses purpose, scope, roles, responsibilities, management commitment, coordination among organizational entities, and compliance; and
+(b) Is consistent with applicable laws, executive orders, directives, regulations, policies, standards, and guidelines; and
+2. Procedures to facilitate the implementation of the personally identifiable information processing and transparency policy and the associated personally identifiable information processing and transparency controls;
+b. Designate an [Assignment: organization-defined official] to manage the development, documentation, and dissemination of the personally identifiable information processing and transparency policy and procedures; and
+c. Review and update the current personally identifiable information processing and transparency:
+1. Policy [Assignment: organization-defined frequency] and following [Assignment: organization-defined events]; and
+2. Procedures [Assignment: organization-defined frequency] and following [Assignment: organization-defined events].",,
+PT-2,Authority to Process Personally Identifiable Information,"a. Determine and document the [Assignment: organization-defined authority] that permits the [Assignment: organization-defined processing] of personally identifiable information; and
+b. Restrict the [Assignment: organization-defined processing] of personally identifiable information to only that which is authorized.",,
+PT-2(1),Authority to Process Personally Identifiable Information | Data Tagging,Attach data tags containing [Assignment: organization-defined authorized processing] to [Assignment: organization-defined elements of personally identifiable information].,,
+PT-2(2),Authority to Process Personally Identifiable Information | Automation,Manage enforcement of the authorized processing of personally identifiable information using [Assignment: organization-defined automated mechanisms].,,
+PT-3,Personally Identifiable Information Processing Purposes,"a. Identify and document the [Assignment: organization-defined purpose(s)] for processing personally identifiable information;
+b. Describe the purpose(s) in the public privacy notices and policies of the organization; 
+c. Restrict the [Assignment: organization-defined processing] of personally identifiable information to only that which is compatible with the identified purpose(s); and 
+d. Monitor changes in processing personally identifiable information and implement [Assignment: organization-defined mechanisms] to ensure that any changes are made in accordance with [Assignment: organization-defined requirements].",,
+PT-3(1),Personally Identifiable Information Processing Purposes | Data Tagging,Attach data tags containing the following purposes to [Assignment: organization-defined elements of personally identifiable information]: [Assignment: organization-defined processing purposes].,,
+PT-3(2),Personally Identifiable Information Processing Purposes | Automation,Track processing purposes of personally identifiable information using [Assignment: organization-defined automated mechanisms].,,
+PT-4,Consent,Implement [Assignment: organization-defined tools or mechanisms] for individuals to consent to the processing of their personally identifiable information prior to its collection that facilitate individuals’ informed decision-making.,,
+PT-4(1),Consent | Tailored Consent,Provide [Assignment: organization-defined mechanisms] to allow individuals to tailor processing permissions to selected elements of personally identifiable information.,,
+PT-4(2),Consent | Just-in-time Consent,Present [Assignment: organization-defined consent mechanisms] to individuals at [Assignment: organization-defined frequency] and in conjunction with [Assignment: organization-defined personally identifiable information processing].,,
+PT-4(3),Consent | Revocation,Implement [Assignment: organization-defined tools or mechanisms] for individuals to revoke consent to the processing of their personally identifiable information.,,
+PT-5,Privacy Notice,"Provide notice to individuals about the processing of personally identifiable information that:
+a. Is available to individuals upon first interacting with an organization, and subsequently at [Assignment: organization-defined frequency];
+b. Is clear and easy-to-understand, expressing information about personally identifiable information processing in plain language;
+c. Identifies the authority that authorizes the processing of personally identifiable information;
+d. Identifies the purposes for which personally identifiable information is to be processed; and
+e. Includes [Assignment: organization-defined information].",,
+PT-5(1),Privacy Notice | Just-in-time Notice,"Present notice of personally identifiable information processing to individuals at a time and location where the individual provides personally identifiable information or in conjunction with a data action, or [Assignment: organization-defined frequency].",,
+PT-5(2),Privacy Notice | Privacy Act Statements,"Include Privacy Act statements on forms that collect information that will be maintained in a Privacy Act system of records, or provide Privacy Act statements on separate forms that can be retained by individuals.",,
+PT-6,System of Records Notice,"For systems that process information that will be maintained in a Privacy Act system of records:
+a. Draft system of records notices in accordance with OMB guidance and submit new and significantly modified system of records notices to the OMB and appropriate congressional committees for advance review;
+b. Publish system of records notices in the Federal Register; and
+c. Keep system of records notices accurate, up-to-date, and scoped in accordance with policy.",,
+PT-6(1),System of Records Notice | Routine Uses,"Review all routine uses published in the system of records notice at [Assignment: organization-defined frequency] to ensure continued accuracy, and to ensure that routine uses continue to be compatible with the purpose for which the information was collected.",,
+PT-6(2),System of Records Notice | Exemption Rules,"Review all Privacy Act exemptions claimed for the system of records at [Assignment: organization-defined frequency] to ensure they remain appropriate and necessary in accordance with law, that they have been promulgated as regulations, and that they are accurately described in the system of records notice.",,
+PT-7,Specific Categories of Personally Identifiable Information,Apply [Assignment: organization-defined processing conditions] for specific categories of personally identifiable information.,,
+PT-7(1),Specific Categories of Personally Identifiable Information | Social Security Numbers,"When a system processes Social Security numbers:
+(a) Eliminate unnecessary collection, maintenance, and use of Social Security numbers, and explore alternatives to their use as a personal identifier;
+(b) Do not deny any individual any right, benefit, or privilege provided by law because of such individual’s refusal to disclose his or her Social Security number; and
+(c) Inform any individual who is asked to disclose his or her Social Security number whether that disclosure is mandatory or voluntary, by what statutory or other authority such number is solicited, and what uses will be made of it.",,
+PT-7(2),Specific Categories of Personally Identifiable Information | First Amendment Information,Prohibit the processing of information describing how any individual exercises rights guaranteed by the First Amendment unless expressly authorized by statute or by the individual or unless pertinent to and within the scope of an authorized law enforcement activity.,,
+PT-8,Computer Matching Requirements,"When a system or organization processes information for the purpose of conducting a matching program:
+a. Obtain approval from the Data Integrity Board to conduct the matching program;
+b. Develop and enter into a computer matching agreement;
+c. Publish a matching notice in the Federal Register;
+d. Independently verify the information produced by the matching program before taking adverse action against an individual, if required; and
+e. Provide individuals with notice and an opportunity to contest the findings before taking adverse action against an individual.",,
+RA-5(5),Vulnerability Monitoring and Scanning | Privileged Access,Implement privileged access authorization to [Assignment: organization-defined system components] for [Assignment: organization-defined vulnerability scanning activities].,,
+RA-9,Criticality Analysis,"Identify critical system components and functions by performing a criticality analysis for [Assignment: organization-defined systems, system components, or system services] at [Assignment: organization-defined decision points in the system development life cycle].",,
+SA-4(1),Acquisition Process | Functional Properties of Controls,"Require the developer of the system, system component, or system service to provide a description of the functional properties of the controls to be implemented.",,
+SA-4(2),Acquisition Process | Design and Implementation Information for Controls,"Require the developer of the system, system component, or system service to provide design and implementation information for the controls that includes: [Selection (one or more): security-relevant external system interfaces; high-level design; low-level design; source code or hardware schematics; [Assignment: organization-defined design and implementation information]] at [Assignment: organization-defined level of detail].",,
+SA-4(9),"Acquisition Process | Functions, Ports, Protocols, and Services in Use","Require the developer of the system, system component, or system service to identify the functions, ports, protocols, and services intended for organizational use.",,
+SA-11,Developer Testing and Evaluation,"Require the developer of the system, system component, or system service, at all post-design stages of the system development life cycle, to:
+a. Develop and implement a plan for ongoing security and privacy control assessments;
+b. Perform [Selection (one or more): unit; integration; system; regression] testing/evaluation [Assignment: organization-defined frequency] at [Assignment: organization-defined depth and coverage];
+c. Produce evidence of the execution of the assessment plan and the results of the testing and evaluation;
+d. Implement a verifiable flaw remediation process; and
+e. Correct flaws identified during testing and evaluation.",,
+SA-15,"Development Process, Standards, and Tools","a. Require the developer of the system, system component, or system service to follow a documented development process that:
+1. Explicitly addresses security and privacy requirements;
+2. Identifies the standards and tools used in the development process;
+3. Documents the specific tool options and tool configurations used in the development process; and
+4. Documents, manages, and ensures the integrity of changes to the process and/or tools used in development; and
+b. Review the development process, standards, tools, tool options, and tool configurations [Assignment: organization-defined frequency] to determine if the process, standards, tools, tool options and tool configurations selected and employed can satisfy the following security and privacy requirements: [Assignment: organization-defined security and privacy requirements].",,
+SA-15(3),"Development Process, Standards, and Tools | Criticality Analysis","Require the developer of the system, system component, or system service to perform a criticality analysis:
+(a) At the following decision points in the system development life cycle: [Assignment: organization-defined decision points in the system development life cycle]; and
+(b) At the following level of rigor: [Assignment: organization-defined breadth and depth of criticality analysis].",,
+SC-2,Separation of System and User Functionality,"Separate user functionality, including user interface services, from system management functionality.",,
+SC-7(3),Boundary Protection | Access Points,Limit the number of external network connections to the system.,,
+SC-7(4),Boundary Protection | External Telecommunications Services,"(a) Implement a managed interface for each external telecommunication service;
+(b) Establish a traffic flow policy for each managed interface;
+(c) Protect the confidentiality and integrity of the information being transmitted across each interface;
+(d) Document each exception to the traffic flow policy with a supporting mission or business need and duration of that need;
+(e) Review exceptions to the traffic flow policy [Assignment: organization-defined frequency] and remove exceptions that are no longer supported by an explicit mission or business need;
+(f) Prevent unauthorized exchange of control plane traffic with external networks;
+(g) Publish information to enable remote networks to detect unauthorized control plane traffic from internal networks; and
+(h) Filter unauthorized control plane traffic from external networks.",,
+SC-7(7),Boundary Protection | Split Tunneling for Remote Devices,Prevent split tunneling for remote devices connecting to organizational systems unless the split tunnel is securely provisioned using [Assignment: organization-defined safeguards].,,
+SC-10,Network Disconnect,Terminate the network connection associated with a communications session at the end of the session or after [Assignment: organization-defined time period] of inactivity.,,
+SC-17,Public Key Infrastructure Certificates,"a. Issue public key certificates under an [Assignment: organization-defined certificate policy] or obtain public key certificates from an approved service provider; and
+b. Include only approved trust anchors in trust stores or certificate stores managed by the organization.",,
+SC-18,Mobile Code,"a. Define acceptable and unacceptable mobile code and mobile code technologies; and
+b. Authorize, monitor, and control the use of mobile code within the system.",,
+SI-8(3),Spam Protection | Continuous Learning Capability,Implement spam protection mechanisms with a learning capability to more effectively identify legitimate communications traffic.,,
+SI-10,Information Input Validation,Check the validity of the following information inputs: [Assignment: organization-defined information inputs to the system].,,
+SI-11,Error Handling,"a. Generate error messages that provide information necessary for corrective actions without revealing information that could be exploited; and
+b. Reveal error messages only to [Assignment: organization-defined personnel or roles].",,
+SI-16,Memory Protection,Implement the following controls to protect the system memory from unauthorized code execution: [Assignment: organization-defined controls].,,

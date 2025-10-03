@@ -1,0 +1,192 @@
+= Lab: The Three Tiers – Admin vs Developer vs Baseline NetworkPolicy
+:role: Intermediate Network Governance
+:skills: AdminNetworkPolicy, Policy Tiering, Egress/Intra-namespace Control
+:mitre: T1021 (Lateral Movement), T1071 (Application Layer Protocol), TA0008 (Lateral Movement)
+:compliance: NIST 800-53 SC-7, ISO 27001 A.13, PCI DSS 1.3
+:labid: LAB-I4B
+
+== Skill
+Apply layered network governance so platform (admin) policies set immutable guardrails while developer policies add only narrower allowances—never broader exposure.
+
+== Objective
+* Enforce egress allowlist with an AdminNetworkPolicy
+* Demonstrate developer attempt to bypass (fails)
+* Add default-deny ingress at a lower priority tier
+* Selectively re-allow intended ingress via developer policy
+== How to Try It
+. Namespaces & services:
++
+[source,sh]
+----
+oc new-project i4-tiered
+# Using standard UBI image which already includes curl and Python tooling
+oc create deployment approved --image=registry.access.redhat.com/ubi9/python-311 -- python3 -m http.server 8080
+oc expose deployment approved --port=8080 --target-port=8080
+oc new-project i4-alt
+oc create deployment alt --image=registry.access.redhat.com/ubi9/python-311 -- python3 -m http.server 9090
+oc expose deployment alt --port=9090 --target-port=9090
+APPROVED_IP=$(oc get svc approved -n i4-tiered -o jsonpath='{.spec.clusterIP}')
+ALT_IP=$(oc get svc alt -n i4-alt -o jsonpath='{.spec.clusterIP}')
+oc run client --image=registry.access.redhat.com/ubi9/ubi -n i4-tiered -- sleep 3600
+----
+. Baseline connectivity (both allowed initially):
++
+[source,sh]
+----
+oc exec client -n i4-tiered -- curl -s -o /dev/null -w '%{http_code}\n' http://$APPROVED_IP:8080
+oc exec client -n i4-tiered -- curl -s -o /dev/null -w '%{http_code}\n' http://$ALT_IP:9090
+----
+. Tier 1 AdminNetworkPolicy (egress allowlist):
++
+[source,sh]
+----
+cat <<'EOF' | oc apply -f -
+apiVersion: policy.networking.k8s.io/v1alpha1
+kind: AdminNetworkPolicy
+metadata:
+  name: tier1-egress
+spec:
+  priority: 10
+  subject:
+    namespaces:
+      matchLabels:
+        kubernetes.io/metadata.name: i4-tiered
+  egress:
+  - action: Allow
+    to:
+    - namespaces:
+        matchLabels:
+          kubernetes.io/metadata.name: i4-tiered
+    ports:
+    - protocol: TCP
+      port: 8080
+  - action: Deny
+    to:
+    - ipBlocks:
+      - cidr: 0.0.0.0/0
+EOF
+----
+. Retest (alt path should fail):
++
+[source,sh]
+----
+oc exec client -n i4-tiered -- curl -s -o /dev/null -w '%{http_code}\n' http://$APPROVED_IP:8080
+oc exec client -n i4-tiered -- curl -s --max-time 3 -o /dev/null -w '%{http_code}\n' http://$ALT_IP:9090 || echo DENIED
+----
+. Tier 2 developer attempt (ineffective override):
++
+[source,sh]
+----
+cat <<'EOF' | oc apply -n i4-tiered -f -
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dev-allow-alt
+spec:
+  podSelector: {}
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: i4-alt
+    ports:
+    - protocol: TCP
+      port: 9090
+  policyTypes: [Egress]
+EOF
+oc exec client -n i4-tiered -- curl -s --max-time 3 -o /dev/null -w '%{http_code}\n' http://$ALT_IP:9090 || echo STILL_DENIED
+----
+. Pre-baseline ingress test (currently open):
++
+[source,sh]
+----
+oc run alt-client --image=registry.access.redhat.com/ubi9/ubi -n i4-alt -- sleep 3600
+oc exec alt-client -n i4-alt -- curl -s -o /dev/null -w '%{http_code}\n' http://$APPROVED_IP:8080
+----
+. Tier 3 baseline ingress deny:
++
+[source,sh]
+----
+cat <<'EOF' | oc apply -f -
+apiVersion: policy.networking.k8s.io/v1alpha1
+kind: AdminNetworkPolicy
+metadata:
+  name: tier3-baseline-ingress
+spec:
+  priority: 200
+  subject:
+    namespaces:
+      matchLabels:
+        kubernetes.io/metadata.name: i4-tiered
+  ingress:
+  - action: Deny
+    from:
+    - ipBlocks:
+      - cidr: 0.0.0.0/0
+EOF
+oc exec alt-client -n i4-alt -- curl -s --max-time 3 -o /dev/null -w '%{http_code}\n' http://$APPROVED_IP:8080 || echo BLOCKED
+----
+. Developer ingress allow inside baseline:
++
+[source,sh]
+----
+cat <<'EOF' | oc apply -n i4-tiered -f -
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dev-allow-alt-ingress
+spec:
+  podSelector:
+    matchLabels:
+      app: approved
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: i4-alt
+    ports:
+    - protocol: TCP
+      port: 8080
+  policyTypes: [Ingress]
+EOF
+oc exec alt-client -n i4-alt -- curl -s -o /dev/null -w '%{http_code}\n' http://$APPROVED_IP:8080
+----
+. (Optional) Cleanup:
++
+[source,sh]
+----
+oc delete project i4-tiered --wait=false
+oc delete project i4-alt --wait=false
+oc delete adminnetworkpolicy tier1-egress tier3-baseline-ingress || true
+----
+
+== Solutions/Controls
+* AdminNetworkPolicy: High-priority segmentation & egress enforcement.
+* Developer NetworkPolicy: Least-privilege intra-namespace and selective ingress.
+* Priority Ordering: Mechanism preventing accidental baseline erosion.
+* Observability: Logging/metrics of denied flows to drive iterative improvement.
+
+== Summary Table
+[options="header"]
+|===
+| What to Secure | How | Outcome
+| Outbound Scope | AdminNetworkPolicy allowlist | Prevents arbitrary scanning
+| Ingress Baseline | High-priority deny | Zero-trust default stance
+| App-to-App Flows | Developer NetworkPolicies | Fine-grained openness
+| Order Predictability | Priority tiers | Fewer debugging cycles
+|===
+
+== FAQs
+Can a developer NetworkPolicy override an admin deny?:: No—higher-priority admin actions always win.
+Why have a broad deny at a later (higher) priority?:: It activates after specific earlier allows, ensuring minimal necessary openness.
+How do I debug which policy blocked traffic?:: Check AdminNetworkPolicy evaluation order + network plugin events; keep a doc mapping priority ranges to ownership.
+What if developers need a new egress destination?:: They request an allowlist update; never workaround with a broad developer policy.
+
+== Closing Story
+Admin policies are the building’s fire code; developer policies are furniture layout. One sets non‑negotiable safety, the other arranges usability inside those rules.
+
+== Next Step Ideas
+* Add metrics: count denied egress attempts per namespace
+* Enforce annotation on developer policies (owner/contact)
+* Introduce tiered policies for compliance zones (PCI vs general)
+

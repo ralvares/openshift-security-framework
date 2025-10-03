@@ -1,0 +1,97 @@
+ = Lab: You’re Not Even on My Network – Isolating Workloads with UDN
+:role: Intermediate Network Segmentation
+:skills: User Defined Networks, Hard Isolation, Segmentation Strategy
+:labid: LAB-I4C
+:toc:
+:sectnums:
+:icons: font
+
+== Skill
+Network segmentation (hard virtual isolation via User Defined Networks).
+
+== Scenario
+Two teams (tenant-a, tenant-b) must not be able to reach each other even if NetworkPolicies are misconfigured. UDN places namespaces on distinct overlays; cross-UDN traffic is inherently blocked.
+
+== Objectives
+* Create two namespaces
+* Assign each a distinct UDN
+* Deploy pods and capture their IPs
+* Attempt cross connectivity (should fail)
+
+== Prerequisites
+* OVN-Kubernetes with UDN feature (version-dependent; ensure enabled)
+* Cluster admin privileges
+
+== Namespaces
+[source,sh]
+----
+oc new-project tenant-a
+oc new-project tenant-b
+----
+
+== Annotate Namespaces with UDN
+(Replace annotation key if your version differs.)
+[source,sh]
+----
+oc annotate namespace tenant-a k8s.ovn.org/udn=tenant-a
+oc annotate namespace tenant-b k8s.ovn.org/udn=tenant-b
+----
+Confirm:
+[source,sh]
+----
+oc get ns tenant-a -o yaml | grep udn
+oc get ns tenant-b -o yaml | grep udn
+----
+
+== Test Pods
+[source,sh]
+----
+oc run a-pod --image=registry.access.redhat.com/ubi9/ubi -n tenant-a -- sleep 3600
+oc run b-pod --image=registry.access.redhat.com/ubi9/ubi -n tenant-b -- sleep 3600
+oc wait --for=condition=Ready pod/a-pod -n tenant-a --timeout=60s
+oc wait --for=condition=Ready pod/b-pod -n tenant-b --timeout=60s
+----
+Grab IPs:
+[source,sh]
+----
+A_IP=$(oc get pod a-pod -n tenant-a -o jsonpath='{.status.podIP}')
+B_IP=$(oc get pod b-pod -n tenant-b -o jsonpath='{.status.podIP}')
+echo A:$A_IP B:$B_IP
+----
+
+== Cross Connectivity Attempts
+[source,sh]
+----
+oc exec a-pod -n tenant-a -- curl -s --max-time 3 http://$B_IP:8080 || echo BLOCKED
+oc exec b-pod -n tenant-b -- curl -s --max-time 3 http://$A_IP:8080 || echo BLOCKED
+----
+No NetworkPolicies required and still blocked.
+
+== Intra-Tenant (Optional)
+[source,sh]
+----
+oc run a-pod2 --image=registry.access.redhat.com/ubi9/ubi -n tenant-a -- sleep 3600
+A2_IP=$(oc get pod a-pod2 -n tenant-a -o jsonpath='{.status.podIP}')
+# Likely no listener, but network path check
+oc exec a-pod -n tenant-a -- ping -c1 $A2_IP || true
+----
+
+== Troubleshooting
+[cols="1,2",options="header"]
+|===
+| Issue | Check
+| Cross ping succeeds | UDN feature not enabled / wrong annotation
+| Pods share same CIDR | Version may allocate unique subnets per UDN; verify cluster config
+|===
+
+== Cleanup
+[source,sh]
+----
+oc delete project tenant-a --wait=false
+oc delete project tenant-b --wait=false
+----
+
+== Key Points
+* UDN gives structural segmentation; fewer NetPol rules to maintain
+* Combine with NetworkPolicies for intra-UDN least privilege
+* Strong foundation for regulated environment separation (dev/test/prod)

@@ -1,5 +1,9 @@
 = Lab: Security & Compliance Add‑Ons – Building the Layered Defense
 :labid: LAB-B8
+:cis-summary: "Layer scanning, profiles, and security contexts (Compliance, SPO, RHACS) for continuous hardening."
+:mitre-summary: "Prevents undetected runtime and supply chain risks through layered scanning, enforced profiles, and policy-driven detection."
+:audit-evidence: "Commands list compliance profiles, schedule scan, and map components to hardening/detection roles."
+:cis-mitre-codes: '{"cisMapping":{"primary":["5.7.2","5.7.3"],"related":[]},"mitre":{"techniques":["T1611","T1195"],"tactics":["TA0004","TA0001"],"mitigations":["M1048","M1016"]}}'
 :toc:
 :sectnums:
 :icons: font
@@ -8,6 +12,7 @@
 Map how OpenShift security add-ons combine for scanning, hardening, detection, and compliance evidence.
 
 == Objective
+
 * Identify component roles
 * Run (or simulate) a benchmark scan
 * Discover SPO runtime hardening options
@@ -17,6 +22,7 @@ Map how OpenShift security add-ons combine for scanning, hardening, detection, a
 Platform defaults are locks & walls; add-ons become cameras, inspectors, detectors, and auto-remediators—shrinking time-to-detect and audit friction.
 
 == What it Solves
+
 * Manual ad hoc audit prep
 * Inconsistent seccomp/SELinux usage
 * Late discovery of vulnerable images
@@ -76,6 +82,7 @@ oc get compliancecheckresults.compliance.openshift.io | head
 NOTE: SPO manages recording & enforcing seccomp / SELinux profiles; deeper commands appear in advanced labs.
 
 == Solutions / Controls
+
 * Continuous scanning & remediation
 * Hardened runtime via seccomp/SELinux
 * Policy gates pre-runtime
@@ -103,6 +110,7 @@ Are scans disruptive?:: Low-impact; schedule off-peak for large estates.
 The cluster is a campus: locks (SCC), guards (RHACS), inspectors (Compliance), custom gear (SPO). Overlapping layers prevent single-point failure.
 
 == Next Step Ideas
+
 * Weekly scan diff reporting
 * Enforce signed images only (cosign + admission)
 * Gradual seccomp rollout starting with low-risk apps

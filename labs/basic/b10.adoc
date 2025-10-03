@@ -1,5 +1,9 @@
 = Lab: Friends Don’t Let Friends Use HTTP – Enforcing TLS End-to-End
 :labid: LAB-B10
+:cis-summary: "Enforce TLS on application routes with automatic HTTP→HTTPS redirects."
+:mitre-summary: "Prevents credential theft and data tampering by enforcing TLS and redirecting all plaintext route access."
+:audit-evidence: "Initial HTTP curl succeeds; after edge TLS route with redirect, HTTPS response retrieved and HTTP downgraded traffic redirected."
+:cis-mitre-codes: '{"cisMapping":{"primary":["1.2.26","1.2.30"],"related":[]},"mitre":{"techniques":["T1040"],"tactics":["TA0006"],"mitigations":["M1041"]}}'
 :toc:
 :sectnums:
 :icons: font
@@ -8,6 +12,7 @@
 Secure application access with TLS, enforce HTTPS-only behavior, choose edge vs re-encrypt termination.
 
 == Objective
+
 * Expose over HTTP
 * Add TLS (edge) + redirect
 * Validate HTTPS & cert
@@ -17,6 +22,7 @@ Secure application access with TLS, enforce HTTPS-only behavior, choose edge vs 
 HTTP is a postcard; TLS is a sealed envelope. Encrypted transit preserves confidentiality and integrity.
 
 == What it Solves
+
 * Credential theft
 * Session hijacking
 * Compliance failures
@@ -75,6 +81,7 @@ oc delete project b9-rebuild --wait=false
 ----
 
 == Solutions / Controls
+
 * Route TLS termination
 * Redirect policy enforcement
 * Re-encrypt mode for internal leg confidentiality
@@ -100,6 +107,7 @@ Re-encrypt vs passthrough difference?:: Re-encrypt terminates then re-establishe
 Enabling TLS + redirect is installing automatic door closers—connections don’t stay ajar.
 
 == Next Step Ideas
+
 * Deny non-TLS routes in prod via policy
 * Implement HSTS headers
 * Cert age monitoring & renewal alerts
