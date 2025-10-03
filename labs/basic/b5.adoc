@@ -1,9 +1,4 @@
 = Lab: Don’t Hardcode – Managing Secrets the Right Way
-:role: Beginner Application Security
-:skills: Kubernetes Secrets, Secret Rotation, Least Exposure, Configuration Hygiene
-:mitre: T1552 (Unsecured Credentials), T1555 (Credentials from Password Stores), TA0006 (Credential Access)
-:mitre_mitigations: M1027 (Password Policies), M1047 (Audit)
-:compliance: CIS OCP 1.8 5.4.1 (Secrets as Files), 5.4.2 (External Secret Storage)
 :labid: LAB-B5
 :toc:
 :sectnums:

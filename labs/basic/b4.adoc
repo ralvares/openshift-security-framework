@@ -1,9 +1,4 @@
 = Lab: You Shall Not Pass – Segmenting Pod Traffic with NetworkPolicies
-:role: Beginner Platform/App Security
-:skills: NetworkPolicy, Microsegmentation, Zero Trust Networking
-:mitre: T1021 (Remote Services), T1071 (Application Layer Protocol), T1105 (Ingress Tool Transfer), TA0008 (Lateral Movement), TA0011 (Command and Control)
-:mitre_mitigations: M1030 (Network Segmentation), M1037 (Filter Network Traffic)
-:compliance: CIS OCP 1.8 5.3.1 (CNI Supports Network Policies), 5.3.2 (Namespaces Have Network Policies Defined)
 :labid: LAB-B4
 :toc:
 :sectnums:

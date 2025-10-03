@@ -1,9 +1,4 @@
 = Lab: Logs Don’t Lie – Tracing Who Did What (Audit Forensics)
-:role: Beginner Security Operations
-:skills: Audit Logs, Forensic Triage, Subresource Analysis, Access Tracing
-:mitre: T1059 (Command and Scripting Interpreter), T1021 (Remote Services), T1105 (Ingress Tool Transfer), TA0002 (Execution), TA0008 (Lateral Movement), TA0011 (Command and Control)
-:mitre_mitigations: M1037 (Filter Network Traffic), M1047 (Audit)
-:compliance: CIS OCP 1.8 1.2.18 (Audit Log Path), 1.2.19 (Audit Log Forwarding), 1.2.20 (Max Retained Files), 1.2.21 (Max Audit Log Size), 3.2.1 (Minimal Audit Policy), 3.2.2 (Audit Policy Scope)
 :labid: LAB-B7
 :toc:
 :sectnums:

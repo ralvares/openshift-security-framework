@@ -1,9 +1,4 @@
 = Lab: Security & Compliance Add‑Ons – Building the Layered Defense
-:role: Beginner Platform Security & Compliance
-:skills: Compliance Operator, SPO, RHACS, SCC/PSA, Policy Automation
-:mitre: T1529 (System Shutdown/Restart), T1068 (Exploitation for Privilege Escalation), TA0003 (Persistence), TA0004 (Privilege Escalation), TA0005 (Defense Evasion)
-:mitre_mitigations: M1050 (Exploit Protection), M1048 (Application Isolation and Sandboxing)
-:compliance: CIS OCP 1.8 5.2.1 (Privileged Containers), 5.2.5 (Privilege Escalation), 5.2.6 (Root Containers)
 :labid: LAB-B8
 :toc:
 :sectnums:

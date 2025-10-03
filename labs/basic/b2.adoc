@@ -1,9 +1,4 @@
 = Lab: Who Really Has Access? (Default RBAC in Action)
-:role: Beginner Platform/App Security
-:skills: RBAC, Least Privilege, Access Review, Authorization Testing
-:mitre: T1078 (Valid Accounts), T1098 (Account Manipulation), TA0001 (Initial Access), TA0004 (Privilege Escalation)
-:mitre_mitigations: M1026 (Privileged Account Management)
-:compliance: CIS OCP 1.8 5.1.1 (Limit cluster-admin Use), 5.1.2 (Minimize Access to Secrets), 5.1.3 (Minimize Wildcards), 5.1.4 (Minimize Create Pod Access), 5.1.5 (Restrict Default Service Accounts), 5.1.6 (Limit SA Token Mounting)
 :labid: LAB-B2
 :toc:
 :sectnums:

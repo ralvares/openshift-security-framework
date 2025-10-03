@@ -1,9 +1,4 @@
 = Lab: Trusted Sources Only – Guardrails Against Unapproved Images
-:role: Beginner Supply Chain Security
-:skills: Trusted Registries, Image Hygiene, Admission Control, Basic Vulnerability Scanning Awareness
-:mitre: T1195 (Supply Chain Compromise), T1608 (Stage Capabilities), T1204 (User Execution), TA0001 (Initial Access), TA0005 (Defense Evasion)
-:mitre_mitigations: M1047 (Audit), M1050 (Exploit Protection)
-:compliance: CIS OCP 1.8 5.5.1 (Image Provenance)
 :labid: LAB-B6
 :toc:
 :sectnums:

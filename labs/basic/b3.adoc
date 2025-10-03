@@ -1,9 +1,4 @@
 = Lab: Why This Third-Party App Fails (SCC & Non-Root Realities)
-:role: Beginner Platform/App Security
-:skills: SCC, UID Strategy, Image Hardening, Principle of Least Privilege
-:mitre: T1611 (Escape to Host - Privilege Escalation), T1068 (Exploitation for Privilege Escalation), TA0004 (Privilege Escalation)
-:mitre_mitigations: M1040 (Behavior Prevention on Endpoint), M1050 (Exploit Protection) (refine)
-:compliance: CIS OCP 1.8 (Workload Security Controls) (refine section)
 :labid: LAB-B3A
 :toc:
 :sectnums:

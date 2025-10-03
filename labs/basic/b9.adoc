@@ -1,9 +1,4 @@
 = Lab: Secure by Design – Rebuilding Images for OpenShift
-:role: Beginner Image Hardening & Supply Chain
-:skills: Dockerfile Hardening, Non-Root Execution, UBI Base Adoption, Port Selection
-:mitre: T1611 (Escape to Host), T1068 (Exploitation for Privilege Escalation), T1195 (Supply Chain Compromise), TA0004 (Privilege Escalation), TA0005 (Defense Evasion)
-:mitre_mitigations: M1050 (Exploit Protection), M1038 (Execution Prevention)
-:compliance: CIS OCP 1.8 5.2.1 (Privileged Containers), 5.2.6 (Root Containers), 5.2.7 (NET_RAW Capability), 5.2.10 (Privileged SCC Access)
 :labid: LAB-B9
 :toc:
 :sectnums:

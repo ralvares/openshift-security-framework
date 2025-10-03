@@ -1,9 +1,4 @@
 = Lab: Least Privilege in Action (Why "It Works on My Laptop" Fails Here)
-:role: Beginner Platform/App Security
-:skills: SCC, Non-root Containers, Least Privilege, Image Hygiene
-:mitre: T1611 (Escape to Host), T1078 (Valid Accounts), T1098 (Account Manipulation), T1068 (Exploitation for Privilege Escalation), T1222 (File & Directory Permissions Modification), TA0001 (Initial Access), TA0003 (Persistence), TA0004 (Privilege Escalation), TA0005 (Defense Evasion)
-:mitre_mitigations: M1048 (Application Isolation and Sandboxing), M1030 (Network Segmentation), M1038 (Execution Prevention), M1026 (Privileged Account Management), M1050 (Exploit Protection)
-:compliance: CIS OCP 1.8 5.2.1 (Privileged Containers), 5.2.2 (Host PID Namespace), 5.2.5 (Privilege Escalation), 5.2.6 (Root Containers), 5.2.7 (NET_RAW Capability), 5.2.10 (Privileged SCC Access)
 :labid: LAB-B1
 :toc:
 :sectnums:

@@ -1,9 +1,4 @@
 = Lab: Friends Don’t Let Friends Use HTTP – Enforcing TLS End-to-End
-:role: Beginner Network/Application Security
-:skills: TLS Termination, Route Security, Encryption in Transit, Redirect Policy
-:mitre: T1557 (Adversary-in-the-Middle), T1040 (Network Sniffing), T1552 (Unsecured Credentials), TA0006 (Credential Access), TA0007 (Discovery)
-:mitre_mitigations: M1030 (Network Segmentation), M1037 (Filter Network Traffic), M1047 (Audit)
-:compliance: CIS OCP 1.8 1.2.29 (Encryption Providers), 1.2.30 (Strong Cryptographic Ciphers), 5.4.1 (Secrets as Files)
 :labid: LAB-B10
 :toc:
 :sectnums:

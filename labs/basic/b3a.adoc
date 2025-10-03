@@ -1,9 +1,4 @@
 = Lab: No Free Lunch – Controlling Resource Usage (Quotas & Limits)
-:role: Beginner Platform/App Resource Governance
-:skills: LimitRange, ResourceQuota, Capacity Planning, Multi-Tenancy
-:mitre: T1499 (Resource Hijacking), T1204 (User Execution), TA0040 (Impact), TA0002 (Execution)
-:mitre_mitigations: M1047 (Audit), M1030 (Network Segmentation), M1045 (Code Signing)
-:compliance: CIS OCP 1.8 5.2.7 (NET_RAW Capability), 5.2.8 (Added Capabilities), 5.2.9 (Capabilities Assigned)
 :labid: LAB-B3B
 :toc:
 :sectnums:
