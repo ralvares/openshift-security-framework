@@ -12,7 +12,7 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1022"]
       },
-      "explanation": "Restricting API server pod spec file permissions reduces discovery (T1083) and permission modification (T1222) opportunities (Defense Evasion TA0005, Discovery TA0007) via least-privilege file ACLs (M1022)."
+  "explanation": "This CIS control requires the API server pod specification manifest be mode 600 (owner read/write only). It mitigates File and Directory Discovery (T1083) and File Permissions Modification (T1222) in Discovery (TA0007) / Defense Evasion (TA0005) by denying broad read or tamper access. OpenShift enforces this through MachineConfig-driven immutable host layers, RBAC-restricted manifest access, and operator reconciliation. Mitigation: M1022."
     },
     "1.1.2": {
       "title": "1.1.2 Ensure that the API server pod specification file ownership is set to root:root",
@@ -26,7 +26,7 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Root:root ownership of the API server pod spec limits unauthorized modification (T1222) and reconnaissance of configuration (T1083), enforcing dedicated admin control (M1026)."
+  "explanation": "This CIS control requires the API server pod specification file be owned root:root. It mitigates File Permissions Modification (T1222) and File and Directory Discovery (T1083) (Defense Evasion TA0005 / Discovery TA0007) by preventing delegated ownership changes. OpenShift secures ownership with immutable host filesystem layers and RBAC-limited operator access. Mitigation: M1026."
     },
     "1.1.3": {
       "title": "1.1.3 Ensure that the controller manager pod specification file permissions are set to 600 or more restrictive",
@@ -40,7 +40,7 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1022"]
       },
-      "explanation": "Tight controller manager spec file permissions block discovery (T1083) and config tampering (T1222) via restrictive ACLs (M1022) limiting defense evasion and reconnaissance."
+  "explanation": "This CIS control requires the controller manager pod manifest be permissioned 600. It mitigates File and Directory Discovery (T1083) and File Permissions Modification (T1222) (Discovery TA0007 / Defense Evasion TA0005) by restricting read/write avenues. OpenShift maintains ACLs via MachineConfig and operator reconciliation. Mitigation: M1022."
     },
     "1.1.4": {
       "title": "1.1.4 Ensure that the controller manager pod specification file ownership is set to root:root",
@@ -54,7 +54,7 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Root ownership prevents non‑admin alteration (T1222) and limits sensitive file reconnaissance (T1083) through privileged account management (M1026)."
+  "explanation": "This CIS control requires controller manager manifest ownership root:root. It mitigates File Permissions Modification (T1222) and File and Directory Discovery (T1083) across Defense Evasion (TA0005) / Discovery (TA0007) by preventing non-root takeover. OpenShift enforces ownership with immutable images and RBAC separation. Mitigation: M1026."
     },
     "1.1.5": {
       "title": "1.1.5 Ensure that the scheduler pod specification file permissions are set to 600 or more restrictive",
@@ -68,7 +68,7 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1022"]
       },
-      "explanation": "Restricting scheduler pod spec permissions thwarts config discovery (T1083) and alteration (T1222) using strong ACLs (M1022)."
+  "explanation": "This CIS control requires the scheduler static pod manifest be 600. It mitigates File and Directory Discovery (T1083) and File Permissions Modification (T1222) (Discovery TA0007 / Defense Evasion TA0005) by denying group/world visibility. OpenShift enforces permissions through MachineConfig and operator reconciliation. Mitigation: M1022."
     },
     "1.1.6": {
       "title": "1.1.6 Ensure that the scheduler pod specification file ownership is set to root:root",
@@ -82,7 +82,7 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Root ownership confines modification (T1222) and limits sensitive file discovery (T1083) through privileged account separation (M1026)."
+  "explanation": "This CIS control requires scheduler manifest ownership root:root. It mitigates File Permissions Modification (T1222) and File and Directory Discovery (T1083) (Defense Evasion TA0005 / Discovery TA0007) by removing alternate write owners. OpenShift protects ownership through immutable hosts and RBAC-limited operator actions. Mitigation: M1026."
     },
     "1.1.7": {
       "title": "1.1.7 Ensure that the etcd pod specification file permissions are set to 600 or more restrictive",
@@ -96,7 +96,7 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1022"]
       },
-      "explanation": "Locking etcd pod spec permissions mitigates reconnaissance (T1083) and config tampering (T1222) using restrictive ACLs (M1022)."
+  "explanation": "This CIS control requires etcd pod manifest files be permissioned 600. It mitigates File and Directory Discovery (T1083) and File Permissions Modification (T1222) (Discovery TA0007 / Defense Evasion TA0005) by denying broad inspection or tampering. OpenShift enforces via config management and operator reconciliation. Mitigation: M1022."
     },
     "1.1.8": {
       "title": "1.1.8 Ensure that the etcd pod specification file ownership is set to root:root",
@@ -110,7 +110,7 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Ensuring root ownership of etcd pod spec limits unauthorized edits (T1222) and sensitive spec enumeration (T1083) through admin account control (M1026)."
+  "explanation": "This CIS control requires etcd manifest ownership root:root. It mitigates File Permissions Modification (T1222) and File and Directory Discovery (T1083) by preventing rogue ownership shifts (Defense Evasion TA0005 / Discovery TA0007). OpenShift ensures this with immutable host layers and operator reconciliation. Mitigation: M1026."
     },
     "1.1.9": {
       "title": "1.1.9 Ensure that the Container Network Interface file permissions are set to 600 or more restrictive",
@@ -124,7 +124,7 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1022"]
       },
-      "explanation": "Restricting CNI file permissions blocks adversary discovery (T1083) and unauthorized changes (T1222) via ACL hardening (M1022)."
+  "explanation": "This CIS control requires CNI configuration files be 600. It mitigates File and Directory Discovery (T1083) and File Permissions Modification (T1222) (Discovery TA0007 / Defense Evasion TA0005) by limiting network plugin reconnaissance or edits. OpenShift network operators apply and preserve ACLs. Mitigation: M1022."
     },
     "1.1.10": {
       "title": "1.1.10 Ensure that the Container Network Interface file ownership is set to root:root",
@@ -138,7 +138,7 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Root ownership of CNI files narrows modification (T1222) and reconnaissance (T1083) vectors using privileged account separation (M1026)."
+  "explanation": "This CIS control requires root:root ownership of CNI configuration files. It mitigates File Permissions Modification (T1222) and File and Directory Discovery (T1083) (Defense Evasion TA0005 / Discovery TA0007) by restricting unauthorized network stack changes. OpenShift operators enforce ownership and revert drift. Mitigation: M1026."
     },
     "1.1.11": {
       "title": "1.1.11 Ensure that the etcd data directory permissions are set to 700 or more restrictive",
@@ -152,7 +152,7 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1022"]
       },
-      "explanation": "700 etcd data dir permissions mitigate key-value reconnaissance (T1083) and malicious edits (T1222) through access restriction (M1022)."
+  "explanation": "This CIS control requires etcd data directory permissions 700. It mitigates File and Directory Discovery (T1083) and File Permissions Modification (T1222) (Discovery TA0007 / Defense Evasion TA0005) by blocking non-owner traversal. OpenShift adds encryption and process confinement for layered protection. Mitigation: M1022."
     },
     "1.1.12": {
       "title": "1.1.12 Ensure that the etcd data directory ownership is set to etcd:etcd",
@@ -166,7 +166,7 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Ownership by etcd user confines unauthorized privilege use (T1222) and sensitive store enumeration (T1083) via controlled admin accounts (M1026)."
+  "explanation": "This CIS control requires etcd data directory ownership etcd:etcd. It mitigates File Permissions Modification (T1222) and File and Directory Discovery (T1083) (Defense Evasion TA0005 / Discovery TA0007) by constraining write authority to the service user. OpenShift uses dedicated systemd units and SELinux labels. Mitigation: M1026."
     },
     "1.1.13": {
       "title": "1.1.13 Ensure that the kubeconfig file permissions are set to 600 or more restrictive",
@@ -180,7 +180,7 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1022"]
       },
-      "explanation": "600 kubeconfig permissions reduce credential/config discovery (T1083) and alteration (T1222) through enforced ACLs (M1022)."
+  "explanation": "This CIS control requires kubeconfig files be 600. It mitigates File and Directory Discovery (T1083) and File Permissions Modification (T1222) (Discovery TA0007 / Defense Evasion TA0005) by limiting endpoint and credential exposure. OpenShift applies ACLs, PKI issuance, and RBAC gating. Mitigation: M1022."
     },
     "1.1.14": {
       "title": "1.1.14 Ensure that the kubeconfig file ownership is set to root:root",
@@ -194,7 +194,7 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Root ownership of kubeconfig curtails privilege misuse (T1222) and limits config reconnaissance (T1083) by dedicated admin account control (M1026)."
+  "explanation": "This CIS control requires kubeconfig ownership root:root. It mitigates File Permissions Modification (T1222) and File and Directory Discovery (T1083) across Defense Evasion (TA0005) / Discovery (TA0007) by denying unprivileged rewrites. OpenShift enforces via immutable hosts and operator reconciliation. Mitigation: M1026."
     },
     "1.1.15": {
       "title": "1.1.15 Ensure that the Scheduler kubeconfig file permissions are set to 600 or more restrictive",
@@ -208,7 +208,7 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1022"]
       },
-      "explanation": "Scheduler kubeconfig 600 permissions reduce discovery (T1083) and alteration (T1222) risk via restrictive ACLs (M1022)."
+  "explanation": "This CIS control requires scheduler kubeconfig permissions 600. It mitigates File and Directory Discovery (T1083) and File Permissions Modification (T1222) (Discovery TA0007 / Defense Evasion TA0005) by protecting embedded credentials. OpenShift enforces via ACLs and certificate rotation. Mitigation: M1022."
     },
     "1.1.16": {
       "title": "1.1.16 Ensure that the Scheduler kubeconfig file ownership is set to root:root",
@@ -222,7 +222,7 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Root ownership of scheduler kubeconfig constrains modification (T1222) and reconnaissance (T1083) through admin separation (M1026)."
+  "explanation": "This CIS control requires scheduler kubeconfig ownership root:root. It mitigates File Permissions Modification (T1222) and File and Directory Discovery (T1083) (Defense Evasion TA0005 / Discovery TA0007) by stopping credential redirection. OpenShift preserves ownership through immutable OS layers. Mitigation: M1026."
     },
     "1.1.17": {
       "title": "1.1.17 Ensure that the Controller Manager kubeconfig file permissions are set to 600 or more restrictive",
@@ -236,7 +236,7 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1022"]
       },
-      "explanation": "Controller manager kubeconfig restrictive permissions hinder discovery (T1083) and tampering (T1222) via ACL enforcement (M1022)."
+  "explanation": "This CIS control requires controller manager kubeconfig permissions 600. It mitigates File and Directory Discovery (T1083) and File Permissions Modification (T1222) (Discovery TA0007 / Defense Evasion TA0005) by restricting credential exposure. OpenShift enforces ACLs and rotation. Mitigation: M1022."
     },
     "1.1.18": {
       "title": "1.1.18 Ensure that the Controller Manager kubeconfig file ownership is set to root:root",
@@ -250,7 +250,7 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Root ownership of controller manager kubeconfig prevents unauthorized edits (T1222) and sensitive config listing (T1083) through admin account controls (M1026)."
+  "explanation": "This CIS control requires controller manager kubeconfig ownership root:root. It mitigates File Permissions Modification (T1222) and File and Directory Discovery (T1083) (Defense Evasion TA0005 / Discovery TA0007) by preventing unauthorized credential redirection. OpenShift enforces via immutable host, SELinux, and operators. Mitigation: M1026."
     },
     "1.1.19": {
       "title": "1.1.19 Ensure that the OpenShift PKI directory and file ownership is set to root:root",
@@ -264,7 +264,7 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Root ownership of PKI assets reduces credential/key discovery (T1083) and permission abuse (T1222) via privileged admin separation (M1026)."
+  "explanation": "This CIS control requires OpenShift PKI directory/file ownership root:root. It mitigates File and Directory Discovery (T1083) and File Permissions Modification (T1222) (Discovery TA0007 / Defense Evasion TA0005) by restricting certificate/key tampering. OpenShift PKI operators and SELinux labels enforce protection. Mitigation: M1026."
     },
     "1.1.20": {
       "title": "1.1.20 Ensure that the OpenShift PKI certificate file permissions are set to 600 or more restrictive",
@@ -278,21 +278,21 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1022"]
       },
-      "explanation": "600 PKI cert file permissions restrict enumeration (T1083) and unauthorized file changes (T1222) through ACL hardening (M1022)."
+  "explanation": "This CIS control requires PKI certificate files be 600. It mitigates File and Directory Discovery (T1083) and File Permissions Modification (T1222) (Discovery TA0007 / Defense Evasion TA0005) by limiting chain reconnaissance/tamper paths. OpenShift PKI operators and ACLs enforce. Mitigation: M1022."
     },
     "1.1.21": {
       "title": "1.1.21 Ensure that the OpenShift PKI key file permissions are set to 600",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
-        "cisv8": "4.8 Uninstall or Disable Unnecessary Services on Enterprise Assets and Software",
-        "cisv7": "5.2 Maintain Secure Images"
+        "cisv8": "3.3 Configure Data Access Control Lists",
+        "cisv7": "14.6 Protect Information through Access Control Lists"
       },
       "mitre": {
-        "techniques": ["T1068"],
-        "tactics": ["TA0004"],
-        "mitigations": ["M1050"]
+        "techniques": ["T1083", "T1222"],
+        "tactics": ["TA0005", "TA0007"],
+        "mitigations": ["M1022"]
       },
-      "explanation": "Dropping NET_RAW reduces kernel/network exploit chaining (T1068) in Privilege Escalation (TA0004) via capability isolation (M1050)."
+  "explanation": "This CIS control requires PKI private key files be 600. It mitigates File and Directory Discovery (T1083) and File Permissions Modification (T1222) (Discovery TA0007 / Defense Evasion TA0005) by preventing disclosure or replacement. OpenShift protects keys via root directories, SELinux, and operator rotation. Mitigation: M1022."
     },
     "1.2.1": {
       "title": "1.2.1 Ensure that anonymous requests are authorized",
@@ -306,7 +306,7 @@
         "tactics": ["TA0001", "TA0004"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Requiring authorization of anonymous API calls prevents misuse of unauthenticated access paths evolving into valid account abuse (T1078) for Initial Access / Privilege Escalation (TA0001/TA0004) through RBAC enforcement (M1026) in OpenShift."
+      "explanation": "This CIS control requires that anonymous (unauthenticated) API requests are subjected to authorization instead of being implicitly allowed. It mitigates Valid Accounts misuse (T1078) mapped to Initial Access and Privilege Escalation (TA0001/TA0004) by removing a frictionless path to enumerate or invoke privileged operations anonymously. OpenShift enforces this through API server configuration (anonymous-auth=false / authorization-mode=RBAC) and RBAC policy evaluation so every request flows through subject review before resource access. Mitigation: M1026."
     },
     "1.2.2": {
       "title": "1.2.2 Use https for kubelet connections",
@@ -320,7 +320,7 @@
         "tactics": ["TA0006"],
         "mitigations": ["M1041"]
       },
-      "explanation": "Enforcing HTTPS for kubelet connections protects credentials and tokens from capture (T1552) in Credential Access (TA0006) via encrypted transport channel enforcement (M1041) in OpenShift."
+      "explanation": "This CIS control requires all kubelet interactions to occur over HTTPS rather than plain HTTP. It mitigates Credentials from Configuration/Files exposure (T1552) within the Credential Access (TA0006) tactic by preventing interception of tokens and client certs in transit. OpenShift configures the kubelet and API server with cluster-issued PKI certs and enforces TLS via systemd units and operators, ensuring encrypted, authenticated channels. Mitigation: M1041."
     },
     "1.2.3": {
       "title": "1.2.3 Ensure that the kubelet uses certificates to authenticate",
@@ -334,7 +334,7 @@
         "tactics": ["TA0001", "TA0004"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Mutual certificate authentication for kubelet API interactions constrains unauthorized node impersonation and valid account misuse (T1078) across Initial Access / Privilege Escalation (TA0001/TA0004) via identity-based RBAC validation (M1026)."
+      "explanation": "This CIS control requires the kubelet to present client certificates for authenticating to the control plane. It mitigates misuse of Valid Accounts (T1078) associated with Initial Access and Privilege Escalation (TA0001/TA0004) by preventing unauthenticated node impersonation. OpenShift automates certificate issuance and rotation for kubelets through its cluster machine and certificate signing operators, integrating with RBAC to bind node identities securely. Mitigation: M1026."
     },
     "1.2.4": {
       "title": "1.2.4 Verify that the kubelet certificate authority is set as appropriate",
@@ -348,7 +348,7 @@
         "tactics": ["TA0006"],
         "mitigations": ["M1041"]
       },
-      "explanation": "Validating the kubelet client CA prevents acceptance of spoofed certificates that could expose credentials (T1552) in Credential Access (TA0006) by enforcing trusted cryptographic roots (M1041)."
+      "explanation": "This CIS control requires the API server (and peers) to trust only an approved certificate authority for kubelet client certs. It mitigates credential harvesting and secret interception (T1552) within Credential Access (TA0006) by rejecting spoofed or rogue certificates that could access cluster data. OpenShift’s integrated PKI and certificate authority management via operators ensures only platform-signed kubelet certs are honored and rotated. Mitigation: M1041."
     },
     "1.2.5": {
       "title": "1.2.5 Ensure that the --authorization-mode argument is not set to AlwaysAllow",
@@ -362,7 +362,7 @@
         "tactics": ["TA0001", "TA0004"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Disabling AlwaysAllow enforces subject authorization checks reducing valid account abuse (T1078) for Initial Access / Privilege Escalation (TA0001/TA0004) through centralized RBAC policy (M1026)."
+      "explanation": "This CIS control requires avoiding the insecure AlwaysAllow authorization mode and using policy-driven modes (e.g., RBAC). It mitigates Valid Accounts abuse (T1078) tied to Initial Access and Privilege Escalation (TA0001/TA0004) by preventing unconditional acceptance of any authenticated identity’s requests. OpenShift enforces RBAC as the authorization backend through cluster-kube-apiserver-operator configuration, ensuring every request is evaluated against roles and bindings. Mitigation: M1026."
     },
     "1.2.6": {
       "title": "1.2.6 Verify that RBAC is enabled",
@@ -376,7 +376,7 @@
         "tactics": ["TA0001", "TA0004"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Enabling RBAC ensures fine-grained authorization limiting misuse of valid credentials (T1078) in Initial Access / Privilege Escalation (TA0001/TA0004) via least privilege policy (M1026) within OpenShift."
+      "explanation": "This CIS control requires Role-Based Access Control be active for API authorization decisions. It mitigates misuse of Valid Accounts (T1078) in Initial Access and Privilege Escalation (TA0001/TA0004) by enforcing least privilege boundaries on every verb/resource combination. OpenShift natively enables RBAC and layers SCC admission, namespace scoping, and operator-managed roles to constrain privilege expansion. Mitigation: M1026."
     },
     "1.2.7": {
       "title": "1.2.7 Ensure that the APIPriorityAndFairness feature gate is enabled",
@@ -390,7 +390,7 @@
         "tactics": ["TA0040"],
         "mitigations": ["M1037"]
       },
-      "explanation": "APIPriorityAndFairness throttles abusive request floods reducing resource exhaustion (T1499) under Impact (TA0040) via prioritized and fair API server queuing (M1037)."
+      "explanation": "This CIS control requires enabling APIPriorityAndFairness to apply priority and concurrency limits to API requests. It mitigates Resource Hijacking / Exhaustion patterns like Endpoint Denial of Service (T1499) under the Impact (TA0040) tactic by preventing low-priority floods from starving critical operations. OpenShift configures and maintains this feature gate in the API server via operators, shaping queues and flow schemas to sustain service availability. Mitigation: M1037."
     },
     "1.2.8": {
       "title": "1.2.8 Ensure that the admission control plugin AlwaysAdmit is not set",
@@ -404,7 +404,7 @@
         "tactics": ["TA0002"],
         "mitigations": ["M1038"]
       },
-      "explanation": "Disabling AlwaysAdmit forces admission evaluation reducing arbitrary API object execution paths (T1106) in Execution (TA0002) via policy-based workload validation (M1038)."
+      "explanation": "This CIS control requires disabling the permissive AlwaysAdmit admission plugin. It mitigates abuse of Native API Execution (T1106) within the Execution (TA0002) tactic by ensuring all create/update operations pass through structured admission validation and policy checks. OpenShift relies on a curated admission chain (SCCs, image policy, namespace lifecycle, quota, and webhooks) managed by cluster operators instead of Allow-All admission. Mitigation: M1038."
     },
     "1.2.9": {
       "title": "1.2.9 Ensure that the admission control plugin AlwaysPullImages is not set",
@@ -418,10 +418,10 @@
         "tactics": ["TA0001"],
         "mitigations": ["M1016"]
       },
-      "explanation": "Controlling AlwaysPullImages avoids unintended pulling of unvetted images reducing supply chain compromise (T1195) in Initial Access (TA0001) via enforced trusted image source policy (M1016) in OpenShift."
+      "explanation": "This CIS control requires not enabling AlwaysPullImages so image retrieval follows trusted, policy-driven sources rather than unconditional pulls. It mitigates Supply Chain Compromise (T1195) in the Initial Access (TA0001) tactic by reducing exposure to swapped or newly poisoned registries at runtime. OpenShift enforces image provenance through ImageStreams, signature/policy enforcement, admission webhooks, and registry mirroring policies rather than blanket image pulls. Mitigation: M1016."
     },
     "1.2.10": {
-  "title": "1.2.10 Ensure that the admission control plugin ServiceAccount is set",
+      "title": "1.2.10 Ensure that the admission control plugin ServiceAccount is set",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "6.8 Define and Maintain Role-Based Access Control",
@@ -432,10 +432,10 @@
         "tactics": ["TA0001", "TA0006"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Enabling ServiceAccount admission enforces controlled credential issuance limiting valid account abuse (T1078) for Initial Access / Credential Access (TA0001/TA0006) via account governance (M1026)."
+      "explanation": "This CIS control requires enabling the ServiceAccount admission plugin so pods receive properly managed service account tokens when intended. It mitigates Valid Accounts misuse (T1078) affecting Initial Access and Credential Access (TA0001/TA0006) by regulating automatic token creation, mounting, and secret references. OpenShift couples this admission plugin with automountServiceAccountToken defaults, RBAC, and token audience/expiration management to constrain credential sprawl. Mitigation: M1026."
     },
     "1.2.11": {
-  "title": "1.2.11 Ensure that the admission control plugin NamespaceLifecycle is set",
+      "title": "1.2.11 Ensure that the admission control plugin NamespaceLifecycle is set",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "3.3 Configure Data Access Control Lists",
@@ -446,10 +446,10 @@
         "tactics": ["TA0005"],
         "mitigations": ["M1018"]
       },
-      "explanation": "NamespaceLifecycle admission blocks interaction with terminating or orphaned namespaces reducing resource manipulation (T1578) in Defense Evasion (TA0005) via policy controls (M1018)."
+      "explanation": "This CIS control requires the NamespaceLifecycle admission plugin remain enabled to block operations in terminating or nonexistent namespaces. It mitigates Modify Cloud Compute Infrastructure / orphan resource manipulation patterns (T1578) under Defense Evasion (TA0005) by preventing attackers from abusing inconsistent namespace states. OpenShift enforces this uniformly so namespace deletion, finalizers, and controlled cleanup proceed through operator and API safeguards. Mitigation: M1018."
     },
     "1.2.12": {
-  "title": "1.2.12 Ensure that the admission control plugin SecurityContextConstraint is set",
+      "title": "1.2.12 Ensure that the admission control plugin SecurityContextConstraint is set",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "4.1 Establish and Maintain a Secure Configuration Process",
@@ -460,10 +460,10 @@
         "tactics": ["TA0004"],
         "mitigations": ["M1048"]
       },
-      "explanation": "SecurityContextConstraint admission enforces runtime privilege boundaries reducing container escape vectors (T1611) in Privilege Escalation (TA0004) via syscall and capability restriction (M1048)."
+      "explanation": "This CIS control requires enabling the SecurityContextConstraint (SCC) admission plugin unique to OpenShift. It mitigates Escape to Host / Container Breakout (T1611) within Privilege Escalation (TA0004) by enforcing capabilities, user IDs, SELinux context, seccomp, and volume restrictions at admission. OpenShift ships predefined SCC tiers and uses RBAC binding to control which identities can request less restrictive execution profiles. Mitigation: M1048."
     },
     "1.2.13": {
-  "title": "1.2.13 Ensure that the admission control plugin NodeRestriction is set",
+      "title": "1.2.13 Ensure that the admission control plugin NodeRestriction is set",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "6.8 Define and Maintain Role-Based Access Control",
@@ -474,10 +474,10 @@
         "tactics": ["TA0008"],
         "mitigations": ["M1038"]
       },
-      "explanation": "NodeRestriction admission limits kubelet and node credential scope reducing administrative command abuse (T1609) for Lateral Movement (TA0008) through execution prevention policies (M1038)."
+      "explanation": "This CIS control requires enabling the NodeRestriction admission plugin to constrain what kubelets can modify (e.g., Node / Pod objects bound to themselves). It mitigates abuse of Container Administration Commands (T1609) aligned with Lateral Movement (TA0008) by preventing node identities from escalating control over other workloads or nodes. OpenShift activates and maintains this plugin in the API server configuration, pairing it with certificate-based node identities. Mitigation: M1038."
     },
     "1.2.14": {
-  "title": "1.2.14 Ensure that the --insecure-bind-address argument is not set",
+      "title": "1.2.14 Ensure that the --insecure-bind-address argument is not set",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "16.11 Leverage Vetted Modules or Services for Application Security Components",
@@ -488,10 +488,10 @@
         "tactics": ["TA0002"],
         "mitigations": ["M1035"]
       },
-      "explanation": "Disallowing insecure bind prevents unauthenticated API method invocation (T1106) impacting Execution (TA0002) through secured interface hardening (M1035)."
+      "explanation": "This CIS control requires avoiding use of --insecure-bind-address for the API server. It mitigates Native API Execution (T1106) inside the Execution (TA0002) tactic by eliminating an unauthenticated cleartext listener that could expose administrative verbs. OpenShift binds control plane services only to secure interfaces with TLS and authentication enforced by cluster-managed PKI and firewalling. Mitigation: M1035."
     },
     "1.2.15": {
-  "title": "1.2.15 Ensure that the --insecure-port argument is set to 0",
+      "title": "1.2.15 Ensure that the --insecure-port argument is set to 0",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "16.11 Leverage Vetted Modules or Services for Application Security Components",
@@ -502,10 +502,10 @@
         "tactics": ["TA0002"],
         "mitigations": ["M1035"]
       },
-      "explanation": "Removing insecure port closes unauthenticated execution channel (T1609) in Execution (TA0002) via service interface restriction (M1035)."
+      "explanation": "This CIS control requires setting the API server --insecure-port to 0 to disable the unauthenticated port. It mitigates misuse of Container Administration / control interfaces (T1609) under Execution (TA0002) by removing a plaintext attack surface for issuing API calls. OpenShift configures the API server exclusively with secure TLS ports managed through operators and disallows the legacy insecure endpoint. Mitigation: M1035."
     },
     "1.2.16": {
-  "title": "1.2.16 Ensure that the --secure-port argument is not set to 0",
+      "title": "1.2.16 Ensure that the --secure-port argument is not set to 0",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "3.10 Encrypt Sensitive Data in Transit",
@@ -516,10 +516,10 @@
         "tactics": ["TA0002"],
         "mitigations": ["M1035"]
       },
-      "explanation": "Maintaining the secure (TLS) port enforces encrypted authenticated API execution preventing plain-text method abuse (T1609) (Execution TA0002) through secure protocol enforcement (M1035)."
+      "explanation": "This CIS control requires keeping a non-zero secure (TLS) port for the API server. It mitigates abuse of administrative execution paths (T1609) in Execution (TA0002) by ensuring all API traffic remains on an authenticated, encrypted channel. OpenShift’s API server operator maintains TLS endpoints with managed certificates and cipher policies, preventing downgrade or disablement. Mitigation: M1035."
     },
     "1.2.17": {
-  "title": "1.2.17 Ensure that the healthz endpoint is protected by RBAC",
+      "title": "1.2.17 Ensure that the healthz endpoint is protected by RBAC",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "6.8 Define and Maintain Role-Based Access Control",
@@ -530,10 +530,10 @@
         "tactics": ["TA0001", "TA0004"],
         "mitigations": ["M1018"]
       },
-      "explanation": "RBAC protection of healthz metrics curbs credential misuse (T1078) and privilege abuse (T1548) spanning Initial Access (TA0001) and Privilege Escalation (TA0004) via role scoping (M1018)."
+      "explanation": "This CIS control requires securing the healthz (and related readiness/liveness) endpoints with authorization. It mitigates Valid Accounts (T1078) and Abuse Elevation Control Mechanism (T1548) under Initial Access and Privilege Escalation (TA0001/TA0004) by preventing reconnaissance or triggering of sensitive status paths without permission. OpenShift enforces this with RBAC, aggregated API server authn/z layers, and network policy where appropriate. Mitigation: M1018."
     },
     "1.2.18": {
-  "title": "1.2.18 Ensure that the --audit-log-path argument is set",
+      "title": "1.2.18 Ensure that the --audit-log-path argument is set",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "8.5 Collect Detailed Audit Logs",
@@ -544,10 +544,10 @@
         "tactics": ["TA0003", "TA0004"],
         "mitigations": ["M1047"]
       },
-      "explanation": "Enabling audit-log-path records persistence modifications (T1543) across Persistence (TA0003) and Privilege Escalation (TA0004) enhancing audit/monitoring (M1047)."
+      "explanation": "This CIS control requires specifying an audit log file path for the API server. It mitigates detection gaps around Create or Modify System Process / persistence changes (T1543) spanning Persistence and Privilege Escalation (TA0003/TA0004) by generating forensic records of sensitive API operations. OpenShift integrates audit policy via the kube-apiserver operator and can forward logs to the cluster logging stack (e.g., Loki / Elasticsearch operators) for retention and analysis. Mitigation: M1047."
     },
     "1.2.19": {
-  "title": "1.2.19 Ensure that the audit logs are forwarded off the cluster for retention",
+      "title": "1.2.19 Ensure that the audit logs are forwarded off the cluster for retention",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "8.1 Establish and Maintain an Audit Log Management Process",
@@ -558,10 +558,10 @@
         "tactics": ["TA0003", "TA0004"],
         "mitigations": ["M1047"]
       },
-      "explanation": "Off-cluster log forwarding preserves evidence of persistence modification (T1543) for Persistence (TA0003) / Privilege Escalation (TA0004) by resilient monitoring (M1047)."
+      "explanation": "This CIS control requires forwarding audit logs off-cluster for durable retention. It mitigates tampering or loss of evidence related to Create or Modify System Process (T1543) in Persistence / Privilege Escalation (TA0003/TA0004) by keeping records outside an attacker’s immediate blast radius. OpenShift supports log shipping through the Cluster Logging / Loki operators and external integrations (e.g., SIEM) for immutable storage and correlation. Mitigation: M1047."
     },
     "1.2.20": {
-  "title": "1.2.20 Ensure that the maximumRetainedFiles argument is set to 10 or as appropriate",
+      "title": "1.2.20 Ensure that the maximumRetainedFiles argument is set to 10 or as appropriate",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "8.3 Ensure Adequate Audit Log Storage",
@@ -572,10 +572,10 @@
         "tactics": ["TA0003", "TA0004"],
         "mitigations": ["M1047"]
       },
-      "explanation": "Retaining sufficient rotated audit files preserves persistence change traces (T1543) (Persistence TA0003 / Privilege Escalation TA0004) via audit log retention (M1047)."
+      "explanation": "This CIS control requires configuring a sufficient number of rotated audit log files (e.g., maximumRetainedFiles). It mitigates loss of evidence for Create or Modify System Process (T1543) across Persistence / Privilege Escalation (TA0003/TA0004) by ensuring historical events are preserved during rotation cycles. OpenShift manages audit policy via operator CRs, and external log forwarders ingest rotations before truncation. Mitigation: M1047."
     },
     "1.2.21": {
-  "title": "1.2.21 Configure Kubernetes API Server Maximum Audit Log Size",
+      "title": "1.2.21 Configure Kubernetes API Server Maximum Audit Log Size",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "8.3 Ensure Adequate Audit Log Storage",
@@ -586,10 +586,10 @@
         "tactics": ["TA0003", "TA0004"],
         "mitigations": ["M1047"]
       },
-      "explanation": "Setting max audit log size ensures rotation without loss of persistence event evidence (T1543) across Persistence (TA0003) and Privilege Escalation (TA0004) with maintained monitoring (M1047)."
+      "explanation": "This CIS control requires setting a maximum audit log file size to govern rotation cadence. It mitigates evidence suppression risks tied to Create or Modify System Process (T1543) in Persistence / Privilege Escalation (TA0003/TA0004) by balancing retention and storage limits without truncating active files. OpenShift’s API server operator applies these log size parameters and integrates with log forwarding for centralized archival. Mitigation: M1047."
     },
     "1.2.22": {
-  "title": "1.2.22 Ensure that the --request-timeout argument is set",
+      "title": "1.2.22 Ensure that the --request-timeout argument is set",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "4.1 Establish and Maintain a Secure Configuration Process",
@@ -600,10 +600,10 @@
         "tactics": ["TA0040"],
         "mitigations": ["M1037"]
       },
-      "explanation": "Configuring request timeout mitigates resource exhaustion (T1499) impacting Impact (TA0040) via capacity and throttling management (M1037)."
+      "explanation": "This CIS control requires defining a request timeout for API server operations. It mitigates Denial of Service via resource exhaustion (T1499) under the Impact (TA0040) tactic by preventing indefinitely hanging or abusive long-running requests. OpenShift’s operator-driven API configuration and APIPriorityAndFairness combine to enforce fair cancellation, freeing server capacity. Mitigation: M1037."
     },
     "1.2.23": {
-  "title": "1.2.23 Ensure that the --service-account-lookup argument is set to true",
+      "title": "1.2.23 Ensure that the --service-account-lookup argument is set to true",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "3.3 Configure Data Access Control Lists",
@@ -614,10 +614,10 @@
         "tactics": ["TA0001"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Service account lookup validation blocks reuse of deleted tokens (T1078) at Initial Access (TA0001) via automated account control (M1026)."
+      "explanation": "This CIS control requires enabling service account token lookup to validate existence and revocation state. It mitigates Valid Accounts reuse (T1078) in Initial Access (TA0001) by preventing continued acceptance of tokens belonging to deleted or altered service accounts. OpenShift’s token volume projection, short-lived token issuance, and API validation ensure stale identities are invalidated promptly. Mitigation: M1026."
     },
     "1.2.24": {
-  "title": "1.2.24 Ensure that the --service-account-key-file argument is set as appropriate",
+      "title": "1.2.24 Ensure that the --service-account-key-file argument is set as appropriate",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "5.2 Use Unique Passwords",
@@ -628,10 +628,10 @@
         "tactics": ["TA0001"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Dedicated service account signing keys isolate credential domains reducing valid account abuse (T1078) at Initial Access (TA0001) via key separation (M1026)."
+      "explanation": "This CIS control requires explicitly providing the service account signing key file(s) rather than implicit or shared defaults. It mitigates misuse of Valid Accounts (T1078) in Initial Access (TA0001) by separating signing authority and enabling rotation without cross-impact. OpenShift manages distinct signing keys through cluster-kube-apiserver-operator and secures them with root ownership and file ACLs. Mitigation: M1026."
     },
     "1.2.25": {
-  "title": "1.2.25 Ensure that the --etcd-certfile and --etcd-keyfile arguments are set as appropriate",
+      "title": "1.2.25 Ensure that the --etcd-certfile and --etcd-keyfile arguments are set as appropriate",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "3.11 Encrypt Sensitive Data at Rest",
@@ -642,10 +642,10 @@
         "tactics": ["TA0006"],
         "mitigations": ["M1022"]
       },
-      "explanation": "Mutual TLS to etcd protects credential/secret material from exposure (T1552) in Credential Access (TA0006) via encryption and access controls (M1022)."
+      "explanation": "This CIS control requires configuring an explicit etcd client certificate and key for the API server. It mitigates Credentials from Configuration/Files exposure (T1552) in Credential Access (TA0006) by enforcing mutually authenticated, encrypted connections to the datastore. OpenShift provisions etcd certificates through the etcd and kube-apiserver operators with rotation and trust anchored in the platform PKI. Mitigation: M1022."
     },
     "1.2.26": {
-  "title": "1.2.26 Ensure that the --tls-cert-file and --tls-private-key-file arguments are set as appropriate",
+      "title": "1.2.26 Ensure that the --tls-cert-file and --tls-private-key-file arguments are set as appropriate",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "3.10 Encrypt Sensitive Data in Transit",
@@ -656,10 +656,10 @@
         "tactics": ["TA0006"],
         "mitigations": ["M1022"]
       },
-      "explanation": "TLS cert/key configuration secures API channel preventing credential harvest (T1552) in Credential Access (TA0006) through encrypted transport and key protection (M1022)."
+      "explanation": "This CIS control requires the API server specify its serving TLS certificate and private key files. It mitigates credential or secret interception (T1552) under Credential Access (TA0006) by ensuring encrypted endpoints rather than default or absent TLS. OpenShift’s API server operator provisions, rotates, and stores these materials in root-owned PKI directories managed with SELinux confinement. Mitigation: M1022."
     },
     "1.2.27": {
-  "title": "1.2.27 Ensure that the --client-ca-file argument is set as appropriate",
+      "title": "1.2.27 Ensure that the --client-ca-file argument is set as appropriate",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "3.10 Encrypt Sensitive Data in Transit",
@@ -670,10 +670,10 @@
         "tactics": ["TA0006"],
         "mitigations": ["M1022"]
       },
-      "explanation": "Client CA enforcement blocks unauthenticated credential replay attacks (T1552) in Credential Access (TA0006) through certificate-based trust (M1022)."
+      "explanation": "This CIS control requires setting a client certificate authority bundle for authenticating incoming API client certs. It mitigates credential replay / interception scenarios (T1552) in Credential Access (TA0006) by validating issuer trust before authorizing requests. OpenShift distributes trusted CA bundles via ConfigMaps and operators, ensuring consistent validation across control plane components. Mitigation: M1022."
     },
     "1.2.28": {
-  "title": "1.2.28 Ensure that the --etcd-cafile argument is set as appropriate",
+      "title": "1.2.28 Ensure that the --etcd-cafile argument is set as appropriate",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "3.10 Encrypt Sensitive Data in Transit",
@@ -684,10 +684,10 @@
         "tactics": ["TA0006"],
         "mitigations": ["M1022"]
       },
-      "explanation": "Etcd CA validation secures control-plane to datastore channel limiting secret interception (T1552) under Credential Access (TA0006) through authenticated encryption (M1022)."
+      "explanation": "This CIS control requires specifying the CA file used to validate etcd server certificates. It mitigates credential and secret interception (T1552) in Credential Access (TA0006) by preventing man-in-the-middle insertion between the API server and etcd. OpenShift’s etcd and API operators coordinate CA distribution and rotation to maintain a trusted encrypted channel. Mitigation: M1022."
     },
     "1.2.29": {
-  "title": "1.2.29 Ensure that encryption providers are appropriately configured",
+      "title": "1.2.29 Ensure that encryption providers are appropriately configured",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "3.11 Encrypt Sensitive Data at Rest",
@@ -698,7 +698,7 @@
         "tactics": ["TA0006"],
         "mitigations": ["M1022"]
       },
-      "explanation": "Proper encryption provider selection protects stored secrets from credential discovery (T1552) in Credential Access (TA0006) via data-at-rest encryption (M1022)."
+      "explanation": "This CIS control requires configuring encryption providers for sensitive API resources (e.g., Secrets) at rest. It mitigates credential harvesting (T1552) within Credential Access (TA0006) by encrypting datastore values so raw secrets cannot be read from etcd. OpenShift manages the encryption config via the cluster-kube-apiserver-operator and supports key rotation workflows to sustain protection. Mitigation: M1022."
     },
     "1.2.30": {
       "title": "1.2.30 Ensure that the API Server only makes use of Strong Cryptographic Ciphers",
@@ -712,10 +712,10 @@
         "tactics": ["TA0006"],
         "mitigations": ["M1041"]
       },
-      "explanation": "Restricting API ciphers to strong suites mitigates credential/secret interception (T1552) in Credential Access (TA0006) via secure channel enforcement (M1041)."
+      "explanation": "This CIS control requires limiting the API server to strong, modern TLS cipher suites. It mitigates credential/secret exposure (T1552) in Credential Access (TA0006) by preventing downgrade or weak cipher exploitation in transit. OpenShift sets cipher policies through API server operator configuration and platform-wide TLS security profiles, ensuring consistent hardened cryptography. Mitigation: M1041."
     },
     "1.2.31": {
-  "title": "1.2.31 Ensure unsupported configuration overrides are not used",
+      "title": "1.2.31 Ensure unsupported configuration overrides are not used",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "2.2 Ensure Authorized Software is Currently Supported",
@@ -726,10 +726,10 @@
         "tactics": ["TA0002"],
         "mitigations": ["M1035"]
       },
-      "explanation": "Avoiding unsupported overrides removes risky undocumented code paths (T1106) in Execution (TA0002) through controlled configuration baselines (M1035)."
+      "explanation": "This CIS control requires avoiding use of unsupported API server configuration overrides that bypass managed defaults. It mitigates Native API Execution (T1106) in the Execution (TA0002) tactic by eliminating hidden or unstable code paths attackers could leverage. OpenShift centralizes supported configuration through operators (ClusterVersion, kube-apiserver operator) and rejects or overwrites unknown custom flags during reconciliation. Mitigation: M1035."
     },
     "1.3.1": {
-  "title": "1.3.1 Ensure that controller manager healthz endpoints are protected by RBAC",
+      "title": "1.3.1 Ensure that controller manager healthz endpoints are protected by RBAC",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "6.8 Define and Maintain Role-Based Access Control",
@@ -740,10 +740,10 @@
         "tactics": ["TA0001"],
         "mitigations": ["M1018"]
       },
-      "explanation": "RBAC gating controller health endpoints limits valid account misuse (T1078) and privilege escalation attempts (T1548) during Initial Access (TA0001) via governance (M1018)."
+  "explanation": "This CIS control requires RBAC protection of controller manager health endpoints. It mitigates Valid Accounts (T1078) and Abuse Elevation Control Mechanism (T1548) in Initial Access / Privilege Escalation (TA0001/TA0004) by blocking unauthorized status probing. OpenShift applies authn/z layers and RBAC gating. Mitigation: M1018."
     },
     "1.3.2": {
-  "title": "1.3.2 Ensure that the --use-service-account-credentials argument is set to true",
+      "title": "1.3.2 Ensure that the --use-service-account-credentials argument is set to true",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "5.2 Use Unique Passwords",
@@ -754,10 +754,10 @@
         "tactics": ["TA0001"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Per-controller service account credentials constrain credential reuse (T1078) in Initial Access (TA0001) through least-privilege segmentation (M1026)."
+  "explanation": "This CIS control requires --use-service-account-credentials so each controller uses a distinct service account. It mitigates Valid Accounts (T1078) in Initial Access (TA0001) by reducing credential blast radius. OpenShift configures separate service accounts with RBAC and rotation. Mitigation: M1026."
     },
     "1.3.3": {
-  "title": "1.3.3 Ensure that the --service-account-private-key-file argument is set as appropriate",
+      "title": "1.3.3 Ensure that the --service-account-private-key-file argument is set as appropriate",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "5.2 Use Unique Passwords",
@@ -768,10 +768,10 @@
         "tactics": ["TA0006"],
         "mitigations": ["M1022"]
       },
-      "explanation": "Dedicated private key file for service account signing protects token material from theft (T1552) in Credential Access (TA0006) using secure key storage (M1022)."
+  "explanation": "This CIS control requires specifying a dedicated service account signing private key file. It mitigates Credentials from Configuration/Files (T1552) in Credential Access (TA0006) by securing signing material. OpenShift stores signing keys root-owned with operator rotation. Mitigation: M1022."
     },
     "1.3.4": {
-  "title": "1.3.4 Ensure that the --root-ca-file argument is set as appropriate",
+      "title": "1.3.4 Ensure that the --root-ca-file argument is set as appropriate",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "13.10 Perform Application Layer Filtering",
@@ -782,10 +782,10 @@
         "tactics": ["TA0006"],
         "mitigations": ["M1022"]
       },
-      "explanation": "Root CA bundle injection enables pod TLS verification preventing credential interception (T1552) in Credential Access (TA0006) via trusted CA distribution (M1022)."
+  "explanation": "This CIS control requires setting the root CA file to validate TLS endpoints. It mitigates Credentials from Configuration/Files (T1552) in Credential Access (TA0006) by rejecting spoofed services. OpenShift distributes trusted CA bundles via ConfigMaps. Mitigation: M1022."
     },
     "1.4.1": {
-  "title": "1.4.1 Ensure that the healthz endpoints for the scheduler are protected by RBAC",
+      "title": "1.4.1 Ensure that the healthz endpoints for the scheduler are protected by RBAC",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "6.8 Define and Maintain Role-Based Access Control",
@@ -796,10 +796,10 @@
         "tactics": ["TA0002"],
         "mitigations": ["M1035"]
       },
-      "explanation": "RBAC protection of scheduler health endpoints mitigates abuse of execution control paths (T1609) in Execution (TA0002) via privileged interface restriction (M1035)."
+  "explanation": "This CIS control requires RBAC protecting scheduler health endpoints. It mitigates Container Administration Commands (T1609) in Execution (TA0002) by denying probing of internal state. OpenShift enforces via authn/z and RBAC plus optional NetworkPolicies. Mitigation: M1035."
     },
     "1.4.2": {
-  "title": "1.4.2 Verify that the scheduler API service is protected by RBAC",
+      "title": "1.4.2 Verify that the scheduler API service is protected by RBAC",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "9.3 Maintain and Enforce Network-Based URL Filters",
@@ -810,10 +810,10 @@
         "tactics": ["TA0002"],
         "mitigations": ["M1035"]
       },
-      "explanation": "Binding scheduler API service to loopback with RBAC prevents unauthenticated method execution (T1106) in Execution (TA0002) via network/service restriction (M1035)."
+  "explanation": "This CIS control requires the scheduler API service be RBAC-protected and securely bound. It mitigates Native API Execution (T1106) in Execution (TA0002) by preventing unauthenticated method calls. OpenShift restricts binding, applies TLS, and enforces RBAC. Mitigation: M1035."
     },
     "2.1": {
-  "title": "2.1 Ensure that the --cert-file and --key-file arguments are set as appropriate",
+      "title": "2.1 Ensure that the --cert-file and --key-file arguments are set as appropriate",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "3.11 Encrypt Sensitive Data at Rest",
@@ -824,10 +824,10 @@
         "tactics": ["TA0006"],
         "mitigations": ["M1022"]
       },
-      "explanation": "TLS cert/key configuration for etcd protects secrets from credential exposure (T1552) under Credential Access (TA0006) via encrypted/authenticated channel (M1022)."
+  "explanation": "This CIS control requires etcd cert/key files be configured. It mitigates Credentials from Configuration/Files (T1552) in Credential Access (TA0006) by encrypting datastore traffic. OpenShift provisions and rotates certs via operators. Mitigation: M1022."
     },
     "2.2": {
-  "title": "2.2 Ensure that the --client-cert-auth argument is set to true",
+      "title": "2.2 Ensure that the --client-cert-auth argument is set to true",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "3.11 Encrypt Sensitive Data at Rest",
@@ -838,10 +838,10 @@
         "tactics": ["TA0006"],
         "mitigations": ["M1022"]
       },
-      "explanation": "Client certificate auth gates etcd access limiting credential/secret theft (T1552) in Credential Access (TA0006) via mutual TLS enforcement (M1022)."
+  "explanation": "This CIS control requires client certificate authentication for etcd. It mitigates Credentials from Configuration/Files (T1552) in Credential Access (TA0006) by requiring mutual TLS. OpenShift manages CA issuance and rotation. Mitigation: M1022."
     },
     "2.3": {
-  "title": "2.3 Ensure that the --auto-tls argument is not set to true",
+      "title": "2.3 Ensure that the --auto-tls argument is not set to true",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "3.10 Encrypt Sensitive Data in Transit",
@@ -852,10 +852,10 @@
         "tactics": ["TA0006"],
         "mitigations": ["M1022"]
       },
-      "explanation": "Disabling auto-tls prevents weak/self-issued peer credentials that could aid secret interception (T1552) (Credential Access TA0006) via controlled CA issuance (M1022)."
+  "explanation": "This CIS control requires disabling --auto-tls for etcd. It mitigates Credentials from Configuration/Files (T1552) in Credential Access (TA0006) by preventing unmanaged self-signed certs. OpenShift supplies trusted certificates only. Mitigation: M1022."
     },
     "2.4": {
-  "title": "2.4 Ensure that the --peer-cert-file and --peer-key-file arguments are set as appropriate",
+      "title": "2.4 Ensure that the --peer-cert-file and --peer-key-file arguments are set as appropriate",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "3.10 Encrypt Sensitive Data in Transit",
@@ -866,10 +866,10 @@
         "tactics": ["TA0006"],
         "mitigations": ["M1022"]
       },
-      "explanation": "Mutual TLS between etcd peers thwarts credential/secret capture (T1552) under Credential Access (TA0006) via authenticated encrypted peer channels (M1022)."
+  "explanation": "This CIS control requires specifying peer cert/key for etcd. It mitigates Credentials from Configuration/Files (T1552) in Credential Access (TA0006) by encrypting and authenticating replication. OpenShift configures and rotates peer certs via operator. Mitigation: M1022."
     },
     "2.5": {
-  "title": "2.5 Ensure that the --peer-client-cert-auth argument is set to true",
+      "title": "2.5 Ensure that the --peer-client-cert-auth argument is set to true",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "6.8 Define and Maintain Role-Based Access Control",
@@ -880,10 +880,10 @@
         "tactics": ["TA0006"],
         "mitigations": ["M1022"]
       },
-      "explanation": "Peer client cert auth confines etcd membership preventing secret access (T1552) (Credential Access TA0006) through certificate-based authorization (M1022)."
+  "explanation": "This CIS control requires enabling peer client cert auth. It mitigates Credentials from Configuration/Files (T1552) in Credential Access (TA0006) by rejecting unauthenticated peers. OpenShift enforces through CA-signed cert distribution. Mitigation: M1022."
     },
     "2.6": {
-  "title": "2.6 Ensure that the --peer-auto-tls argument is not set to true",
+      "title": "2.6 Ensure that the --peer-auto-tls argument is not set to true",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "5.2 Use Unique Passwords",
@@ -894,10 +894,10 @@
         "tactics": ["TA0006"],
         "mitigations": ["M1022"]
       },
-      "explanation": "Disallowing peer auto TLS avoids weak automatically issued creds that aid credential theft (T1552) (Credential Access TA0006) via strong CA/key management (M1022)."
+  "explanation": "This CIS control requires disabling peer auto TLS. It mitigates Credentials from Configuration/Files (T1552) in Credential Access (TA0006) by enforcing issued, auditable certificates only. OpenShift operators provision sanctioned peer certs. Mitigation: M1022."
     },
     "2.7": {
-  "title": "2.7 Ensure that a unique Certificate Authority is used for etcd",
+      "title": "2.7 Ensure that a unique Certificate Authority is used for etcd",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "3.11 Encrypt Sensitive Data at Rest",
@@ -908,10 +908,10 @@
         "tactics": ["TA0006"],
         "mitigations": ["M1022"]
       },
-      "explanation": "Dedicated etcd CA isolates trust so stolen non-etcd certs cannot access secrets (T1552) in Credential Access (TA0006) via segmented PKI (M1022)."
+  "explanation": "This CIS control requires a unique CA for etcd. It mitigates Credentials from Configuration/Files (T1552) in Credential Access (TA0006) by isolating trust domains. OpenShift issues a dedicated etcd CA with rotation. Mitigation: M1022."
     },
     "3.1.1": {
-  "title": "3.1.1 Client certificate authentication should not be used for users",
+      "title": "3.1.1 Client certificate authentication should not be used for users",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "16.11 Leverage Vetted Modules or Services for Application Security Components",
@@ -922,10 +922,10 @@
         "tactics": ["TA0003", "TA0006"],
         "mitigations": ["M1027", "M1032"]
       },
-      "explanation": "Replacing unmanaged user client certs reduces persistent account abuse (T1098) and valid account misuse (T1078) across Persistence (TA0003) / Credential Access (TA0006) via central auth hardening (M1027, M1032)."
+  "explanation": "This CIS control requires avoiding unmanaged user client cert auth in favor of central identity. It mitigates Account Manipulation (T1098) and Valid Accounts (T1078) in Persistence / Credential Access (TA0003/TA0006) by eliminating static certificates. OpenShift uses OAuth/OIDC, short-lived tokens, and IDPs. Mitigations: M1027, M1032."
     },
     "3.2.1": {
-  "title": "3.2.1 Ensure that a minimal audit policy is created",
+      "title": "3.2.1 Ensure that a minimal audit policy is created",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "8.2 Collect Audit Logs",
@@ -936,10 +936,10 @@
         "tactics": ["TA0003", "TA0004"],
         "mitigations": ["M1026"]
       },
-      "explanation": "A minimal audit policy establishes baseline capture of API modifications enabling detection of persistence changes (T1543) across Persistence (TA0003) and Privilege Escalation (TA0004) via privileged activity governance (M1026)."
+  "explanation": "This CIS control requires creating a minimal audit policy capturing core security events. It mitigates Create or Modify System Process (T1543) in Persistence / Privilege Escalation (TA0003/TA0004) by yielding baseline traceability. OpenShift applies audit policy via operators; logs feed external analysis. Mitigation: M1026."
     },
     "3.2.2": {
-  "title": "3.2.2 Ensure that the audit policy covers key security concerns",
+      "title": "3.2.2 Ensure that the audit policy covers key security concerns",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "8.5 Collect Detailed Audit Logs",
@@ -950,10 +950,10 @@
         "tactics": ["TA0003", "TA0004"],
         "mitigations": ["M1026"]
       },
-      "explanation": "A comprehensive audit policy covering sensitive resource access records privileged service modifications (T1543) revealing Persistence (TA0003) / Privilege Escalation (TA0004) attempts through privileged account governance (M1026)."
+  "explanation": "This CIS control requires expanding audit policy to cover key security concerns. It mitigates Create or Modify System Process (T1543) in Persistence / Privilege Escalation (TA0003/TA0004) by logging sensitive access. OpenShift manages detailed audit categories through operator configuration. Mitigation: M1026."
     },
     "4.1.1": {
-  "title": "4.1.1 Ensure that the kubelet service file permissions are set to 644 or more restrictive",
+      "title": "4.1.1 Ensure that the kubelet service file permissions are set to 644 or more restrictive",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "3.3 Configure Data Access Control Lists",
@@ -964,10 +964,10 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1022"]
       },
-      "explanation": "Restricting kubelet service file permissions (644) limits configuration discovery (T1083) and unauthorized modification (T1222) (Defense Evasion TA0005, Discovery TA0007) via file permission hardening (M1022)."
+  "explanation": "This CIS control requires kubelet service file permissions 644 or stricter. It mitigates File and Directory Discovery (T1083) and File Permissions Modification (T1222) (Discovery TA0007 / Defense Evasion TA0005) by narrowing tamper surface. OpenShift sets and preserves permissions via MachineConfig. Mitigation: M1022."
     },
     "4.1.2": {
-  "title": "4.1.2 Ensure that the kubelet service file ownership is set to root:root",
+      "title": "4.1.2 Ensure that the kubelet service file ownership is set to root:root",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "5.4 Restrict Administrator Privileges to Dedicated Administrator Accounts",
@@ -978,10 +978,10 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Root ownership of kubelet service file restricts who can alter service parameters reducing config discovery (T1083) and permission abuse (T1222) (Defense Evasion TA0005 / Discovery TA0007) through privileged account separation (M1026)."
+  "explanation": "This CIS control requires kubelet service file ownership root:root. It mitigates File Permissions Modification (T1222) and File and Directory Discovery (T1083) (Defense Evasion TA0005 / Discovery TA0007) by preventing unauthorized parameter changes. OpenShift enforces via immutable host image. Mitigation: M1026."
     },
     "4.1.3": {
-  "title": "4.1.3 If proxy kube proxy configuration file exists ensure permissions are set to 644 or more restrictive",
+      "title": "4.1.3 If proxy kube proxy configuration file exists ensure permissions are set to 644 or more restrictive",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "3.3 Configure Data Access Control Lists",
@@ -992,10 +992,10 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1022"]
       },
-      "explanation": "644 kube-proxy config permissions impede reconnaissance (T1083) and unauthorized parameter edits (T1222) (Defense Evasion TA0005 / Discovery TA0007) via ACL hardening (M1022)."
+  "explanation": "This CIS control requires kube-proxy config file permissions 644. It mitigates File and Directory Discovery (T1083) and File Permissions Modification (T1222) by limiting inspection and edits (Discovery TA0007 / Defense Evasion TA0005). OpenShift enforces through node config management. Mitigation: M1022."
     },
     "4.1.4": {
-  "title": "4.1.4 If proxy kubeconfig file exists ensure ownership is set to root:root",
+      "title": "4.1.4 If proxy kubeconfig file exists ensure ownership is set to root:root",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "5.4 Restrict Administrator Privileges to Dedicated Administrator Accounts",
@@ -1006,10 +1006,10 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Root ownership of kube-proxy kubeconfig limits enumeration (T1083) and config manipulation (T1222) (Defense Evasion TA0005 / Discovery TA0007) through admin account control (M1026)."
+  "explanation": "This CIS control requires kube-proxy kubeconfig ownership root:root. It mitigates File Permissions Modification (T1222) and File and Directory Discovery (T1083) (Defense Evasion TA0005 / Discovery TA0007) by restricting credential rerouting. OpenShift preserves ownership via immutable hosts. Mitigation: M1026."
     },
     "4.1.5": {
-  "title": "4.1.5 Ensure that the --kubeconfig kubelet.conf file permissions are set to 644 or more restrictive",
+      "title": "4.1.5 Ensure that the --kubeconfig kubelet.conf file permissions are set to 644 or more restrictive",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "3.3 Configure Data Access Control Lists",
@@ -1020,7 +1020,7 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1022"]
       },
-      "explanation": "Kubelet kubeconfig 644 permissions restrict credential/config discovery (T1083) and illicit edits (T1222) (Defense Evasion TA0005 / Discovery TA0007) via ACL enforcement (M1022)."
+  "explanation": "This CIS control requires kubelet kubeconfig permissions 644. It mitigates File and Directory Discovery (T1083) and File Permissions Modification (T1222) by limiting credential exposure (Discovery TA0007 / Defense Evasion TA0005). OpenShift manages via MachineConfig. Mitigation: M1022."
     },
     "4.1.6": {
       "title": "4.1.6 Ensure that the --kubeconfig kubelet.conf file ownership is set to root:root",
@@ -1034,10 +1034,10 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Root ownership of kubelet kubeconfig limits sensitive data enumeration (T1083) and permission alteration (T1222) (Defense Evasion TA0005 / Discovery TA0007) through privileged account separation (M1026)."
+  "explanation": "This CIS control requires kubelet kubeconfig ownership root:root. It mitigates File Permissions Modification (T1222) and File and Directory Discovery (T1083) by preventing credential replacement (Defense Evasion TA0005 / Discovery TA0007). OpenShift enforces via immutable host layers. Mitigation: M1026."
     },
     "4.1.7": {
-  "title": "4.1.7 Ensure that the certificate authorities file permissions are set to 644 or more restrictive",
+      "title": "4.1.7 Ensure that the certificate authorities file permissions are set to 644 or more restrictive",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "3.3 Configure Data Access Control Lists",
@@ -1048,7 +1048,7 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1022"]
       },
-      "explanation": "Restricting client CA file permissions curbs certificate/key discovery (T1083) and unauthorized trust store changes (T1222) (Defense Evasion TA0005 / Discovery TA0007) using ACL hardening (M1022)."
+  "explanation": "This CIS control requires client CA file permissions 644. It mitigates File and Directory Discovery (T1083) and File Permissions Modification (T1222) (Discovery TA0007 / Defense Evasion TA0005) by reducing trust anchor exposure. OpenShift enforces ACLs through config management. Mitigation: M1022."
     },
     "4.1.8": {
       "title": "4.1.8 Ensure that the client certificate authorities file ownership is set to root:root",
@@ -1062,10 +1062,10 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Root ownership of client CA file thwarts enumeration (T1083) and trust anchor manipulation (T1222) (Defense Evasion TA0005 / Discovery TA0007) via privileged ownership control (M1026)."
+  "explanation": "This CIS control requires client CA file ownership root:root. It mitigates File Permissions Modification (T1222) and File and Directory Discovery (T1083) by blocking unauthorized trust anchor changes (Defense Evasion TA0005 / Discovery TA0007). OpenShift preserves ownership immutably. Mitigation: M1026."
     },
     "4.1.9": {
-  "title": "4.1.9 Ensure that the kubelet --config configuration file has permissions set to 600 or more restrictive",
+      "title": "4.1.9 Ensure that the kubelet --config configuration file has permissions set to 600 or more restrictive",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "5.4 Restrict Administrator Privileges to Dedicated Administrator Accounts",
@@ -1076,10 +1076,10 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1022"]
       },
-      "explanation": "Setting kubelet config file to 600 blocks broader read/list (T1083) and edit (T1222) attempts (Defense Evasion TA0005 / Discovery TA0007) through strict file permission and baseline protection (M1022)."
+  "explanation": "This CIS control requires kubelet config file permissions 600. It mitigates File and Directory Discovery (T1083) and File Permissions Modification (T1222) (Discovery TA0007 / Defense Evasion TA0005) by blocking unprivileged reads/edits. OpenShift applies via MachineConfig. Mitigation: M1022."
     },
     "4.1.10": {
-  "title": "4.1.10 Ensure that the kubelet configuration file ownership is set to root:root",
+      "title": "4.1.10 Ensure that the kubelet configuration file ownership is set to root:root",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "5.4 Restrict Administrator Privileges to Dedicated Administrator Accounts",
@@ -1090,7 +1090,7 @@
         "tactics": ["TA0005", "TA0007"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Root ownership of kubelet config prevents unauthorized edits (T1222) and file reconnaissance (T1083) (Defense Evasion TA0005 / Discovery TA0007) through admin account separation (M1026)."
+  "explanation": "This CIS control requires kubelet config ownership root:root. It mitigates File Permissions Modification (T1222) and File and Directory Discovery (T1083) by preventing flag tampering (Defense Evasion TA0005 / Discovery TA0007). OpenShift maintains via immutable OS. Mitigation: M1026."
     },
     "4.2.1": {
       "title": "4.2.1 Activate Garbage collection in OpenShift Container Platform 4, as appropriate",
@@ -1104,10 +1104,10 @@
         "tactics": ["TA0040"],
         "mitigations": ["M1037"]
       },
-      "explanation": "Configuring container/image garbage collection prevents resource exhaustion denial of service (T1499) impacting Impact (TA0040) through capacity and lifecycle management (M1037)."
+  "explanation": "This CIS control requires enabling container/image garbage collection. It mitigates Resource Exhaustion (T1499) in Impact (TA0040) by reclaiming storage proactively. OpenShift tunes kubelet GC through MachineConfig. Mitigation: M1037."
     },
     "4.2.2": {
-  "title": "4.2.2 Ensure that the --anonymous-auth argument is set to false",
+      "title": "4.2.2 Ensure that the --anonymous-auth argument is set to false",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "3.3 Configure Data Access Control Lists",
@@ -1118,7 +1118,7 @@
         "tactics": ["TA0001"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Disabling anonymous kubelet auth blocks valid account misuse (T1078) and external remote access (T1133) during Initial Access (TA0001) via privileged access control (M1026)."
+  "explanation": "This CIS control requires disabling anonymous kubelet auth. It mitigates Valid Accounts (T1078) and External Remote Services (T1133) in Initial Access (TA0001) by removing unauthenticated endpoints. OpenShift enforces flags via MachineConfig and RBAC. Mitigation: M1026."
     },
     "4.2.3": {
       "title": "4.2.3 Ensure that the --authorization-mode argument is not set to AlwaysAllow",
@@ -1132,10 +1132,10 @@
         "tactics": ["TA0001"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Rejecting AlwaysAllow forces explicit authorization reducing abuse of exposed services (T1133) at Initial Access (TA0001) via RBAC governance (M1026)."
+  "explanation": "This CIS control requires avoiding AlwaysAllow authorization. It mitigates External Remote Services (T1133) in Initial Access (TA0001) by forcing RBAC evaluation. OpenShift configures webhook/RBAC modes only. Mitigation: M1026."
     },
     "4.2.4": {
-  "title": "4.2.4 Ensure that the --client-ca-file argument is set as appropriate",
+      "title": "4.2.4 Ensure that the --client-ca-file argument is set as appropriate",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "3.11 Encrypt Sensitive Data at Rest",
@@ -1146,10 +1146,10 @@
         "tactics": ["TA0006"],
         "mitigations": ["M1022"]
       },
-      "explanation": "Setting kubelet client CA enforces mutual TLS limiting credential capture (T1552) under Credential Access (TA0006) via certificate-based access control (M1022)."
+  "explanation": "This CIS control requires specifying a client CA for kubelet. It mitigates Credentials from Configuration/Files (T1552) in Credential Access (TA0006) by validating client certs. OpenShift distributes CA bundles via operators. Mitigation: M1022."
     },
     "4.2.5": {
-  "title": "4.2.5 Verify that the read only port is not used or is set to 0",
+      "title": "4.2.5 Verify that the read only port is not used or is set to 0",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "4.8 Uninstall or Disable Unnecessary Services on Enterprise Assets and Software",
@@ -1160,10 +1160,10 @@
         "tactics": ["TA0001"],
         "mitigations": ["M1035"]
       },
-      "explanation": "Disabling the unauthenticated kubelet read-only port removes a public entry point (T1190) at Initial Access (TA0001) via service/interface restriction (M1035)."
+  "explanation": "This CIS control requires disabling the kubelet read-only port. It mitigates Exploit Public-Facing Application (T1190) in Initial Access (TA0001) by eliminating an unauthenticated interface. OpenShift configures port=0 via MachineConfig. Mitigation: M1035."
     },
     "4.2.6": {
-  "title": "4.2.6 Ensure that the --streaming-connection-idle-timeout argument is not set to 0",
+      "title": "4.2.6 Ensure that the --streaming-connection-idle-timeout argument is not set to 0",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "4.8 Uninstall or Disable Unnecessary Services on Enterprise Assets and Software",
@@ -1174,10 +1174,10 @@
         "tactics": ["TA0040"],
         "mitigations": ["M1037"]
       },
-      "explanation": "Enforcing non-zero streaming idle timeouts reduces prolonged resource consumption DoS (T1499) impacting Impact (TA0040) via connection lifecycle management (M1037)."
+  "explanation": "This CIS control requires non-zero kubelet streaming idle timeout. It mitigates Resource Exhaustion (T1499) in Impact (TA0040) by closing idle exec/attach sessions. OpenShift manages timeout defaults in kubelet config. Mitigation: M1037."
     },
     "4.2.7": {
-  "title": "4.2.7 Ensure that the --make-iptables-util-chains argument is set to true",
+      "title": "4.2.7 Ensure that the --make-iptables-util-chains argument is set to true",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "4.4 Implement and Manage a Firewall on Servers",
@@ -1188,10 +1188,10 @@
         "tactics": ["TA0007"],
         "mitigations": ["M1030"]
       },
-      "explanation": "Allowing kubelet to manage iptables keeps network policy synchronized reducing unauthorized service discovery (T1046) in Discovery (TA0007) through managed firewall enforcement (M1030)."
+  "explanation": "This CIS control requires kubelet manage iptables util chains. It mitigates Network Service Scanning (T1046) in Discovery (TA0007) by keeping firewall chains consistent with policy. OpenShift synchronizes via kube-proxy/OVN. Mitigation: M1030."
     },
     "4.2.8": {
-  "title": "4.2.8 Ensure that the kubeAPIQPS [--event-qps] argument is set to 0 or a level which ensures appropriate event capture",
+      "title": "4.2.8 Ensure that the kubeAPIQPS [--event-qps] argument is set to 0 or a level which ensures appropriate event capture",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "8.5 Collect Detailed Audit Logs",
@@ -1202,10 +1202,10 @@
         "tactics": ["TA0003", "TA0004"],
         "mitigations": ["M1047"]
       },
-      "explanation": "Tuning kubeAPIQPS to capture events preserves visibility of service modification (T1543) across Persistence (TA0003) / Privilege Escalation (TA0004) via enhanced monitoring (M1047)."
+  "explanation": "This CIS control requires tuning kubelet/API QPS to retain security events. It mitigates Create or Modify System Process (T1543) in Persistence / Privilege Escalation (TA0003/TA0004) by preventing event loss. OpenShift sets balanced QPS via MachineConfig. Mitigation: M1047."
     },
     "4.2.9": {
-  "title": "4.2.9 Ensure that the --tls-cert-file and --tls-private-key-file arguments are set as appropriate",
+      "title": "4.2.9 Ensure that the --tls-cert-file and --tls-private-key-file arguments are set as appropriate",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "3.10 Encrypt Sensitive Data in Transit",
@@ -1216,10 +1216,10 @@
         "tactics": ["TA0006"],
         "mitigations": ["M1022"]
       },
-      "explanation": "Configuring kubelet TLS cert/key secures channel limiting credential interception (T1552) in Credential Access (TA0006) through encrypted/authenticated transport (M1022)."
+  "explanation": "This CIS control requires specifying kubelet serving cert/key. It mitigates Credentials from Configuration/Files (T1552) in Credential Access (TA0006) by encrypting API traffic. OpenShift provisions and rotates serving certs. Mitigation: M1022."
     },
     "4.2.10": {
-  "title": "4.2.10 Ensure that the --rotate-certificates argument is not set to false",
+      "title": "4.2.10 Ensure that the --rotate-certificates argument is not set to false",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "3.10 Encrypt Sensitive Data in Transit",
@@ -1230,10 +1230,10 @@
         "tactics": ["TA0003"],
         "mitigations": ["M1027"]
       },
-      "explanation": "Enabling kubelet client certificate rotation reduces long‑lived credential persistence (T1098) under Persistence (TA0003) via periodic credential lifecycle enforcement (M1027)."
+  "explanation": "This CIS control requires kubelet client certificate rotation. It mitigates Account Manipulation (T1098) in Persistence (TA0003) by shortening credential lifetime. OpenShift automates CSR approval and renewal. Mitigation: M1027."
     },
     "4.2.11": {
-  "title": "4.2.11 Verify that the RotateKubeletServerCertificate argument is set to true",
+      "title": "4.2.11 Verify that the RotateKubeletServerCertificate argument is set to true",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "3.10 Encrypt Sensitive Data in Transit",
@@ -1244,10 +1244,10 @@
         "tactics": ["TA0003"],
         "mitigations": ["M1027"]
       },
-      "explanation": "Rotating kubelet serving certs limits abuse of stale persistent credentials (T1098) in Persistence (TA0003) through automated certificate renewal (M1027)."
+  "explanation": "This CIS control requires rotating kubelet serving certificates. It mitigates Account Manipulation (T1098) in Persistence (TA0003) by invalidating stale certs. OpenShift manages issuance via node cert controllers. Mitigation: M1027."
     },
     "4.2.12": {
-  "title": "4.2.12 Ensure that the Kubelet only makes use of Strong Cryptographic Ciphers",
+      "title": "4.2.12 Ensure that the Kubelet only makes use of Strong Cryptographic Ciphers",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "3.10 Encrypt Sensitive Data in Transit",
@@ -1258,10 +1258,10 @@
         "tactics": ["TA0006"],
         "mitigations": ["M1041"]
       },
-      "explanation": "Restricting kubelet to strong ciphers reduces credential/secret interception (T1552) in Credential Access (TA0006) via hardened cryptographic protocols (M1041)."
+  "explanation": "This CIS control requires strong TLS ciphers for kubelet. It mitigates Credentials from Configuration/Files (T1552) in Credential Access (TA0006) by preventing downgrade/weak crypto attacks. OpenShift sets cluster TLS security profiles. Mitigation: M1041."
     },
     "5.1.1": {
-  "title": "5.1.1 Ensure that the cluster-admin role is only used where required",
+      "title": "5.1.1 Ensure that the cluster-admin role is only used where required",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "5.4 Restrict Administrator Privileges to Dedicated Administrator Accounts",
@@ -1272,10 +1272,10 @@
         "tactics": ["TA0001", "TA0004"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Restricting cluster-admin bindings limits misuse of valid accounts (T1078 / T1078.002) for Initial Access (TA0001) and Privilege Escalation (TA0004) via privileged account governance (M1026)."
+  "explanation": "This CIS control requires limiting cluster-admin usage. It mitigates Valid Accounts (T1078/T1078.002) in Initial Access / Privilege Escalation (TA0001/TA0004) by shrinking high-privilege blast radius. OpenShift applies least privilege RBAC and auditing. Mitigation: M1026."
     },
     "5.1.2": {
-  "title": "5.1.2 Minimize access to secrets",
+      "title": "5.1.2 Minimize access to secrets",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "3.12 Segment Data Processing and Storage Based on Sensitivity",
@@ -1286,10 +1286,10 @@
         "tactics": ["TA0006"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Restricting secret object access reduces credential material exposure (T1552) under Credential Access (TA0006) via least-privilege data segmentation (M1026)."
+  "explanation": "This CIS control requires minimizing secret read permissions. It mitigates Credentials from Configuration/Files (T1552) in Credential Access (TA0006) by limiting enumeration paths. OpenShift namespaces, RBAC, and SCC boundaries reduce exposure. Mitigation: M1026."
     },
     "5.1.3": {
-  "title": "5.1.3 Minimize wildcard use in Roles and ClusterRoles",
+      "title": "5.1.3 Minimize wildcard use in Roles and ClusterRoles",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "6.8 Define and Maintain Role-Based Access Control",
@@ -1300,10 +1300,10 @@
         "tactics": ["TA0001", "TA0004"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Eliminating wildcard RBAC grants narrows valid account abuse scope (T1078 / T1078.002) for Initial Access (TA0001) / Privilege Escalation (TA0004) via role specificity (M1026)."
+  "explanation": "This CIS control requires avoiding wildcard verbs/resources in RBAC. It mitigates Valid Accounts (T1078/T1078.002) in Initial Access / Privilege Escalation (TA0001/TA0004) by constraining privilege spread. OpenShift encourages granular role definitions and auditing. Mitigation: M1026."
     },
     "5.1.4": {
-  "title": "5.1.4 Minimize access to create pods",
+      "title": "5.1.4 Minimize access to create pods",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "2.7 Allowlist Authorized Scripts",
@@ -1314,10 +1314,10 @@
         "tactics": ["TA0001", "TA0004"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Restricting pod creation rights lowers opportunities for valid account abuse (T1078 / .002) enabling malicious workloads for escalation (TA0001/TA0004) via execution authorization control (M1026)."
+  "explanation": "This CIS control requires limiting who can create pods. It mitigates Valid Accounts (T1078/T1078.002) in Initial Access / Privilege Escalation (TA0001/TA0004) by preventing malicious workload deployment. OpenShift RBAC, SCC, and namespaces restrict creation. Mitigation: M1026."
     },
     "5.1.5": {
-  "title": "5.1.5 Ensure that default service accounts are not actively used.",
+      "title": "5.1.5 Ensure that default service accounts are not actively used.",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "5.3 Disable Dormant Accounts",
@@ -1328,10 +1328,10 @@
         "tactics": ["TA0006"],
         "mitigations": ["M1028"]
       },
-      "explanation": "Avoiding use of default service accounts reduces exposure of broadly scoped tokens (T1552) in Credential Access (TA0006) via deactivation of dormant/unscoped identities (M1028)."
+  "explanation": "This CIS control requires not using default service accounts. It mitigates Credentials from Configuration/Files (T1552) in Credential Access (TA0006) by removing broadly scoped tokens. OpenShift supports dedicated service accounts and automount=false. Mitigation: M1028."
     },
     "5.1.6": {
-  "title": "5.1.6 Ensure that Service Account Tokens are only mounted where necessary",
+      "title": "5.1.6 Ensure that Service Account Tokens are only mounted where necessary",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "4.8 Uninstall or Disable Unnecessary Services on Enterprise Assets and Software",
@@ -1342,10 +1342,10 @@
         "tactics": ["TA0006"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Disabling unnecessary service account token mounts reduces container credential theft (T1528, T1555) in Credential Access (TA0006) via least-privilege token provisioning (M1026)."
+  "explanation": "This CIS control requires mounting service account tokens only when needed. It mitigates Steal Application Access Token (T1528) and Credentials from Password Stores (T1555) in Credential Access (TA0006) by reducing token presence. OpenShift enforces via automount flags and projected tokens. Mitigation: M1026."
     },
     "5.2.1": {
-  "title": "5.2.1 Minimize the admission of privileged containers",
+      "title": "5.2.1 Minimize the admission of privileged containers",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "5.4 Restrict Administrator Privileges to Dedicated Administrator Accounts",
@@ -1356,10 +1356,10 @@
         "tactics": ["TA0004"],
         "mitigations": ["M1048"]
       },
-      "explanation": "Blocking privileged containers reduces container breakout / host escape attempts (T1611) in Privilege Escalation (TA0004) via restricting elevated execution paths (M1048)."
+  "explanation": "This CIS control requires avoiding privileged containers. It mitigates Escape to Host (T1611) in Privilege Escalation (TA0004) by removing broad host access. OpenShift SCCs gate privileged usage. Mitigation: M1048."
     },
     "5.2.2": {
-  "title": "5.2.2 Minimize the admission of containers wishing to share the host process ID namespace",
+      "title": "5.2.2 Minimize the admission of containers wishing to share the host process ID namespace",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "5.4 Restrict Administrator Privileges to Dedicated Administrator Accounts",
@@ -1370,10 +1370,10 @@
         "tactics": ["TA0001", "TA0004"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Denying hostPID usage limits abuse of valid/container credentials (T1078 / .002) for reconnaissance-to-escalation (TA0001 / TA0004) via strict namespace isolation (M1026)."
+  "explanation": "This CIS control requires minimizing hostPID usage. It mitigates Valid Accounts (T1078/T1078.002) in Initial Access / Privilege Escalation (TA0001/TA0004) by preventing host process observation. OpenShift SCCs deny hostPID by default. Mitigation: M1026."
     },
     "5.2.3": {
-  "title": "5.2.3 Minimize the admission of containers wishing to share the host IPC namespace",
+      "title": "5.2.3 Minimize the admission of containers wishing to share the host IPC namespace",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "13.10 Perform Application Layer Filtering",
@@ -1384,10 +1384,10 @@
         "tactics": ["TA0001", "TA0004"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Restricting hostIPC blocks shared memory channels for valid account abuse (T1078 / .002) supporting Initial Access and Privilege Escalation (TA0001/TA0004) via inter-process boundary enforcement (M1026)."
+  "explanation": "This CIS control requires prohibiting hostIPC for general workloads. It mitigates Valid Accounts (T1078/T1078.002) in Initial Access / Privilege Escalation (TA0001/TA0004) by eliminating shared memory snooping paths. OpenShift SCCs block hostIPC. Mitigation: M1026."
     },
     "5.2.4": {
-  "title": "5.2.4 Minimize the admission of containers wishing to share the host network namespace",
+      "title": "5.2.4 Minimize the admission of containers wishing to share the host network namespace",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "3.12 Segment Data Processing and Storage Based on Sensitivity",
@@ -1398,10 +1398,10 @@
         "tactics": ["TA0003"],
         "mitigations": ["M1030"]
       },
-      "explanation": "Denying hostNetwork reduces persistence via network configuration manipulation (T1098) in Persistence (TA0003) through enforced network segmentation (M1030)."
+  "explanation": "This CIS control requires minimizing hostNetwork usage. It mitigates Account Manipulation (T1098) in Persistence (TA0003) by preventing direct host network access. OpenShift SCCs and NetworkPolicies isolate networking. Mitigation: M1030."
     },
     "5.2.5": {
-  "title": "5.2.5 Minimize the admission of containers with allowPrivilegeEscalation",
+      "title": "5.2.5 Minimize the admission of containers with allowPrivilegeEscalation",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "5.4 Restrict Administrator Privileges to Dedicated Administrator Accounts",
@@ -1412,10 +1412,10 @@
         "tactics": ["TA0004"],
         "mitigations": ["M1038", "M1048"]
       },
-      "explanation": "Disallowing allowPrivilegeEscalation constrains container breakout vectors (T1611) in Privilege Escalation (TA0004) via syscall/capability restriction and elevated path control (M1038, M1048)."
+  "explanation": "This CIS control requires allowPrivilegeEscalation=false. It mitigates Escape to Host (T1611) in Privilege Escalation (TA0004) by blocking new elevated capability acquisition. OpenShift SCC defaults and seccomp/capability drops enforce. Mitigations: M1038, M1048."
     },
     "5.2.6": {
-  "title": "5.2.6 Minimize the admission of root containers",
+      "title": "5.2.6 Minimize the admission of root containers",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "5.4 Restrict Administrator Privileges to Dedicated Administrator Accounts",
@@ -1426,10 +1426,10 @@
         "tactics": ["TA0003"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Blocking root containers limits establishing persistent high-privilege contexts (T1098) in Persistence (TA0003) via enforced non-root runtime identities (M1026)."
+  "explanation": "This CIS control requires running as non-root when possible. It mitigates Account Manipulation (T1098) in Persistence (TA0003) by removing default UID 0 access. OpenShift SCC restricted profiles enforce non-root. Mitigation: M1026."
     },
     "5.2.7": {
-  "title": "5.2.7 Minimize the admission of containers with the NET_RAW capability",
+      "title": "5.2.7 Minimize the admission of containers with the NET_RAW capability",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "4.8 Uninstall or Disable Unnecessary Services on Enterprise Assets and Software",
@@ -1440,10 +1440,10 @@
         "tactics": ["TA0004"],
         "mitigations": ["M1050"]
       },
-      "explanation": "Dropping NET_RAW reduces kernel/network exploit chaining (T1068) in Privilege Escalation (TA0004) via capability isolation (M1050)."
+  "explanation": "This CIS control requires removing NET_RAW capability. It mitigates Exploitation for Privilege Escalation (T1068) in Privilege Escalation (TA0004) by blocking raw packet crafting. OpenShift SCC capability drops enforce. Mitigation: M1050."
     },
     "5.2.8": {
-  "title": "5.2.8 Minimize the admission of containers with added capabilities",
+      "title": "5.2.8 Minimize the admission of containers with added capabilities",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "4.8 Uninstall or Disable Unnecessary Services on Enterprise Assets and Software",
@@ -1454,10 +1454,10 @@
         "tactics": ["TA0002", "TA0003"],
         "mitigations": ["M1047"]
       },
-      "explanation": "Blocking added Linux capabilities lowers malicious execution staging (T1204) across Execution (TA0002) / Persistence (TA0003) via enforced baseline profiles (M1047)."
+  "explanation": "This CIS control requires avoiding added capabilities. It mitigates User Execution (T1204) in Execution (TA0002) and persistence setup (TA0003) by limiting privileged syscalls. OpenShift SCC allowedCapabilities policy enforces minimal sets. Mitigation: M1047."
     },
     "5.2.9": {
-  "title": "5.2.9 Minimize the admission of containers with capabilities assigned",
+      "title": "5.2.9 Minimize the admission of containers with capabilities assigned",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "4.8 Uninstall or Disable Unnecessary Services on Enterprise Assets and Software",
@@ -1468,10 +1468,10 @@
         "tactics": ["TA0002", "TA0003"],
         "mitigations": ["M1045", "M1047"]
       },
-      "explanation": "Requiring capability drop (ALL) curtails arbitrary execution triggers (T1204) for Execution (TA0002) / Persistence (TA0003) via disabling unneeded privileged functions (M1045, M1047)."
+  "explanation": "This CIS control requires dropping all unnecessary capabilities. It mitigates User Execution (T1204) in Execution (TA0002) / Persistence (TA0003) by removing privileged syscall vectors. OpenShift restricted SCC sets drop defaults. Mitigations: M1045, M1047."
     },
     "5.2.10": {
-  "title": "5.2.10 Minimize access to privileged Security Context Constraints",
+      "title": "5.2.10 Minimize access to privileged Security Context Constraints",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "6.8 Define and Maintain Role-Based Access Control",
@@ -1482,10 +1482,10 @@
         "tactics": ["TA0001", "TA0004"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Restricting privileged SCC usage limits valid account elevation (T1078) for Initial Access / Privilege Escalation (TA0001/TA0004) via RBAC boundary enforcement (M1026)."
+  "explanation": "This CIS control requires limiting privileged SCC access. It mitigates Valid Accounts (T1078) in Initial Access / Privilege Escalation (TA0001/TA0004) by denying broad escalation paths. OpenShift RBAC 'use' verb scopes SCC usage. Mitigation: M1026."
     },
     "5.3.1": {
-  "title": "5.3.1 Ensure that the CNI in use supports Network Policies",
+      "title": "5.3.1 Ensure that the CNI in use supports Network Policies",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "4.4 Implement and Manage a Firewall on Servers",
@@ -1496,10 +1496,10 @@
         "tactics": ["TA0007"],
         "mitigations": ["M1030", "M1042"]
       },
-      "explanation": "Using a CNI that enforces NetworkPolicies constrains network scanning (T1046) in Discovery (TA0007) via segmentation and traffic filtering (M1030, M1042)."
+  "explanation": "This CIS control requires a CNI supporting NetworkPolicies. It mitigates Network Service Scanning (T1046) in Discovery (TA0007) by enforcing pod-level segmentation. OpenShift OVN/SDN implements NetworkPolicy semantics. Mitigations: M1030, M1042."
     },
     "5.3.2": {
-  "title": "5.3.2 Ensure that all Namespaces have Network Policies defined",
+      "title": "5.3.2 Ensure that all Namespaces have Network Policies defined",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "4.4 Implement and Manage a Firewall on Servers",
@@ -1510,10 +1510,10 @@
         "tactics": ["TA0007"],
         "mitigations": ["M1030", "M1042"]
       },
-      "explanation": "Namespace-specific NetworkPolicies block broad lateral discovery (T1046) in Discovery (TA0007) via enforced micro-segmentation (M1030, M1042)."
+  "explanation": "This CIS control requires NetworkPolicies in every namespace. It mitigates Network Service Scanning (T1046) in Discovery (TA0007) by removing unrestricted lateral paths. OpenShift controllers enforce policies cluster-wide. Mitigations: M1030, M1042."
     },
     "5.4.1": {
-  "title": "5.4.1 Prefer using secrets as files over secrets as environment variables",
+      "title": "5.4.1 Prefer using secrets as files over secrets as environment variables",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "3.10 Encrypt Sensitive Data in Transit",
@@ -1524,10 +1524,10 @@
         "tactics": ["TA0006"],
         "mitigations": ["M1026"]
       },
-      "explanation": "Mounting secrets as files (not env vars) reduces inadvertent credential exposure (T1552) in Credential Access (TA0006) via controlled secret access patterns (M1026)."
+  "explanation": "This CIS control requires preferring secret volume mounts over environment variables. It mitigates Credentials from Configuration/Files (T1552) in Credential Access (TA0006) by reducing accidental logging or proliferation. OpenShift supports file-based secret projection and rotation. Mitigation: M1026."
     },
     "5.4.2": {
-  "title": "5.4.2 Consider external secret storage",
+      "title": "5.4.2 Consider external secret storage",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "3.12 Segment Data Processing and Storage Based on Sensitivity",
@@ -1538,7 +1538,7 @@
         "tactics": ["TA0006"],
         "mitigations": ["M1026"]
       },
-      "explanation": "External secret vault integration limits broad in-cluster credential disclosure (T1552) under Credential Access (TA0006) via segregated secret management (M1026)."
+  "explanation": "This CIS control recommends external secret storage integration. It mitigates Credentials from Configuration/Files (T1552) in Credential Access (TA0006) by centralizing rotation and access audit. OpenShift integrates with Vault/External Secrets Operator. Mitigation: M1026."
     },
     "5.5.1": {
       "title": "5.5.1 Configure Image Provenance using image controller configuration parameters",
@@ -1552,10 +1552,10 @@
         "tactics": ["TA0001", "TA0003"],
         "mitigations": ["M1016", "M1042"]
       },
-      "explanation": "Enforcing image provenance restricts untrusted external image intake (T1195) and remote service abuse (T1133) across Initial Access (TA0001)/Persistence (TA0003) via configuration validation and source control (M1016, M1042)."
+  "explanation": "This CIS control requires configuring image provenance (signatures/allowed registries). It mitigates Supply Chain Compromise (T1195) and External Remote Services (T1133) in Initial Access / Persistence (TA0001/TA0003) by restricting untrusted images. OpenShift ImageStreams and signature policies enforce sources. Mitigations: M1016, M1042."
     },
     "5.7.1": {
-  "title": "5.7.1 Create administrative boundaries between resources using namespaces",
+      "title": "5.7.1 Create administrative boundaries between resources using namespaces",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "4.4 Implement and Manage a Firewall on Servers",
@@ -1566,7 +1566,7 @@
         "tactics": ["TA0002", "TA0008"],
         "mitigations": ["M1038"]
       },
-      "explanation": "Namespace isolation constrains unauthorized code execution interfaces (T1106) and container orchestration abuse (T1609) in Execution / Lateral Movement (TA0002/TA0008) via scoped workload segmentation (M1038)."
+  "explanation": "This CIS control requires using namespaces for administrative boundaries. It mitigates Native API Execution (T1106) and Container Administration Commands (T1609) in Execution / Lateral Movement (TA0002/TA0008) by scoping RBAC and policies. OpenShift integrates namespaces with SCC, NetworkPolicies, and quotas. Mitigation: M1038."
     },
     "5.7.2": {
       "title": "5.7.2 Ensure that the seccomp profile is set to docker/default in your pod definitions",
@@ -1580,10 +1580,10 @@
         "tactics": ["TA0004"],
         "mitigations": ["M1048"]
       },
-      "explanation": "Applying default seccomp limits kernel syscall surface reducing container escape vectors (T1611) in Privilege Escalation (TA0004) via syscall filtering (M1048)."
+  "explanation": "This CIS control requires setting a restrictive seccomp profile (runtime/default). It mitigates Escape to Host (T1611) in Privilege Escalation (TA0004) by filtering dangerous syscalls. OpenShift SCCs and pod security admission (optional) enforce profiles. Mitigation: M1048."
     },
     "5.7.3": {
-  "title": "5.7.3 Apply Security Context to Your Pods and Containers",
+      "title": "5.7.3 Apply Security Context to Your Pods and Containers",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "7.3 Perform Automated Operating System Patch Management",
@@ -1594,10 +1594,10 @@
         "tactics": ["TA0004", "TA0006"],
         "mitigations": ["M1048"]
       },
-      "explanation": "Defining securityContext enforces identity and syscall constraints reducing credential manipulation (T1556) and container escape (T1611) across Privilege Escalation / Credential Access (TA0004/TA0006) via hardened runtime controls (M1048)."
+  "explanation": "This CIS control requires applying securityContext (runAsUser, capabilities, seccomp, fsGroup). It mitigates Modify Authentication Process (T1556) and Escape to Host (T1611) in Credential Access / Privilege Escalation (TA0006/TA0004) by constraining runtime privileges. OpenShift SCCs default/enforce these fields. Mitigation: M1048."
     },
     "5.7.4": {
-  "title": "5.7.4 The default namespace should not be used",
+      "title": "5.7.4 The default namespace should not be used",
       "cisVersion": "CIS OCP 1.8",
       "cisMapping": {
         "cisv8": "4.9 Configure Trusted DNS Servers on Enterprise Assets",
@@ -1608,7 +1608,7 @@
         "tactics": ["TA0005"],
         "mitigations": ["M1018"]
       },
-      "explanation": "Avoiding the default namespace impedes hiding or manipulating terminating resources (T1578) in Defense Evasion (TA0005) via namespace-scoped policy controls (M1018)."
+  "explanation": "This CIS control requires avoiding the default namespace for workloads. It mitigates Modify Cloud Compute Infrastructure (T1578) in Defense Evasion (TA0005) by denying attackers a shared namespace to obscure changes. OpenShift uses namespace-scoped RBAC and policies for isolation. Mitigation: M1018."
     }
   }
 }
