@@ -1,0 +1,31 @@
+flowchart TD
+  subgraph Internet
+    EXTAPI["🌍 Public Weather API"]
+  end
+
+  subgraph Frontend["ns-frontend-user"]
+    FE["frontend-app (UI)"]
+    WP["weather-proxy (python-legacy)"]
+  end
+
+  subgraph API["ns-api-user"]
+    GW["api-gateway (Go, JWT)"]
+    FC["api-forecast (FastAPI)"]
+    DS["data-syncer (Go)"]
+  end
+
+  subgraph Data["ns-data-user"]
+    MYSQL["MySQL (shared DB)"]
+  end
+
+  subgraph Vendor["ns-vendor-analytics"]
+    VA["vendor-analytics (3rd-party, anyuid)"]
+  end
+
+  EXTAPI --> WP
+  DS -->|pulls weather| WP
+  DS -->|pushes| GW
+  GW -->|CRUD /forecast| FC
+  FC --> MYSQL
+  FE -->|GET /weather| GW
+  GW -->|GET /analytics| VA

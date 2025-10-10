@@ -1,0 +1,14 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: weather-proxy
+  labels:
+    app: weather-proxy
+spec:
+  to:
+    kind: Service
+    name: weather-proxy
+  port:
+    targetPort: http
+  tls:
+    termination: edge

@@ -60,6 +60,7 @@ NetworkPolicies are label-driven and namespace-scoped. You control two sides wit
 - Direction: policyTypes: [Ingress, Egress] controls which directions are enforced.
 
 Matching semantics you’ll use most:
+
 - AND within matchLabels (all keys must match); OR across list items:
   - Multiple labels under matchLabels must all match.
   - Multiple entries in from or ports act like OR rules.

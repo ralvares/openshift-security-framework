@@ -1,0 +1,4 @@
+github.com/golang-jwt/jwt/v5 v5.2.1 h1:1XwHfNaQ1WEfBQ/N2mYwLd7mVZLJIYurJcidUB2sHZ0=
+github.com/golang-jwt/jwt/v5 v5.2.1/go.mod h1:7Y2odes1tC0KFQF1JxWx3V63zxvZN7FDnEqZHe+W68c=
+github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQp1vr9SHP3KZM9C0J0D4nV5w=
+github.com/joho/godotenv v1.5.1/go.mod h1:f4m2lTWCWbMqCj0GL3h3n1LQbCpaZLWrp+0z/XbR0Zs=

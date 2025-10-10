@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ns-vendor-analytics
+  labels:
+    stage: demo
+    layer: vendor
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vendor-analytics
+  namespace: ns-vendor-analytics
+  labels:
+    app: vendor-analytics
+    security-exception: anyuid
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vendor-analytics
+  namespace: ns-vendor-analytics
+  labels:
+    app: vendor-analytics
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vendor-analytics
+  template:
+    metadata:
+      labels:
+        app: vendor-analytics
+        security-exception: anyuid
+    spec:
+      serviceAccountName: vendor-analytics
+      containers:
+        - name: vendor-analytics
+          image: YOUR_REGISTRY/vendor-analytics:dev
+          ports:
+            - containerPort: 443
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 443
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          securityContext:
+            runAsUser: 0
+            allowPrivilegeEscalation: false
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vendor-analytics
+  namespace: ns-vendor-analytics
+spec:
+  selector:
+    app: vendor-analytics
+  ports:
+    - port: 443
+      targetPort: 443

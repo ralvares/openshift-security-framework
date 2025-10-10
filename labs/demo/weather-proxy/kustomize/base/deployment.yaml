@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weather-proxy
+  labels:
+    app: weather-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: weather-proxy
+  template:
+    metadata:
+      labels:
+        app: weather-proxy
+    spec:
+      containers:
+        - name: apache
+          image: registry.redhat.io/rhscl/httpd-24-rhel7:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          volumeMounts:
+            - name: apache-conf
+              mountPath: /etc/httpd/conf.d/custom.conf
+              subPath: custom.conf
+            - name: cgi-bin
+              mountPath: /var/www/cgi-bin/index.py
+              subPath: index.py
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+      volumes:
+        - name: apache-conf
+          configMap:
+            name: weather-proxy-apache-conf
+            defaultMode: 0444
+        - name: cgi-bin
+          configMap:
+            name: weather-proxy-cgi
+            defaultMode: 0755
