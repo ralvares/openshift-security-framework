@@ -1,4 +1,0 @@
-fastapi==0.111.0
-uvicorn==0.30.0
-mysqlclient==2.2.4
-PyJWT==2.9.0

@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: apache
-          image: registry.redhat.io/rhscl/httpd-24-rhel7:latest
+          image: registry.access.redhat.com/ubi9/httpd-24
           ports:
             - containerPort: 8080
           env:
