@@ -9,7 +9,7 @@
 :icons: font
 
 == Skill
-Parse audit logs to identify suspicious exec and port-forward events and build a concise incident report.
+Learn to analyze OpenShift API audit logs to spot risky activity across the board—exec, port‑forward, secret access, RBAC changes, and other sensitive verbs—and turn findings into a concise, attributable incident report.
 
 == Objective
 
@@ -19,7 +19,7 @@ Parse audit logs to identify suspicious exec and port-forward events and build a
 * Produce structured report
 
 == Why it Matters
-Audit logs are door swipe records for API actions. They reduce investigation time and support compliance evidence.
+Audit logs are the security camera for API actions—who did what, when, and from where. They turn guesswork into evidence, speeding investigations and proving compliance.
 
 == What it Solves
 
@@ -46,13 +46,13 @@ Audit logs are door swipe records for API actions. They reduce investigation tim
 == How to Try It
 Assuming `audit.json` file (JSON lines).
 
-.Basic presence check
+=== Basic presence check
 [source,sh]
 ----
 ls -l audit.json
 ----
 
-.Extract exec events
+=== Extract exec events
 [source,sh]
 ----
 jq 'select(.objectRef.subresource=="exec") | {time:.requestReceivedTimestamp,user:.user.username,ns:.objectRef.namespace,pod:.objectRef.name,cmd:.requestObject.command}' audit.json
@@ -63,32 +63,32 @@ Fallback:
 grep -F '"exec"' audit.json | head
 ----
 
-.Extract port-forward events
+=== Extract port-forward events
 [source,sh]
 ----
 jq 'select(.objectRef.subresource=="portforward") | {time:.requestReceivedTimestamp,user:.user.username,ns:.objectRef.namespace,pod:.objectRef.name}' audit.json
 ----
 
-.Focus on suspected user
+=== Focus on suspected user
 [source,sh]
 ----
 USER=suspect@example.com
 jq --arg U "$USER" 'select(.user.username==$U and (.objectRef.subresource=="exec" or .objectRef.subresource=="portforward")) | {time:.requestReceivedTimestamp,sub:.objectRef.subresource,pod:.objectRef.name,ns:.objectRef.namespace,sourceIPs:.sourceIPs}' audit.json
 ----
 
-.Stage distribution
+=== Stage distribution
 [source,sh]
 ----
 jq 'select(.objectRef.subresource=="exec") | .stage' audit.json | sort | uniq -c
 ----
 
-.Unique exec actors
+=== Unique exec actors
 [source,sh]
 ----
 jq 'select(.objectRef.subresource=="exec") | .user.username' audit.json | sort | uniq -c
 ----
 
-.Commands (if captured)
+=== Commands (if captured)
 [source,sh]
 ----
 jq 'select(.objectRef.subresource=="exec") | .requestObject.command' audit.json | sort | uniq -c

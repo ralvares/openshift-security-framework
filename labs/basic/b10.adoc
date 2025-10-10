@@ -9,7 +9,7 @@
 :icons: font
 
 == Skill
-Secure application access with TLS, enforce HTTPS-only behavior, choose edge vs re-encrypt termination.
+Learn to secure OpenShift routes with TLS, enforce HTTPS-only access with automatic redirects, and choose the right termination mode (edge, re-encrypt, or passthrough).
 
 == Objective
 
@@ -19,7 +19,7 @@ Secure application access with TLS, enforce HTTPS-only behavior, choose edge vs 
 * Understand re-encrypt vs passthrough
 
 == Why it Matters
-HTTP is a postcard; TLS is a sealed envelope. Encrypted transit preserves confidentiality and integrity.
+HTTP is a postcard; TLS is a sealed envelope with a signature. Without TLS, credentials, cookies, and API payloads can be read or altered in transit. Enforcing HTTPS with automatic redirects ensures confidentiality, integrity, and server identity while closing downgrade paths—often a compliance requirement.
 
 == What it Solves
 
@@ -45,36 +45,36 @@ HTTP is a postcard; TLS is a sealed envelope. Encrypted transit preserves confid
 * Runtime: Monitor expiry & cipher posture.
 
 == How to Try It
-Prereq: LAB-B9 `b9-rebuild` project with `secure-app` exists.
+Prereq: LAB-B9 `b9-rebuild` project with `webapp` exists.
 
-.Switch project & get host
+=== Switch project & get host
 [source,sh]
 ----
 oc project b9-rebuild
-HOST=$(oc get route secure-app -o jsonpath='{.spec.host}' 2>/dev/null)
-echo $HOST
+ROUTE=$(oc get route webapp -o jsonpath='{.spec.host}' 2>/dev/null)
+echo $ROUTE
 ----
 
-.Baseline HTTP
+=== Baseline HTTP
 [source,sh]
 ----
-curl http://$HOST
+curl http://$ROUTE
 ----
 
-.Replace route with HTTPS (edge + redirect)
+=== Replace route with HTTPS (edge + redirect)
 [source,sh]
 ----
-oc delete route secure-app
-oc create route edge secure-app --service=secure-app --port=8080 --insecure-policy=Redirect
+oc delete route webapp
+oc create route edge webapp --service=webapp --port=8080 --insecure-policy=Redirect
 ----
 
-.Test HTTPS
+=== Test HTTPS
 [source,sh]
 ----
-curl -k https://$HOST
+curl -k https://$ROUTE
 ----
 
-.(Optional) Cleanup
+=== Cleanup (optional)
 [source,sh]
 ----
 oc delete project b9-rebuild --wait=false

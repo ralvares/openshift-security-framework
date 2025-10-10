@@ -9,7 +9,7 @@
 :icons: font
 
 == Skill
-You’ll enforce per-container defaults and namespace resource ceilings to prevent noisy neighbors and accidental cost explosions.
+Master the ability to enforce resource controls in OpenShift by setting per-container defaults and namespace-wide ceilings. This ensures fair resource distribution, prevents noisy neighbors from disrupting other workloads, and avoids unexpected cost spikes. You'll learn to use LimitRange for container-level defaults and ResourceQuota for namespace-level boundaries, creating a predictable and balanced multi-tenant environment.
 
 == Objective
 
@@ -22,7 +22,11 @@ You’ll enforce per-container defaults and namespace resource ceilings to preve
 * Read events / jsonpath outputs to confirm enforcement
 
 == Why it Matters
-Unbounded pods are like an open buffet with no portion sizes. They create starvation, evictions, and unpredictable spend. Defaults (LimitRange) + ceilings (ResourceQuota) deliver predictable tenancy and early saturation signals.
+Without resource controls, containers can request unlimited CPU and memory, much like an all-you-can-eat buffet with no portion control. This leads to "noisy neighbor" problems where one application starves others of resources, causing unexpected workload evictions and runaway cloud costs. 
+
+In shared OpenShift environments, this chaos is prevented through two complementary mechanisms: LimitRange sets sensible defaults for individual containers (ensuring every workload has minimum guarantees and maximum caps), while ResourceQuota establishes namespace-wide boundaries (preventing any single team from monopolizing cluster capacity). Together, they create predictable multi-tenancy, fair resource distribution, and early warning signals when capacity limits are approaching—turning potential resource conflicts into manageable, observable events.
+
+Business value: Resource controls translate to cost predictability, performance stability, and tenant isolation. Without them, one misconfigured deployment can cascade into cluster-wide degradation and emergency spending.
 
 == What it Solves
 
@@ -55,16 +59,17 @@ Namespace: `b3-resources-demo`. Image: UBI `sleep infinity`.
 
 NOTE: LimitRange & ResourceQuota creation usually needs elevated (cluster-admin or delegated) rights. Forbidden errors confirm RBAC boundaries.
 
-.Namespace setup
+=== Namespace setup
 [source,sh]
 ----
 oc new-project b3-resources-demo
 oc project
 ----
 
-.LimitRange (defaults + bounds + ratios)
-[source,yaml]
+=== LimitRange (defaults + bounds + ratios)
+[source,sh]
 ----
+oc apply -f - <<'EOF'
 apiVersion: v1
 kind: LimitRange
 metadata:
@@ -88,14 +93,15 @@ spec:
     maxLimitRequestRatio:
       cpu: "5"
       memory: "4"
+EOF
 ----
-.Verify
+=== Verify
 [source,sh]
 ----
 oc get limitrange default-limits -o jsonpath='{.spec.limits[0]}' | sed 's/,/\n/g'
 ----
 
-.ResourceQuota (namespace ceilings)
+=== ResourceQuota (namespace ceilings)
 [source,sh]
 ----
 oc create quota compute-quota \
@@ -107,7 +113,7 @@ oc create quota compute-quota \
 oc describe quota compute-quota | sed -n '1,25p'
 ----
 
-.Deploy unbounded workload (inherits defaults)
+=== Deploy unbounded workload (inherits defaults)
 [source,sh]
 ----
 oc create deployment stress --image=registry.access.redhat.com/ubi9/ubi -- /bin/sh -c "sleep infinity"
@@ -116,7 +122,7 @@ oc get pod -l app=stress -o jsonpath='{.items[0].spec.containers[0].resources}{"
 ----
 Expected: requests 100m/128Mi; limits 500m/256Mi.
 
-.Override within bounds
+=== Override within bounds
 [source,sh]
 ----
 oc set resources deploy/stress --requests=cpu=300m,memory=256Mi --limits=cpu=800m,memory=512Mi
@@ -125,7 +131,7 @@ oc wait --for=condition=Available deployment/stress --timeout=90s
 oc get pod -l app=stress -o jsonpath='{.items[0].spec.containers[0].resources}{"\n"}'
 ----
 
-.Exceed max (admission rejects new pods)
+=== Exceed max (admission rejects new pods)
 [source,sh]
 ----
 oc set resources deployment/stress --limits=cpu=2,memory=1Gi
@@ -135,7 +141,7 @@ oc get pod -l app=stress -o jsonpath='{.items[0].spec.containers[0].resources}{"
 oc get deploy stress -o jsonpath='{.spec.template.spec.containers[0].resources.limits}{"\n"}'
 ----
 
-.Scale beyond quota (pods limit)
+=== Scale beyond quota (pods limit)
 [source,sh]
 ----
 oc scale deployment stress --replicas=25 || true
@@ -143,7 +149,7 @@ oc get events --sort-by=.lastTimestamp | grep -E 'FailedCreate.*compute-quota' |
 oc get quota compute-quota
 ----
 
-.Cleanup (optional)
+=== Cleanup (optional)
 [source,sh]
 ----
 oc delete project b3-resources-demo --wait=false

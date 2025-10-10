@@ -19,7 +19,7 @@ Remove passwords from manifests, store them as Secrets, inject safely, rotate cl
 * Rotate and compare behaviors
 
 == Why it Matters
-Hardcoding credentials is writing the PIN on the ATM. Secrets reduce casual exposure and support rotation & compliance.
+Hardcoding credentials is like writing your ATM PIN on the card—anyone who sees it can use it. Storing passwords in Git, manifests, or images spreads them too widely and makes rotation painful. Kubernetes Secrets separate credentials from code, restrict access via RBAC, and support safe rotation (files update in place; env vars on restart), improving security and compliance.
 
 == What it Solves
 
@@ -46,13 +46,13 @@ Hardcoding credentials is writing the PIN on the ATM. Secrets reduce casual expo
 
 == How to Try It
 
-.Project
+=== Project
 [source,sh]
 ----
 oc new-project b5-secrets
 ----
 
-.Insecure deployment (hardcoded credential)
+=== Insecure deployment (hardcoded credential)
 [source,sh]
 ----
 oc create deployment insecure-app --image=registry.access.redhat.com/ubi9/ubi -- sleep infinity
@@ -60,46 +60,46 @@ oc set env deployment/insecure-app DB_PASSWORD=SuperSecret123
 oc get deploy insecure-app -o yaml | grep -n 'SuperSecret'
 ----
 
-.Remove insecure workload
+=== Remove insecure workload
 [source,sh]
 ----
 oc delete deployment insecure-app
 ----
 
-.Create a Secret
+=== Create a Secret
 [source,sh]
 ----
 oc create secret generic db-credentials --from-literal=DB_PASSWORD=SuperSecret123
 ----
 
-.Deployment using env var from Secret
+=== Deployment using env var from Secret
 [source,sh]
 ----
 oc create deployment secure-app-env --image=registry.access.redhat.com/ubi9/ubi -- sleep infinity
-och set env deployment/secure-app-env --from=secret/db-credentials
-och exec deploy/secure-app-env -- printenv | grep DB_PASSWORD
+oc set env deployment/secure-app-env --from=secret/db-credentials
+oc exec deploy/secure-app-env -- printenv | grep DB_PASSWORD
 oc get deploy secure-app-env -o yaml | grep -n 'SuperSecret'
 ----
 
-.Deployment mounting Secret as file
+=== Deployment mounting Secret as file
 [source,sh]
 ----
 oc create deployment secure-app-file --image=registry.access.redhat.com/ubi9/ubi -- sleep infinity
-och set volume deployment/secure-app-file --add --name=creds --type=secret --secret-name=db-credentials --mount-path=/opt/creds --read-only
-och exec deploy/secure-app-file -- ls /opt/creds
-och exec deploy/secure-app-file -- cat /opt/creds/DB_PASSWORD
+oc set volume deployment/secure-app-file --add --name=creds --type=secret --secret-name=db-credentials --mount-path=/opt/creds --read-only
+oc exec deploy/secure-app-file -- ls /opt/creds
+oc exec deploy/secure-app-file -- cat /opt/creds/DB_PASSWORD
 ----
 
-.Rotate secret (mount auto-updates, env needs restart)
+=== Rotate secret (mount auto-updates, env needs restart)
 [source,sh]
 ----
 oc create secret generic db-credentials --from-literal=DB_PASSWORD=NewValue456 -o yaml --dry-run=client | oc apply -f -
-och exec deploy/secure-app-file -- cat /opt/creds/DB_PASSWORD
+oc exec deploy/secure-app-file -- cat /opt/creds/DB_PASSWORD
 oc rollout restart deployment/secure-app-env
-och exec deploy/secure-app-env -- printenv | grep DB_PASSWORD
+oc exec deploy/secure-app-env -- printenv | grep DB_PASSWORD
 ----
 
-.Cleanup (optional)
+=== Cleanup (optional)
 [source,sh]
 ----
 oc delete project b5-secrets --wait=false

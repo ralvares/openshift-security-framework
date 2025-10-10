@@ -9,17 +9,17 @@
 :icons: font
 
 == Skill
-Diagnose why an image that runs fine elsewhere fails on OpenShift, and learn correct remediation (rebuild image) instead of weakening security (granting anyuid).
+Learn that third-party applications (like vendor or legacy software) often can't be rebuilt or modified to fit OpenShift's security requirements, such as running without root privileges or binding to privileged ports. In these real-world scenarios, the key skill is to analyze the specific security risks and make an informed decision to accept those risks, rather than automatically weakening platform security by granting broad permissions like anyuid. You'll diagnose why such an image fails on OpenShift, understand the security implications, and learn responsible risk management with proper documentation.
 
 == Objective
 
 * Attempt to run a container binding privileged port 80 and observe failure
 * Attempt to force root (runAsUser=0) and see SCC block it
 * Grant anyuid and observe the container now runs as root on port 80
-* Explain why this is insecure and what the proper alternative would be (change the workload, not the SCC)
+* Explain why this is insecure and when the proper alternative is to analyze and accept the risk (for third-party apps where rebuilding is not feasible)
 
 == Why it Matters
-Using an image that insists on a fixed user or root is like a touring band demanding to rewire your venue’s electrical system before playing. You could say yes (faster “win”)—but you inherit fire risk, insurance issues, and future lock-in. Granting anyuid is the platform equivalent: a convenience that normalizes bypassing guardrails.
+Using an image that insists on a fixed user or root is like a touring band demanding to rewire your venue’s electrical system before playing. You could say yes (faster “win”), but you inherit fire risk, insurance issues, and future lock-in. Granting anyuid is the platform equivalent: a convenience that normalizes bypassing guardrails.
 
 OpenShift injects a random non-root UID so containers can’t rely on root. Images built without flexible ownership (root:0 with group write) break, flushing out insecure design early. The business upside: fewer “surprise” escalations, simpler compliance (“all workloads non-root by default”), and faster production readiness.
 
@@ -51,18 +51,18 @@ Attackers look for root-running containers or SCC exceptions. By refusing them u
 == How to Secure (Lifecycle View)
 * Build: Ensure writable dirs are group-writable; avoid USER root in final stage.
 * Registry: Store only images passing a non-root readiness check.
-* Deploy: Rely on restricted SCC; track anyuid grants via GitOps.
+* Deploy: For third-party apps, analyze risks and register acceptance with annotations; rely on restricted SCC otherwise.
 * Runtime: RHACS policy flags root or privileged UID usage.
 
 == How to Try It
 
-.Project
+=== Project
 [source,sh]
 ----
 oc new-project b3-scc-demo
 ----
 
-.Deploy (attempting privileged port 80)
+=== Deploy (attempting privileged port 80)
 [source,sh]
 ----
 oc create deployment vendor-app --image=registry.access.redhat.com/ubi9/python-311 -- python3 -m http.server 80
@@ -70,7 +70,7 @@ oc logs -l app=vendor-app --tail=50
 ----
 Expected: CrashLoopBackOff with PermissionError (binding port 80).
 
-.Attempt to force root (runAsUser=0) – expect denial
+=== Attempt to force root (runAsUser=0) – expect denial
 [source,sh]
 ----
 oc patch deployment vendor-app --type='json' -p='[{"op":"add","path":"/spec/template/spec/securityContext","value":{"runAsUser":0}}]'
@@ -79,7 +79,7 @@ oc get events --sort-by=.lastTimestamp | grep vendor-app | tail -n 5 || true
 ----
 Look for invalid UID range / runAsUser errors.
 
-.Grant anyuid (anti-pattern, requires cluster-admin)
+=== Grant anyuid (anti-pattern, requires cluster-admin)
 [source,sh]
 ----
 oc adm policy add-scc-to-user anyuid -z default || echo 'Expected Forbidden if not admin'
@@ -89,10 +89,30 @@ oc logs -l app=vendor-app --tail=10 || true
 ----
 If succeeded (not recommended): id -u = 0 and server listens on 80.
 
-.Proper fix (do this instead)
-Use a high port (8080) & flexible permissions; rebuild image rather than broad SCC.
+=== Register Risk Acceptance (namespace annotation)
+For third‑party apps where rebuilding is not possible, analyze the risk and formally register the acceptance so it’s discoverable and auditable.
 
-.Cleanup (optional)
+Multiple deployments? Use one of these patterns:
+* Preferred: annotate each Deployment with its own risk-acceptance metadata
+* Optional index: annotate the namespace with per-deployment keys to avoid overlap (suffix the key with the deployment name)
+
+[source,sh]
+----
+oc annotate namespace b3-scc-demo \
+	openshift.io/risk-accepted.vendor-app="Requires anyuid for privileged port" \
+	openshift.io/risk-accepted-approved-by.vendor-app="InfoSec Team" \
+	--overwrite
+----
+
+=== Verify annotation
+[source,sh]
+----
+oc get ns b3-scc-demo -o yaml | grep -E 'openshift.io/risk-accepted'
+----
+
+NOTE: Keep this for exceptional cases. The preferred path is to rebuild images so they run under the restricted SCC without anyuid.
+
+=== Cleanup (optional)
 [source,sh]
 ----
 oc delete project b3-scc-demo --wait=false
@@ -111,7 +131,7 @@ oc delete project b3-scc-demo --wait=false
 |Issue | Bad Shortcut | Secure Fix
 |Privileged port 80 fails | Grant anyuid | Use high port (8080)
 |Writable dirs missing | chmod at runtime | Fix ownership during build
-|Legacy root-only startup | Persist anyuid exception | Refactor image / entrypoint
+|Legacy root-only startup | Persist anyuid exception | Analyze risk and accept with annotations
 |===
 
 == Error Interpretation Cheat Sheet

@@ -9,7 +9,7 @@
 :icons: font
 
 == Skill
-You’ll understand why OpenShift deliberately applies security guardrails (like SCCs) that assume a workload was NOT built with security best practices, and how choosing or building the right image (non-root, high port) removes friction while strengthening safety.
+Learn why OpenShift enforces strict security rules (like running containers as non-root users and avoiding privileged ports like 80) because it assumes workloads weren't built with security best practices in mind. You'll discover how choosing or building images designed for these rules (e.g., using a non-root user and high ports like 8080) makes deployment smoother and safer, eliminating the need for risky security exceptions while demonstrating the benefits of least privilege.
 
 == Objective
 
@@ -20,12 +20,12 @@ You’ll understand why OpenShift deliberately applies security guardrails (like
 * Compare external vs curated image from security, reliability, and compliance perspectives
 
 == Why it Matters
-Imagine an office tower where the building management assumes every new tenant forgot to set up internal badge rules. Instead of trusting everyone, doors default to locked, access is scoped, and reception screens visitors. That’s OpenShift: it does NOT assume developers applied security best practices—it assumes the opposite and installs guardrails to compensate. A container that “just worked” on a laptop (root + port 80) collides with these controls and fails fast. That failure isn’t punishment; it’s feedback. It prevents: unnecessary root power, accidental data exposure, shortened attacker dwell time, and audit headaches.
+Imagine an office tower where the building management assumes every new tenant forgot to set up internal badge rules. Instead of trusting everyone, doors default to locked, access is scoped, and reception screens visitors. That’s OpenShift: it does NOT assume developers applied security best practices, it assumes the opposite and installs guardrails to compensate. A container that “just worked” on a laptop (root + port 80) collides with these controls and fails fast. That failure isn’t punishment; it’s feedback. It prevents: unnecessary root power, accidental data exposure, shortened attacker dwell time, and audit headaches.
 
-Business value: guardrails turn silent risk into visible learning. Non-root + high-port norms reduce exploit blast radius, simplify compliance evidence (“all workloads run non-root”), and strengthen customer trust. Most security incidents aren’t cinematic hacks—they’re misconfigurations and permissive defaults. OpenShift converts risky assumptions into an engineered safety net.
+Business value: guardrails turn silent risk into visible learning. Non-root + high-port norms reduce exploit blast radius, simplify compliance evidence (“all workloads run non-root”), and strengthen customer trust. Most security incidents aren’t cinematic hacks, they’re misconfigurations and permissive defaults. OpenShift converts risky assumptions into an engineered safety net.
 
 == What it Solves
-This lab exposes a chain of quiet assumptions: “root is fine,” “port 80 is normal,” “logs can write to root-owned directories,” “public images are good enough.” On a laptop these blend into the background because the environment is single-tenant and permissive. In a shared platform every one of those assumptions widens attack surface or slows audits. Attackers don’t need brilliance when defaults gift them privileges; they only need one container running as root or one mis-owned directory to pivot. OpenShift breaks this chain by injecting a random non-root UID and refusing privileged binds—forcing images to be explicit about what they truly need. The failure of the external `httpd` image is a design review in disguise. The success of the UBI variant demonstrates that secure defaults (non-root user, high port readiness, sane permissions) remove friction rather than add it.
+This lab exposes a chain of quiet assumptions: “root is fine,” “port 80 is normal,” “logs can write to root-owned directories,” “public images are good enough.” On a laptop these blend into the background because the environment is single-tenant and permissive. In a shared platform every one of those assumptions widens attack surface or slows audits. Attackers don’t need brilliance when defaults gift them privileges; they only need one container running as root or one mis-owned directory to pivot. OpenShift breaks this chain by injecting a random non-root UID and refusing privileged binds, forcing images to be explicit about what they truly need. The failure of the external `httpd` image is a design review in disguise. The success of the UBI variant demonstrates that secure defaults (non-root user, high port readiness, sane permissions) remove friction rather than add it.
 
 == Understanding the Attack Surface
 [cols="1,2,2",options="header"]
@@ -39,15 +39,15 @@ This lab exposes a chain of quiet assumptions: “root is fine,” “port 80 is
 |===
 
 == How to Try It
-Narrative: One deployment. First it fails (external image expecting root + port 80). We replace the image with a trusted UBI variant (non‑root, high port) and it succeeds—no privilege grants needed.
+Narrative: One deployment. First it fails (external image expecting root + port 80). We replace the image with a trusted UBI variant (non‑root, high port) and it succeeds, no privilege grants needed.
 
-.Create a project
+=== Create a project
 [source,sh]
 ----
 oc new-project b1-httpd-demo
 ----
 
-.Deploy external image (will fail under restricted SCC)
+=== Deploy external image (will fail under restricted SCC)
 [source,sh]
 ----
 oc create deployment web --image=httpd
@@ -64,7 +64,18 @@ AH00015: Unable to open logs
 ----
 Reason: Port 80 requires elevated privileges + root-owned log dirs + random non-root UID injection.
 
-.Replace the image in-place with trusted UBI httpd (listens on 8080)
+=== Replace the image in-place with trusted UBI httpd (listens on 8080)
+
+Now deploy the webserver using a Red Hat UBI image that follows security best practices: runs as non-root, uses a non-privileged port (8080 instead of 80), and is curated, patched, and supported.
+
+[cols="1,2",options="header"]
+|===
+|Best practice | Why it matters
+|Non-root user | Works with OpenShift’s random UID; least privilege
+|High port (8080) | Avoids privileged port 80 and extra capabilities
+|Curated & supported | Regular patches, lower risk, clear provenance
+|===
+
 [source,sh]
 ----
 oc set image deployment/web *=registry.access.redhat.com/ubi9/httpd-24
@@ -74,7 +85,7 @@ oc exec deploy/web -- id -u
 ----
 Expect: Random non-root UID; container stable.
 
-.Comparison
+=== Comparison
 [cols="1,2,1,1,1,2",options="header"]
 |===
 |Scenario | Image | Port | UID | Result | Reason
@@ -83,7 +94,7 @@ Expect: Random non-root UID; container stable.
 |OpenShift (after swap) | registry.access.redhat.com/ubi9/httpd-24 | 8080 | random | Succeeds | Built for non-root + high port
 |===
 
-.Cleanup
+=== Cleanup
 [source,sh]
 ----
 oc delete project b1-httpd-demo --wait=false
@@ -114,15 +125,15 @@ oc delete project b1-httpd-demo --wait=false
 |===
 
 == FAQs
-Why did it work locally?:: Your local environment let the container run as root and bind port 80—no guardrails.
+Why did it work locally?:: Your local environment let the container run as root and bind port 80, no guardrails.
 Does OpenShift “distrust” my image?:: It assumes nothing was hardened yet and applies defaults that are safe even for naive builds.
 Isn’t granting anyuid easier?:: Short term yes; long term it expands audit scope and risk. Fix the image instead.
 Why avoid privileged ports?:: They require elevation; high ports remove the need entirely and simplify compliance evidence.
-How do curated images help?:: They bake in sane permissions and are maintained—reducing unknown vulnerabilities and operational toil.
+How do curated images help?:: They bake in sane permissions and are maintained, reducing unknown vulnerabilities and operational toil.
 What if I must run root?:: Create a documented exception with justification, scope, and expiration. Treat it like a temporary safety override.
 
 == Closing Story
-OpenShift’s model is “secure-by-default through skepticism.” It behaves like a facilities team that locks doors and limits master keys because experience shows not every tenant configures safety correctly the first time. By embracing those guardrails—rather than bypassing them—you convert invisible risk into durable engineering hygiene.
+OpenShift’s model is “secure-by-default through skepticism.” It behaves like a facilities team that locks doors and limits master keys because experience shows not every tenant configures safety correctly the first time. By embracing those guardrails, rather than bypassing them, you convert invisible risk into durable engineering hygiene.
 
 == Next Step Ideas
 

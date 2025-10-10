@@ -9,7 +9,7 @@
 :icons: font
 
 == Skill
-Understand risk of unvetted registry images and enforce a trusted-source allow‑list in OpenShift.
+Learn why images from unknown registries are risky and how to allow only trusted sources. You'll set an allow‑list and verify image provenance (registry host + sha256 digest) in OpenShift.
 
 == Objective
 
@@ -19,7 +19,7 @@ Understand risk of unvetted registry images and enforce a trusted-source allow�
 * Verify provenance (host + digest)
 
 == Why it Matters
-Unknown registry images are like unlabeled packages at a loading dock. Allow‑lists enforce provenance and reduce CVE noise.
+Images from random registries are risky—you don’t know who built them, what’s inside, or whether they’re maintained. An allow‑list only permits trusted sources, making provenance clear and reducing noisy, avoidable CVEs.
 
 == What it Solves
 
@@ -43,16 +43,17 @@ Unknown registry images are like unlabeled packages at a loading dock. Allow‑l
 
 == How to Try It
 
-.Create & label project
+=== Create & label project
 [source,sh]
 ----
 oc new-project b6-trusted
 oc label namespace b6-trusted trusted-registry-enforce=true --overwrite
 ----
 
-.Apply namespace-scoped allow‑list (cluster-admin)
-[source,yaml]
+=== Apply namespace-scoped allow‑list (cluster-admin)
+[source,sh]
 ----
+oc apply -f - <<'EOF'
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingAdmissionPolicy
 metadata:
@@ -110,29 +111,41 @@ spec:
     namespaceSelector:
       matchLabels:
         trusted-registry-enforce: "true"
+EOF
 ----
 
-.Attempt disallowed image (expect deny)
+=== Attempt disallowed image (expect deny)
 [source,sh]
 ----
 oc -n b6-trusted create deployment bad --image=docker.io/library/nginx:latest || true
 ----
 
-.Deploy trusted UBI image (should succeed)
+=== Deploy trusted UBI image (should succeed)
 [source,sh]
 ----
-oc -n b6-trusted create deployment good --image=registry.access.redhat.com/ubi9/ubi:latest -- sleep infinity
+oc -n b6-trusted create deployment good --image=registry.access.redhat.com/ubi9/ubi:9.6 -- sleep infinity
 oc -n b6-trusted wait --for=condition=Available deployment/good --timeout=60s
 ----
 
-.Verify provenance
+=== Verify provenance
 [source,sh]
 ----
 oc -n b6-trusted describe pod -l app=good | grep -E 'Image:|Image ID:'
-oc -n b6-trusted get deployment good -o yaml | grep -i 'image:'
 ----
 
-.Cleanup (optional)
+What to look for:
+
+- Image: should show a trusted registry host (registry.access.redhat.com, registry.redhat.io, quay.io, or your internal registry)
+- Image ID: should show an immutable sha256 digest. This proves the exact content that ran; tags like :latest can change, digests do not.
+
+If both are correct (trusted host + sha256 digest), you have a basic provenance check: approved source and exact, verifiable content.
+
+Example (if you use UBI 9.6):
+
+- Image: registry.redhat.io/ubi9/ubi:9.6 (trusted source)
+- Image ID: …@sha256:dbc1e98d14a022542e45b5f22e0206d3f86b5bdf237b58ee7170c9ddd1b3a283 (immutable digest)
+
+=== Cleanup (optional)
 [source,sh]
 ----
 oc delete project b6-trusted --wait=false

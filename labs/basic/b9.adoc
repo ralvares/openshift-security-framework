@@ -9,7 +9,7 @@
 :icons: font
 
 == Skill
-Rebuild an insecure image so it runs under the restricted SCC without special privileges.
+Learn to rebuild a container image so it runs under OpenShift’s restricted SCC by design: drop root, fix file ownership/permissions for random UIDs, and use an unprivileged port—no anyuid or special privileges required.
 
 == Objective
 
@@ -20,7 +20,7 @@ Rebuild an insecure image so it runs under the restricted SCC without special pr
 * Confirm no elevated SCC required
 
 == Why it Matters
-“Requires root” is future security debt. Rebuilding converts exceptions into design-time hygiene.
+“Requires root” adds security debt, and every exception (like anyuid) makes it worse. Rebuild the image to be safe by default: run as non‑root, use a high port, and fix file ownership. Then it runs under the restricted SCC with no exceptions. Result: smaller blast radius, easier audits, and portability across secure clusters.
 
 == What it Solves
 
@@ -47,61 +47,104 @@ Rebuild an insecure image so it runs under the restricted SCC without special pr
 
 == How to Try It
 
-.Project setup
+=== Project setup
 [source,sh]
 ----
 oc new-project b9-rebuild
 ----
 
-.Build context (UBI httpd runtime)
+=== Deploy external image (will fail under restricted SCC)
+[source,sh]
+----
+oc create deployment webapp --image=httpd
+oc logs -l app=webapp --tail=40 || true
+----
+Expected failure snippet:
+[source,text]
+----
+AH00558: httpd: Could not reliably determine the server's fully qualified domain name, using 10.128.2.191. Set the 'ServerName' directive globally to suppress this message
+(13)Permission denied: AH00072: make_sock: could not bind to address [::]:80
+(13)Permission denied: AH00072: make_sock: could not bind to address 0.0.0.0:80
+no listening sockets available, shutting down
+AH00015: Unable to open logs
+----
+Reason: Port 80 requires elevated privileges + root-owned log dirs + random non-root UID injection.
+
+Why this image fails (what’s “broken”):
+
+* It’s Apache httpd listening on port 80 (a privileged port that requires root)
+* It writes logs under root-owned paths (not writable by random non-root UIDs)
+* It’s not built for OpenShift’s defaults (restricted SCC runs containers as non-root)
+
+Result: it either gets denied at admission or crash loops at runtime with permission errors.
+
+NOTE: We’ll rebuild the app on top of a trusted base (UBI 9 httpd 2.4 from registry.access.redhat.com / registry.redhat.io). This image is designed for OpenShift: it runs as non‑root by default and listens on an unprivileged port (8080). Because this is a web server, we’ll copy a simple sample page (index.html) into the default document root; in a real app you’d place any site files (static assets, app output) that httpd should serve.
+
+=== Rebuild context (UBI 9 httpd 2.4 from a trusted registry)
+
 [source,sh]
 ----
 mkdir -p build && cd build
-cat > Dockerfile <<'EOF'
-FROM registry.access.redhat.com/ubi9/httpd-24:latest
-COPY index.html /var/www/html/index.html
-EXPOSE 8080
-EOF
 cat > index.html <<'EOF'
 <html><body><h1>Secure UBI httpd App</h1></body></html>
 EOF
+cat > Dockerfile <<'EOF'
+FROM registry.access.redhat.com/ubi9/httpd-24:latest
+COPY index.html /var/www/html/index.html
+
+USER 1001
+
+EXPOSE 8080
+EOF
 ----
 
-.Build with OpenShift
+=== Build with OpenShift
 [source,sh]
 ----
-oc new-build --name secure-app --binary --strategy=docker
-oc start-build secure-app --from-dir=. --follow
-och get is
+oc new-build --name webapp --binary --strategy=docker
+oc start-build webapp --from-dir=. --follow
+oc get is
 ----
 
-.Deploy
+=== Deploy
 [source,sh]
 ----
-oc create deployment secure-app --image=image-registry.openshift-image-registry.svc:5000/b9-rebuild/secure-app:latest
-oc rollout status deployment/secure-app
+oc set image deployment/webapp *=image-registry.openshift-image-registry.svc:5000/b9-rebuild/webapp:latest
+oc rollout status deployment/webapp
+oc logs -l app=webapp --tail=40 || true
 ----
 
-.Verify UID & SCC
+=== Verify UID & SCC
 [source,sh]
 ----
-oc exec deploy/secure-app -- id -u
-oc get pod -l app=secure-app -o jsonpath='{.items[0].metadata.annotations.openshift\.io/scc}{"\n"}'
+oc exec deploy/webapp -- id -u
+oc get pod -l app=webapp -o jsonpath='{.items[0].metadata.annotations.openshift\.io/scc}{"\n"}'
 ----
-Should show `restricted`.
+Expected:
 
-.Expose via Route
+* `id -u` prints a non-zero UID (NOT 0), e.g., random high UID
+* SCC annotation shows `restricted-v2`
+
+What “restricted-v2” means (in short):
+
+* Non-root only: containers must not run as UID 0
+* No privilege escalation; no privileged or host access (hostPID/IPC/Network disallowed)
+* ALL Linux capabilities dropped by default; adding extra caps is blocked
+* Default seccomp (runtime/default) and SELinux MCS isolation
+* Designed so well-built apps run safely without any special SCC
+
+=== Expose via Route
 [source,sh]
 ----
-oc expose deployment secure-app --port=8080 --target-port=8080
-oc expose service secure-app
-ROUTE=$(oc get route secure-app -o jsonpath='{.spec.host}')
+oc expose deployment webapp --port=8080 --target-port=8080
+oc expose service webapp
+ROUTE=$(oc get route webapp -o jsonpath='{.spec.host}')
 curl -s http://$ROUTE | head -3
 ----
 
 NOTE: Keep project for LAB-B10 (TLS). Delete only if done.
 
-.Cleanup (optional)
+=== Cleanup (optional)
 [source,sh]
 ----
 oc delete project b9-rebuild --wait=false
@@ -126,8 +169,7 @@ oc delete project b9-rebuild --wait=false
 |===
 
 == FAQs
-Why not just grant anyuid?:: Short-term speed, long-term security debt.
-Do I need fixed UID 1001?:: Random UID capability is more flexible.
+Why not just grant anyuid?:: Short-term speed, long-term security debt. Rebuilds avoid exceptions and reduce blast radius.
 Is UBI required?:: No, but offers predictable updates & support.
 How small should images be?:: Smaller surface → fewer CVEs & faster pulls.
 

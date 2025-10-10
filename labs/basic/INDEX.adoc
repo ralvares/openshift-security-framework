@@ -1,19 +1,52 @@
+== Overview
+
+These basic labs are a hands-on introduction to OpenShift’s secure-by-default posture. You’ll see how to run apps without weakening the platform by aligning workloads to built-in guardrails instead of bypassing them.
+
+Built-in capabilities covered (where to see them):
+
+- Least privilege by default (restricted SCC/PSA: non-root, drop caps, high ports) - B1, B3
+- RBAC tiers (view/edit/admin) and impersonation - B2
+- Network segmentation (NetworkPolicies) - B4
+- Secret management (env vs file mounts; rotation behavior) - B5
+- Image provenance gates (allow-listed registries, admission policies) - B6
+- API audit trails (exec/port-forward forensics) - B7
+- Secure-by-design images (UBI, non-root, high ports) - B9
+- Transport security on routes (TLS with redirect) - B10
+- Resource controls (LimitRange + ResourceQuota) - B3B
+
+What you’ll practice:
+
+- Deploy something that “worked on a laptop” and learn why guardrails block it
+- Fix the workload (not the platform) to run non-root on high ports
+- Limit who can do what with built-in RBAC roles
+- Lock down pod-to-pod traffic with default deny + target allows
+- Use Secrets properly and understand rotation trade-offs
+- Enforce trusted registries and verify image digests
+- Query audit logs to answer who/what/when/where
+- Rebuild images to pass restricted SCC without exceptions
+- Force HTTPS on app routes
+
+Audience and prerequisites:
+
+- OpenShift Local or Red Hat OpenShift cluster
+- For platform admins, app teams, and security engineers
+- Requires oc CLI and a sandbox namespace; most labs need only project-level access
+- Cluster-admin (or delegated) is needed for specific steps: B3’s anyuid exercise, B6’s admission policies
+
 == Basic Labs Index (Skills B1–B10)
 
 [cols="1,2,3,1",options="header"]
 |===
 |Skill | Lab File | Title | Status
-|B1 | b1.adoc | It Works on My Laptop (Default Secure Behavior) | Implemented
-|B2 | b2.adoc | Who Really Has Access? (RBAC Basics) | Implemented
-|B3 | b3.adoc | SCC Limits & Resource Guardrails (Part A) | Implemented
-|B3B | b3a.adoc | Resource Usage (Quotas & Limits) (Part B) | Implemented
-|B4 | b4.adoc | You Shall Not Pass – NetworkPolicy Basics | Implemented
-|B5 | b5.adoc | Don’t Hardcode – Managing Secrets Properly | Implemented
-|B6 | b6.adoc | Trusted Sources Only – Image Provenance Guardrails | Implemented
-|B7 | b7.adoc | Logs Don’t Lie – Audit & Exec Events | Implemented
-|B8 | b8.adoc | Security & Compliance Add‑Ons Overview | Implemented
-|B9 | b9.adoc | Secure by Design – Rebuilding Images | Implemented
-|B10 | b10.adoc | Enforcing TLS on Routes | Implemented
+|B1 | b1.adoc | It Works on My Laptop (Default Secure Behavior) | Work in Progress
+|B2 | b2.adoc | Who Really Has Access? (RBAC Basics) | Work in Progress
+|B3 | b3.adoc | SCC Limits & Resource Guardrails (Part A) | Work in Progress
+|B3B | b3a.adoc | Resource Usage (Quotas & Limits) (Part B) | Work in Progress
+|B4 | b4.adoc | You Shall Not Pass – NetworkPolicy Basics | Work in Progress
+|B5 | b5.adoc | Don’t Hardcode – Managing Secrets Properly | Work in Progress
+|B6 | b6.adoc | Trusted Sources Only – Image Provenance Guardrails | Work in Progress
+|B7 | b7.adoc | Logs Don’t Lie – Audit & Exec Events | Work in Progress
+|B8 | b8.adoc | Security & Compliance Add‑Ons Overview | Work in Progress
+|B9 | b9.adoc | Secure by Design – Rebuilding Images | Work in Progress
+|B10 | b10.adoc | Enforcing TLS on Routes | Work in Progress
 |===
-
-Legend: Implemented = fully written. Future enhancements: add estimated duration, prerequisites, cross-links.

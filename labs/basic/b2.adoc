@@ -9,7 +9,7 @@
 :icons: font
 
 == Skill
-Understand and practically test ONLY the built‑in (default) OpenShift roles (no custom Roles): what each grants, how to move from view → edit → admin safely, and how to validate access without creating real user accounts.
+Learn about OpenShift's built-in roles (view, edit, admin) and how they provide graduated levels of access without needing custom roles. You'll practically test what each role allows (from read-only access to full namespace control), understand how to safely escalate permissions step-by-step, and validate access using impersonation—no real user accounts or custom roles required.
 
 == Objective
 
@@ -64,13 +64,13 @@ By adopting existing defaults, you eliminate redundant YAML, ease training, and 
 == How to Try It
 We will impersonate a fictitious user name `dev-user` and only bind built-in ClusterRoles in a single namespace.
 
-. Create sandbox project:
+=== Create sandbox project
 [source,sh]
 ----
 oc new-project b2-rbac
 ----
 
-. Bind view (read-most objects, no writes, no RBAC changes):
+=== Bind view (read-most objects, no writes, no RBAC changes)
 [source,sh]
 ----
 oc create rolebinding dev-view --clusterrole=view --user=dev-user
@@ -80,7 +80,7 @@ oc auth can-i get secret/mysecret --as=dev-user || true
 ----
 Expected: get pods = yes; create deployment = no; secret access should fail (cannot read secret contents).
 
-. Escalate to edit (can mutate workloads, still cannot edit RBAC):
+=== Escalate to edit (can mutate workloads, still cannot edit RBAC)
 [source,sh]
 ----
 oc delete rolebinding dev-view
@@ -90,7 +90,7 @@ oc auth can-i create rolebinding --as=dev-user
 ----
 Expected: create deployment = yes; create rolebinding = no.
 
-. Escalate to admin (full namespace administration including RBAC objects):
+=== Escalate to admin (full namespace administration including RBAC objects)
 [source,sh]
 ----
 oc delete rolebinding dev-edit
@@ -100,14 +100,14 @@ oc auth can-i delete secret --as=dev-user
 ----
 Expected: both now permitted (RBAC + secret mutation) within the namespace.
 
-. Workload check under edit/admin:
+=== Workload check under edit/admin
 [source,sh]
 ----
 oc create deployment sample --image=registry.access.redhat.com/ubi9/ubi -- sleep infinity
 oc get deploy --as=dev-user
 ----
 
-. ServiceAccount conservative default:
+=== ServiceAccount conservative default
 [source,sh]
 ----
 oc create sa app-sa
@@ -115,7 +115,7 @@ oc auth can-i list secrets --as=system:serviceaccount:b2-rbac:app-sa
 ----
 Expected: denied until explicitly bound (shows default restraint for service accounts).
 
-. (Optional) Cleanup:
+=== Cleanup (optional)
 [source,sh]
 ----
 oc delete project b2-rbac --wait=false
