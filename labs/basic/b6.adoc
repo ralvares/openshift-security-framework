@@ -19,7 +19,7 @@ Learn why images from unknown registries are risky and how to allow only trusted
 * Verify provenance (host + digest)
 
 == Why it Matters
-Images from random registries are risky—you don’t know who built them, what’s inside, or whether they’re maintained. An allow‑list only permits trusted sources, making provenance clear and reducing noisy, avoidable CVEs.
+Images from random registries are risky, you don’t know who built them, what’s inside, or whether they’re maintained. An allow‑list only permits trusted sources, making provenance clear and reducing noisy, avoidable CVEs.
 
 == What it Solves
 

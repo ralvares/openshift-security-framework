@@ -1,0 +1,14 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: connectivity-probe  
+  labels:
+    app: connectivity-probe
+spec:
+  to:
+    kind: Service
+    name: connectivity-probe
+  port:
+    targetPort: http
+  tls:
+    termination: edge

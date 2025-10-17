@@ -1,0 +1,3 @@
+resources:
+  - ../../base
+  - netpol-strict-team-b.yaml

@@ -1,0 +1,101 @@
+= OpenShift Networking Demo Flow (From Default OVN to Advanced Controls)
+:toc:
+:icons: font
+
+This demo illustrates the evolution of network security and multi-tenancy in OpenShift, using a minimal, reusable set of namespaces to clearly show the power of UDN and CUDN segmentation.
+
+
+== Namespace Set
+
+[options="header"]
+|===
+| Namespace        | Purpose
+| team-a1          | App team A pod #1
+| team-a2          | App team A pod #2
+| team-b1          | App team B pod #1
+| team-b2          | App team B pod #2
+| weather-proxy    | Egress demo (egressIP, proxy, external access)
+| vlan-zone       | Dedicated physical network (VLAN) demo
+|===
+
+
+== Demo Flow
+
+1. Flat (No NetPol, Default OVN)
+	* All namespaces, default CNI, full communication.
+	* Demo: `curl` from any pod to any other → _Allowed_
+
+2. Default Deny (Drop-All Policy)
+	* Apply default deny NetworkPolicy in all namespaces.
+	* Demo: All pod-to-pod traffic is denied, even within the same namespace.
+
+3. Allow Intra-Namespace (team-a1, team-a2)
+	* Add NetworkPolicy to allow only within the same namespace for team-a*.
+	* Demo: `team-a1` ↔ `team-a2` → _Allowed_, `team-a1` → `team-b1` → _Denied_
+
+4. Strict Namespace (team-b1, team-b2)
+	* In team-b*, block all by default, then allow only specific pod-to-pod flows (e.g., only `team-b1` can talk to `team-b2` on port 8080).
+	* Demo: Only explicitly allowed traffic is permitted in team-b*.
+
+5. Egress Control (weather-proxy)
+	* Deploy `weather-proxy` app in its namespace.
+	* Apply NetworkPolicy to allow egress only to specific external endpoints.
+	* Assign egressIP to the namespace for controlled outbound traffic.
+	* Demo: `weather-proxy` can reach allowed external services, others cannot.
+
+6. UDN Isolation (optional advanced)
+	* Assign team-a* to `udn-a`, team-b* to `udn-b`.
+	* Demo: No traffic between team-a* and team-b* even without NetworkPolicies.
+
+7. CUDN Isolation (optional advanced)
+	* Assign team-a* to `cudn-a`, team-b* to `cudn-b`.
+	* Demo: No cross-CUDN traffic, even with NetworkPolicy allow.
+
+8. Advanced: Exposing Services with MetalLB (UDN)
+	* Deploy MetalLB in the cluster and configure an address pool for your lab network.
+	* In a UDN-enabled namespace (e.g., `team-a1`), deploy a sample app (e.g., httpd).
+	* Create a `Service` of type `LoadBalancer` for the app.
+	* Demo: MetalLB assigns an external IP from the pool, making the app reachable on the UDN network.
+	* Show that only UDN-attached namespaces can reach the service, demonstrating network-level exposure control.
+
+9. Advanced: Node-Scoped VLAN Exposure (Dedicated Physical Network)
+	* On a specific node, configure a VLAN interface (e.g., ens5.101) and attach it to a bridge (e.g., br-vlan101).
+	* Define a localnet bridge mapping in the node’s NodeNetworkConfigurationPolicy, linking br-vlan101 to a named mapping (e.g., vlan-zone-net).
+	* Create a dedicated namespace (e.g., vlan-zone) for this VLAN demo.
+	* In this namespace, create a NetworkAttachmentDefinition referencing vlan-zone-net.
+	* Deploy a pod (e.g., httpd) using this NAD, and use nodeSelector to pin it to the VLAN-enabled node.
+	* Demo: The pod receives a second interface on the physical VLAN network.
+	* Show that it can communicate directly with external VLAN-connected devices (e.g., gateway ping, curl to external server), but pods on other nodes cannot.
+	* This demonstrates node-specific physical network exposure
+
+== Example Table: Policy Effects
+
+[options="header"]
+|===
+| Step | Namespace(s) | Policy | Inter-NS | Intra-NS | Egress
+| 1 | all | none | ✅ | ✅ | ✅
+| 2 | all | default deny | ❌ | ❌ | ❌
+| 3 | team-a* | allow intra-NS | ❌ | ✅ | ❌
+| 4 | team-b* | allow only needed | ❌ | ✅ (selective) | ❌
+| 5 | weather-proxy | egress only | ❌ | ✅ | ✅ (restricted)
+| 6 | team-a*, team-b* | UDN | ❌ (diff UDN) | ✅ | ✅
+| 7 | team-a*, team-b* | CUDN | ❌ (diff CUDN) | ✅ | ✅
+| 8 | vlan-zone | VLAN | ❌ | ✅ | ✅
+|===
+
+
+== Takeaway
+
+- Demonstrates default open, deny-all, least privilege, and egress controls.
+- Shows both namespace and pod-level segmentation.
+- Clean, reusable namespace set for all scenarios.
+- Easy to extend for UDN/CUDN or future demos.
+
+
+== Next Steps
+
+* Apply each stage using Kustomize overlays.
+* Validate with test pods and `curl` commands.
+* Optionally, automate with scripts or CI.
+
+_This flow is ideal for workshops, enablement, and demonstrating secure-by-design networking in OpenShift._

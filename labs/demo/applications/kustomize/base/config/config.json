@@ -1,0 +1,21 @@
+{
+  "destinations": [
+    {
+      "name": "team-b1",
+      "service": "httpd",
+      "namespace": "team-b1",
+      "port": 8080
+    },
+    {
+      "name": "weather-proxy",
+      "service": "weather-proxy",
+      "namespace": "weather-proxy",
+      "port": 80
+    },
+    {
+      "name": "open-meteo",
+      "service": "api.open-meteo.com",
+      "port": 443
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+resources:
+  - namespaces.yaml
+  - deployments/httpd-team-a1.yaml

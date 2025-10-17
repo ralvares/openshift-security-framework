@@ -21,7 +21,7 @@ Shrink lateral movement by moving from implicit allow-all networking to explicit
 == Why it Matters
 In a flat network where all pods can talk to each other by default, a single compromised container becomes a launching pad for attackers to explore your entire cluster, scanning for databases, probing internal APIs, and pivoting to sensitive services. This "implicit trust" model is like a building where every door is unlocked: once someone gets in one room, they have access to everything.
 
-NetworkPolicies introduce explicit segmentation—interior doors that require intent rather than assumption. By moving from "allow-all by default" to "deny-all with specific exceptions," you dramatically reduce the attack surface. Even if one pod is compromised, it can only reach the services you've explicitly permitted, limiting lateral movement and making incident response clearer ("what could this pod actually reach?"). This approach aligns with zero-trust principles and satisfies compliance requirements for network segmentation.
+NetworkPolicies introduce explicit segmentation, interior doors that require intent rather than assumption. By moving from "allow-all by default" to "deny-all with specific exceptions," you dramatically reduce the attack surface. Even if one pod is compromised, it can only reach the services you've explicitly permitted, limiting lateral movement and making incident response clearer ("what could this pod actually reach?"). This approach aligns with zero-trust principles and satisfies compliance requirements for network segmentation.
 
 Business value: Segmentation contains breaches before they spread, reduces the scope of security audits, and demonstrates defense-in-depth to customers and regulators.
 

@@ -19,7 +19,7 @@ Remove passwords from manifests, store them as Secrets, inject safely, rotate cl
 * Rotate and compare behaviors
 
 == Why it Matters
-Hardcoding credentials is like writing your ATM PIN on the card—anyone who sees it can use it. Storing passwords in Git, manifests, or images spreads them too widely and makes rotation painful. Kubernetes Secrets separate credentials from code, restrict access via RBAC, and support safe rotation (files update in place; env vars on restart), improving security and compliance.
+Hardcoding credentials is like writing your ATM PIN on the card, anyone who sees it can use it. Storing passwords in Git, manifests, or images spreads them too widely and makes rotation painful. Kubernetes Secrets separate credentials from code, restrict access via RBAC, and support safe rotation (files update in place; env vars on restart), improving security and compliance.
 
 == What it Solves
 
