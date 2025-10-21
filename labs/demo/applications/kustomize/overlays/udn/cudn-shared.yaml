@@ -1,0 +1,14 @@
+apiVersion: k8s.ovn.org/v1
+kind: ClusterUserDefinedNetwork
+metadata:
+  name: shared-clusterudn
+spec:
+  namespaceSelector:
+    matchLabels:
+      secondaryudn: shared
+  network:
+    layer2:
+      role: Secondary
+      subnets:
+      - 10.10.40.0/24
+    topology: Layer2

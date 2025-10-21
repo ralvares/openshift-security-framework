@@ -1,0 +1,11 @@
+apiVersion: k8s.ovn.org/v1
+kind: UserDefinedNetwork
+metadata:
+  name: team-a1-udn
+  namespace: team-a1
+spec:
+  layer2:
+    role: Primary
+    subnets:
+      - 10.10.10.0/24
+  topology: Layer2

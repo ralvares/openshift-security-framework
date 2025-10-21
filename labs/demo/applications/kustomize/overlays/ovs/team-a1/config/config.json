@@ -1,0 +1,33 @@
+{
+  "destinations": [
+    {
+      "name": "team-a1",
+      "namespace": "team-a1",
+      "service": "team-a1-connectivity-probe",
+      "port": 80
+    },
+    {
+      "name": "team-a2",
+      "namespace": "team-a2",
+      "service": "team-a2-connectivity-probe",
+      "port": 80
+    },
+    {
+      "name": "team-b1",
+      "namespace": "team-b1",
+      "service": "team-b1-connectivity-probe",
+      "port": 80
+    },
+    {
+      "name": "team-b2",
+      "namespace": "team-b2",
+      "service": "team-b2-connectivity-probe",
+      "port": 80
+    },
+    {
+      "name": "open-meteo",
+      "service": "api.open-meteo.com",
+      "port": 443
+    }
+  ]
+}

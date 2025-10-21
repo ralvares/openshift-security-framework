@@ -9,10 +9,13 @@ resources:
 configMapGenerator:
 - files:
   - config/custom.conf
-  name: connectivity-probe-apache-conf
+  name: weather-proxy-apache-conf
 - files:
   - cgi/index.py
-  name: connectivity-probe-cgi
-- files:
-  - config/config.json
-  name: probe-config
+  name: weather-proxy-cgi
+
+labels:
+- includeSelectors: true
+  pairs:
+    app.kubernetes.io/component: proxy
+    app.kubernetes.io/part-of: weather-platform

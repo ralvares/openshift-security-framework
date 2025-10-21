@@ -77,7 +77,7 @@ def main():
     # Detect CGI query
     query = os.environ.get("QUERY_STRING", "")
     params = parse_qs(query)
-    format_type = params.get("format", ["html"])[0]
+    format_type = params.get("format", ["text"])[0]  # Default to "text" if no format is provided
 
     config = load_config()
     now = time.strftime('%H:%M:%S')

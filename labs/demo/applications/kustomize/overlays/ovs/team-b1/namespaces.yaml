@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: team-b1
+  labels:
+    cudn: team-b
+    secondaryudn: shared

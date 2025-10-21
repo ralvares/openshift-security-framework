@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Reuse everything from teams/
+resources:
+  - ../ovs
+  - cudn-team-b.yaml
+  - udn-team-a1.yaml
+  - udn-team-a2.yaml
+  - cudn-shared.yaml
+
+# Modern, supported syntax
+patches:
+  - target:
+      kind: Namespace
+    path: patch-namespace-network.json

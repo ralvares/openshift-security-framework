@@ -1,0 +1,7 @@
+[
+  {
+    "op": "add",
+    "path": "/metadata/labels/k8s.ovn.org~1primary-user-defined-network",
+    "value": ""
+  }
+]

@@ -34,12 +34,6 @@ spec:
             - name: probe-config
               mountPath: /etc/probe/config.json
               subPath: config.json
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 8080
-            initialDelaySeconds: 5
-            periodSeconds: 10
       volumes:
         - name: apache-conf
           configMap:
