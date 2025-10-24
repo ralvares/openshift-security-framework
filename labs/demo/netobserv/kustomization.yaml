@@ -6,5 +6,5 @@ resources:
   - loki.yaml
   - service.yaml
   - privileged-scc.yaml
+  - netobserv-operator.yaml
 
-namespace: netobserv
