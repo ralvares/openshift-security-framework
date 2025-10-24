@@ -11,9 +11,7 @@ kind: OperatorGroup
 metadata:
   name: openshift-netobserv-operator
   namespace: openshift-netobserv-operator
-spec:
   upgradeStrategy: Default
-
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
