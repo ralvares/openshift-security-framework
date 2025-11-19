@@ -1,0 +1,183 @@
+= Cluster Network Security Operationalization Plan
+
+This document defines a phased approach for implementing a consistent, least‑privilege network‑security model on OpenShift, aligned with the governance and onboarding documents. It focuses on a suite of AdminNetworkPolicies (ANPs) and application `NetworkPolicy` usage for application namespaces.
+
+== 1. Objectives
+
+- Establish a consistent security posture across all business application namespaces
+- Enforce deny‑by‑default as the baseline decision for all traffic
+- Keep admin‑tier guardrails stable and minimal
+- Let developers shape safe, reviewable traffic patterns inside their namespaces
+- Maintain visibility into allowed flows and drops for troubleshooting and audit
+
+== 2. Guiding Principles
+
+[cols="1,3",options="header"]
+|===
+| Principle
+| Description
+
+| Deny by default
+| No ingress or egress is allowed unless there is a documented and approved need.
+
+| Immutable guardrails
+| The AdminNetworkPolicy suite rarely changes and defines the cluster perimeter.
+
+| Namespace autonomy
+| Application teams manage `NetworkPolicy` objects inside their namespaces to shape pod‑to‑pod traffic.
+
+| GitOps‑first
+| All policy changes (Admin or namespace level) go through version control and approval workflows.
+
+| Auditability
+| Every approval, exception, and change is traceable to a ticket and a commit.
+|===
+
+== 3. Network Security Layers
+
+This layered model mirrors the governance and onboarding docs and clarifies responsibilities.
+
+[cols="1,2,1,3",options="header"]
+|===
+| Tier
+| Object Type
+| Owner
+| Purpose
+
+| 1
+| `AdminNetworkPolicy` suite (ANPs)
+| Security / Platform
+| Enforce global perimeter: ingress exposure, DNS egress, proxy egress, kube‑API egress, metadata denial, and final default‑deny.
+
+| 2
+| Namespace `NetworkPolicy`
+| Application teams
+| Define application‑level service boundaries, ingress and egress within the allowed perimeter.
+
+| 3
+| (Optional) `BaselineAdminNetworkPolicy` (BANP)
+| Security
+| Provide cluster‑wide defaults and fall‑back behavior if used in your environment.
+|===
+
+Egress to the Internet is handled through the proxy endpoint defined in the AdminNetworkPolicy; direct outbound access is not part of this plan.
+
+== 4. Phase 1 - Foundation
+
+Goal: establish a predictable, enforced perimeter for all owned namespaces.
+
+.Deploy and standardize the AdminNetworkPolicy suite
+- Apply the ANP suite described in the governance doc to all namespaces with `business.workload/owned=true`.
+- Ensure the suite covers at minimum: metadata denial, ingress approval, DNS egress, proxy egress, kube‑API egress, and a final default‑deny.
+- Treat these ANPs as a stable contract; changes require Security approval and review.
+
+.Adopt namespace labels for gating
+- Require the following labels for each application namespace:
+
+[source,yaml]
+----
+business.workload/owned=true
+----
+
+- Use the optional labels to enable additional capabilities when approved:
+  - `security.allow/ingress=true`
+  - `security.allow/monitoring=true`
+  - `security.allow/kapi=true`
+
+.Align onboarding with the perimeter
+- Ensure the onboarding workflow provisions namespaces with `business.workload/owned=true` from day one.
+- Confirm that no namespace can bypass AdminNetworkPolicy by lacking labels or using custom annotations.
+
+== 5. Phase 2 - Application NetworkPolicies
+
+Goal: give application teams clear patterns for defining traffic inside the perimeter.
+
+.Provide NetworkPolicy templates
+- Offer a small set of reusable examples, such as:
+  - "default deny" for ingress and egress
+  - "frontend → backend" only
+  - "app → database" over a specific port
+- Store these templates alongside other application configuration for reuse.
+
+.Document recommended patterns
+- Encourage each team to:
+  - Start from a deny‑all posture.
+  - Add explicit allow rules only for known flows.
+  - Use namespace selectors and pod labels consistently.
+- Emphasize that NetworkPolicies cannot override AdminNetworkPolicy decisions.
+
+.Integrate with GitOps
+- Require all NetworkPolicy objects to be managed in version control.
+- Use CI checks (linting, basic schema validation) to catch obvious mistakes before merge.
+
+== 6. Phase 3 - Monitoring and Feedback
+
+Goal: validate that the perimeter and policies behave as intended and support troubleshooting.
+
+.Enable flow visibility
+- Use NetObserv (or equivalent) to observe:
+  - Allowed flows between namespaces and pods.
+  - Dropped connections due to AdminNetworkPolicy or NetworkPolicy decisions.
+
+.Operational feedback loop
+- When drops impact applications, teams:
+  - Inspect flows to identify the blocked path.
+  - Propose NetworkPolicy updates inside their namespace.
+  - If the drop is at the AdminNetworkPolicy tier, raise a Security request with justification.
+
+.Periodic reviews
+- On a regular cadence, Security and Platform:
+  - Review AdminNetworkPolicy and BANP for unnecessary complexity.
+  - Validate that label usage (`business.workload/owned`, `security.allow/*`) matches current requirements.
+
+== 7. Example Policy Stack for a Namespace
+
+For a business namespace such as `payments-prod`:
+
+- `AdminNetworkPolicy` suite (cluster):
+  - `deny-metadata` (priority 1): blocks access to the cloud metadata endpoint.
+  - `ingress-approval-guardrail` (priority 10): controls router exposure based on `security.allow/ingress`.
+  - `dns-egress-guardrail` (priority 11): allows DNS only to the cluster resolver.
+  - `corporate-proxy-egress-guardrail` (priority 12): forces external egress through the corporate proxy.
+  - `kubeapi-egress-guardrail` (priority 13): allows kube‑API egress only for approved workloads.
+  - `deny-dangerous-default` (priority 100): final default‑deny for any remaining egress.
+- (Optional) `BaselineAdminNetworkPolicy` (cluster): used only if you adopt BANP for additional defaults.
+- Namespace `NetworkPolicy`: controls frontend → backend, app → database, and in‑namespace ingress/egress.
+
+This stack matches the governance and onboarding documentation and applies consistently across environments.
+
+== 8. Governance Lifecycle (Networking Focus)
+
+[cols="2,2,3",options="header"]
+|===
+| Event
+| Trigger
+| Action
+
+| New application namespace
+| Project request and onboarding
+| Platform creates the namespace with `business.workload/owned=true` and brings it under AdminNetworkPolicy.
+
+| Need for ingress, monitoring, or kube‑API
+| Developer request
+| Security reviews and, if approved, sets the appropriate `security.allow/*` labels.
+
+| Change to application traffic
+| Developer PR
+| Team updates namespace `NetworkPolicy` via GitOps; CI validates, and changes are rolled out.
+
+| Unexpected drops or connectivity issues
+| Application incident
+| Teams inspect flows, adjust `NetworkPolicy` if needed, or request a perimeter change from Security.
+|===
+
+== 9. Summary
+
+This plan operationalizes the network‑security model described in the governance and onboarding documents by:
+
+- Using a stable cluster‑wide AdminNetworkPolicy suite as the perimeter
+- Gating additional capabilities through namespace labels
+- Letting application teams define internal traffic with NetworkPolicies under GitOps control
+- Providing monitoring and feedback loops to keep the posture least‑privilege and practical over time
+
+The result is a predictable, auditable, and developer‑friendly network‑security posture for OpenShift application namespaces.

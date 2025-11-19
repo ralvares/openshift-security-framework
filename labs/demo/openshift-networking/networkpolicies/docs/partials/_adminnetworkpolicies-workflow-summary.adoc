@@ -1,0 +1,187 @@
+== 6. Developer Workflow
+
+Developers continue to own their namespace `NetworkPolicy` objects.
+
+Their responsibilities:
+
+- Define allowed ingress/egress for workloads inside their namespace
+- Maintain service-to-service topology
+- Document required communication paths for review
+
+Their NetworkPolicies operate inside the Admin perimeter enforced by the ANP suite:
+
+- They can allow traffic only to destinations that one of the AdminNetworkPolicies has `Allow`ed.
+-- They cannot override:
+  - kube-API restrictions enforced by the kube API ANP
+  - Internet restrictions and proxy routing enforced by the proxy ANP and final default-deny ANP
+  - metadata blocks enforced by the metadata-deny ANP
+  - ingress exposure without Security labels enforced by the ingress ANP
+
+The result is:
+
+- Security controls the perimeter
+- Developers control workload communication inside that perimeter
+- Reduced risk of accidental broad exposure through permissive NetworkPolicies
+
+
+== 7. Best Practices and Improvements for AdminNetworkPolicies
+
+AdminNetworkPolicies (ANPs) are powerful tools for enforcing cluster-wide network security. To maximize their effectiveness and avoid common pitfalls, follow these best practices:
+
+- **Priority Management:**
+  - Use the supported priority range (0–99) in OVN-Kubernetes. Avoid priorities above 99.
+  - Plan priorities with gaps (e.g., 10, 20, 30) to allow future policies to be inserted.
+  - Limit the number of ANPs to 30–50 per cluster for manageability and performance.
+
+- **Policy Design:**
+  - Prefer label-based selectors over empty selectors (`{}`) to avoid unintentionally selecting all namespaces, including system ones.
+  - Use `Deny` for strict perimeter enforcement and `Pass` to delegate to namespace NetworkPolicies.
+  - Avoid overlapping selectors at the same priority to prevent unpredictable results.
+
+- **Operational Safety:**
+  - Always define high-priority `Allow` rules for essential services (DNS, kube-API) before applying a default-deny.
+  - Use `Pass` to let developers control specific flows via NetworkPolicies.
+
+- **Performance:**
+  - Minimize use of namedPorts in large clusters.
+  - Keep address sets small and non-overlapping to avoid scale bottlenecks.
+
+- **Monitoring and Troubleshooting:**
+  - Enable ACL logging for observability.
+  - Use metrics and tracing tools (e.g., `ovn-trace`) to validate policy behavior.
+
+- **Documentation and Review:**
+  - Document the intent and effect of each ANP.
+  - Regularly review ANPs for unnecessary complexity and update as requirements evolve.
+
+== 8. Example AdminNetworkPolicies in This Environment
+
+The following AdminNetworkPolicies are present in this environment and define the security posture:
+
+[source,yaml]
+----
+# corporate-external-networks-guardrail.yaml
+apiVersion: policy.networking.k8s.io/v1alpha1
+kind: AdminNetworkPolicy
+metadata:
+  name: corporate-access-external-networks-guardrail
+spec:
+  [source,yaml]
+  ----
+  # deny-all-allow-dns-monitoring-owned-namespaces.yaml
+  apiVersion: policy.networking.k8s.io/v1alpha1
+  kind: AdminNetworkPolicy
+  metadata:
+    name: deny-all-allow-dns-monitoring-owned-namespaces
+  spec:
+    priority: 99
+    subject:
+      namespaces:
+        matchLabels:
+          business.workload/owned: "true"
+    ingress:
+      - name: allow-openshift-monitoring
+        action: Allow
+        from:
+          - namespaces:
+              matchLabels:
+                kubernetes.io/metadata.name: openshift-monitoring
+
+      - name: allow-user-workload-monitoring
+        action: Allow
+        from:
+          - namespaces:
+              matchLabels:
+                kubernetes.io/metadata.name: openshift-user-workload-monitoring
+
+      - name: pass-from-owned-namespaces
+        action: Pass
+        from:
+          - namespaces:
+              matchLabels:
+                business.workload/owned: "true"
+
+      - name: deny-ingress
+        action: Deny
+        from:
+          - namespaces: {}
+    egress:
+      - name: allow-dns
+        action: Allow
+        to:
+          - namespaces:
+              matchLabels:
+                kubernetes.io/metadata.name: openshift-dns
+        ports:
+          - portNumber:
+              port: 53
+              protocol: UDP
+          - portNumber:
+              port: 53
+              protocol: TCP
+          - portNumber:
+              port: 5353
+              protocol: UDP
+          - portNumber:
+              port: 5353
+              protocol: TCP
+    
+      - name: pass-to-owned-namespaces
+        action: Pass
+        to:
+          - namespaces:
+              matchLabels:
+                business.workload/owned: "true"
+
+      - name: deny-egress
+        action: Deny
+        to:
+          - networks:
+              - 0.0.0.0/0
+  ----
+    - name: pass-from-owned-namespaces
+      action: Pass
+      from:
+        - namespaces:
+            matchLabels:
+              business.workload/owned: "true"
+    - name: deny-ingress
+      action: Deny
+      from:
+        - namespaces: {}
+  egress:
+    - name: allow-dns
+      action: Allow
+      to:
+        - namespaces:
+            matchLabels:
+              kubernetes.io/metadata.name: openshift-dns
+      ports:
+        - portNumber:
+            port: 53
+            protocol: UDP
+        - portNumber:
+            port: 53
+            protocol: TCP
+        - portNumber:
+            port: 5353
+            protocol: UDP
+        - portNumber:
+            port: 5353
+            protocol: TCP
+
+    - name: pass-to-owned-namespaces
+      action: Pass
+      to:
+        - namespaces:
+            matchLabels:
+              business.workload/owned: "true"
+
+    - name: deny-egress
+      action: Deny
+      to:
+        - networks:
+            - 0.0.0.0/0
+----
+
+These policies are the only AdminNetworkPolicies present and should be referenced for implementation and troubleshooting.

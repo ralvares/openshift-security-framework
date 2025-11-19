@@ -1,0 +1,22 @@
+apiVersion: policy.networking.k8s.io/v1alpha1
+kind: AdminNetworkPolicy
+metadata:
+  name: corporate-access-external-networks-guardrail
+spec:
+  priority: 12
+
+  subject:
+    namespaces:
+      matchLabels:
+        security.allow/networks: "true"
+
+  egress:
+    - name: allow-corporate-external-networks
+      action: Allow
+      to:
+        - networks:
+            - 51.79.73.0/24    # Corporate External API Network
+      ports:
+        - portNumber:
+            protocol: TCP
+            port: 443

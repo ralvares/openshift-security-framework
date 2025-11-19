@@ -1,0 +1,101 @@
+== 7. RACI Matrix
+
+[cols="3,1,1,1",options="header"]
+|===
+| Task / Activity | Developers | Security Team | Platform Team
+
+| Request namespace
+| R
+| I
+| C
+
+| Namespace creation with baseline labels
+| I
+| I
+| R
+
+| Enforcing namespace templates
+| I
+| I
+| R
+
+| Managing AdminNetworkPolicy suite
+| I
+| A
+| R
+
+| Approving ingress exposure
+| I
+| A/R
+| C
+
+| Enabling monitoring scrapes
+| I
+| A/R
+| C
+
+| Enabling kube-API access
+| I
+| A/R
+| C
+
+| Maintaining application NetworkPolicies
+| R
+| I
+| I
+
+| Internal pod-to-pod connectivity management
+| R
+| I
+| I
+
+| Exposing workloads via Routes
+| R
+| A
+| C
+
+| Managing external egress through proxy
+| I
+| A
+| C
+
+| Preventing metadata & unauthorized egress
+| I
+| A
+| C
+
+| Changing namespace labels
+| I
+| A
+| R
+
+| Ongoing namespace-level troubleshooting
+| C
+| C
+| R
+
+| Compliance validation / audits
+| I
+| R
+| C
+|===
+
+.Legend
+
+- R = Responsible
+- A = Accountable
+- C = Consulted
+- I = Informed
+
+== 8. Summary
+
+This onboarding playbook provides a consistent, secure operational model by combining:
+
+-- a strict perimeter enforced by a small suite of AdminNetworkPolicies
+- namespace-level label gating
+- developer autonomy inside safe boundaries
+- clear separation of responsibilities
+- predictable ingress and egress controls
+- standardized onboarding workflow across the organization
+
+It guarantees that application teams can innovate quickly without exposing the platform to security or compliance risks.

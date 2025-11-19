@@ -7,5 +7,3 @@ resources:
   - service.yaml
   - privileged-scc.yaml
   - netobserv-operator.yaml
-  - flowcollector.yaml
-

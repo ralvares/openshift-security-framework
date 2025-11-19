@@ -1,0 +1,11 @@
+= Application Namespace Onboarding Playbook
+
+This playbook defines how new application teams are onboarded into the secured OpenShift environment. It covers project creation, namespace setup, required labels, security approvals, and how developers operate within the enforced network-security model.
+
+== 1. Overview
+
+All application namespaces run inside a security-controlled perimeter.
+Each namespace is created with standardized labels and is covered by a small suite of single-purpose AdminNetworkPolicies.
+Developers gain autonomy within their namespace but cannot bypass mandatory security controls enforced at the admin tier.
+
+Namespace creation is not self-service. Developers request a project, and the Platform Team provisions it with the correct labels and baseline configuration.

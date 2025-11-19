@@ -1,0 +1,133 @@
+== 2. Onboarding Workflow
+
+Below is the exact sequence followed whenever a new application team is onboarded.
+
+=== Step 1 - Developer Requests a Project
+
+The developer submits a request that includes:
+
+- Application name
+- Team/owner
+- Namespace name(s) required
+- Whether the application requires:
+  - ingress exposure
+  - kube-API access
+  - monitoring scrapes
+  - external connectivity through the proxy
+
+Requests follow the organizations standard intake workflow (ServiceNow, Jira, internal portal, etc.).
+
+=== Step 2 - Platform Team Creates the Namespace
+
+The Platform Team creates the project/namespace using the organization-approved template.
+This ensures the namespace is onboarded into the security perimeter automatically.
+
+.Namespace labels added by default
+[source,yaml]
+----
+business.workload/owned=true
+----
+
+These labels guarantee:
+
+- The namespace falls under the AdminNetworkPolicy
+- All sensitive flows are denied until explicitly approved
+- Developers can start deploying workloads immediately
+- No exposure or risk exists during the initial setup
+
+This step is mandatory.
+
+=== Step 3 - Platform Team Applies the Baseline Objects
+
+The following baseline objects are added as part of namespace creation:
+
+- ResourceQuotas
+- LimitRanges
+- Default deny-all (if using namespace NP)
+- Optional templates: ConfigMaps, RBAC, service accounts
+- NetworkPolicy scaffolding (if the organization provides templates)
+
+This ensures consistency for all application namespaces.
+
+=== Step 4 - Security Reviews the Developer Requirements
+
+Based on the request:
+
+- If ingress exposure is needed → Security approves and enables
+- If kube-API calls are required → Security evaluates and enables
+- If monitoring scrapes are requested → Security validates and enables
+- If proxy egress is required → no approval needed (always enabled via Admin Policy)
+
+Security confirms that enabling these features does not violate external or internal compliance standards.
+
+=== Step 5 - Security Enables the Required Network Capabilities
+
+Security enables capabilities by adding labels to the namespace.
+
+[WARNING]
+====
+Ingress exposure is intentionally controlled.
+Allowing ingress by default could unintentionally make an internal workload reachable through the router, without review or context.
+To prevent accidental exposure, every ingress request must be approved and documented by the Security Team before its enabled.
+====
+
+Examples:
+
+Enable ROUTE / ingress exposure:
+
+[source,shell]
+----
+oc label ns <name> security.allow/ingress=true --overwrite
+----
+
+Enable Monitoring scrapes:
+
+[source,shell]
+----
+oc label ns <name> security.allow/monitoring=true --overwrite
+----
+
+Enable kube-API access:
+
+[source,shell]
+----
+oc label ns <name> security.allow/kapi=true --overwrite
+----
+
+These labels activate the appropriate ALLOW or PASS behavior inside the AdminNetworkPolicy.
+
+=== Step 6 - Developer Deploys Applications
+
+Developers now deploy workloads:
+
+- Deployments, StatefulSets, CronJobs
+- Services, Routes (if ingress enabled)
+- Application-level NetworkPolicies
+
+Developers maintain full control over pod-to-pod connectivity within their namespaces. The AdminNetworkPolicy enforces the perimeter boundaries.
+
+=== Step 7 - Developer Creates NetworkPolicies
+
+Developers create NetworkPolicies to define internal application topology.
+
+Typical use cases:
+
+- Only allow frontend → backend
+- Only allow app → database
+- Enforce deny-all followed by explicit allows
+- Control monitoring access for specific ports
+- Restrict ingress only to specific workloads
+
+The AdminNetworkPolicy ensures that even if developers misconfigure policies (e.g., allow-all), the perimeter remains intact.
+
+=== Step 8 - Optional: Changes to Namespace Behavior
+
+When application requirements change, developers submit a modification request:
+
+Examples:
+
+- "We need ingress exposure."
+- "We need kube-API access."
+- "We need monitoring to scrape this workload."
+
+Security reviews and updates the namespace labels accordingly.

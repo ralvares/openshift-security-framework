@@ -1,0 +1,35 @@
+business.workload/owned=true
+
+
+== 3. Policy Reference: Enforced Policies
+
+Below is a concise reference for the AdminNetworkPolicies (ANP) and BaselineAdminNetworkPolicy (BANP) currently enforced in this environment:
+
+
+[cols="1,2,3",options="header"]
+|===
+| Policy File | Purpose | Effect
+
+| `corporate-external-networks-guardrail.yaml`
+| Allow egress to specific corporate external networks for approved namespaces
+| Namespaces with `security.allow/networks: "true"` can access XX.XX.XX.0/24 on TCP 443. All other namespaces are denied this egress.
+
+| `kubeapi-egress-guardrail.yaml`
+| Allow egress to kube-API for approved namespaces
+| Namespaces with `security.allow/kapi: "true"` can access the Kubernetes API server (TCP 6443) on control-plane nodes. All other namespaces are denied this egress.
+
+| `deny-all-allow-dns-monitoring-owned-namespaces.yaml`
+| Default deny for all, allow DNS, allow monitoring ingress, and pass traffic between owned namespaces
+| For namespaces with `business.workload/owned: "true"`: DNS egress to `openshift-dns` is allowed, ingress from `openshift-monitoring` and `openshift-user-workload-monitoring` is allowed for monitoring, traffic to other owned namespaces is passed to developer NetworkPolicies, and all other ingress/egress is denied.
+
+| `banp/deny-all.yaml`
+| Baseline default-deny fallback for all owned namespaces
+| For namespaces with `business.workload/owned: "true"`: denies all ingress and egress between owned namespaces unless allowed by a higher-tier policy.
+|===
+
+All application namespaces must have:
+
+[source]
+----
+business.workload/owned=true
+----

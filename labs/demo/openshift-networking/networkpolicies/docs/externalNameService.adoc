@@ -1,0 +1,234 @@
+Lock Down Egress and Hide External Endpoints Behind an ExternalName Service
+
+This guide explains *why* and *when* to use a Kubernetes `ExternalName` Service, and *how* to secure it with NetworkPolicies so that:
+
+* Developers only call *internal* services.
+* Platform/security teams control the real external endpoints and IPs.
+* The cluster egress behavior is deterministic and auditable.
+
+== When to use an ExternalName service
+
+Use an `ExternalName` Service when:
+
+* Your applications must call an external SaaS/API (for example: `api.vulnerawise.ai`).
+* You do **not** want developers hardcoding external hostnames or IP addresses.
+* You want a stable, cluster-internal DNS name that the platform team can later repoint without touching application code.
+* You want to combine this with NetworkPolicies to only allow egress to the specific IPs/ports that back that service.
+
+With this pattern, developers treat the external API as just another Service in the cluster; only the platform team worries about IPs, TLS endpoints, and egress policy.
+
+== High-level architecture
+
+1. Applications call an internal DNS name: `https://vulnerawise-api.externalname.svc`.
+2. Kubernetes DNS maps that name to the external hostname: `api.vulnerawise.ai` via an `ExternalName` Service.
+3. A strict *default deny egress* NetworkPolicy blocks all outbound traffic.
+4. Additional NetworkPolicies selectively re-enable:
+   * DNS resolution.
+   * Egress only to the IP and port of the external API.
+
+Result: developers use clean, internal endpoints; security teams control and lock down the real egress paths.
+
+== Step 1: Create the ExternalName service
+
+Applications should *not* hardcode external hostnames or IPs.
+Instead, define a stable, internal Service that points to the external host:
+
+[source,bash]
+----
+cat <<EOF | oc apply -f -
+apiVersion: v1
+kind: Service
+metadata:
+  name: vulnerawise-api
+  namespace: externalname
+spec:
+  type: ExternalName
+  externalName: api.vulnerawise.ai
+EOF
+----
+
+Developers now call:
+
+[source]
+----
+https://vulnerawise-api.externalname.svc
+----
+
+Kubernetes DNS transparently maps that internal name to `api.vulnerawise.ai`. If the SaaS provider changes IP or hostname, platform teams update the Service or DNS, not application code.
+
+== Step 2: Deploy a test pod
+
+To verify the flow and policies end-to-end, create a simple test pod. In real environments, this is your application workload.
+
+[source,bash]
+----
+oc -n externalname run curltester \
+  --image=quay.io/curl/curl \
+  --restart=Never \
+  --command -- sleep infinity
+----
+
+The pod gets the label:
+
+[source]
+----
+run=curltester
+----
+
+We will use this label in all egress NetworkPolicies.
+
+== Step 3: Enforce default deny egress
+
+To make the ExternalName pattern safe, start from *zero trust* on egress: block everything, then explicitly allow what you need.
+
+[source,bash]
+----
+cat <<EOF | oc apply -f -
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all-egress
+  namespace: externalname
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+EOF
+----
+
+At this point, DNS resolution, API calls, and all other external traffic from the namespace are blocked.
+
+== Step 4: Allow only DNS (port 5353)
+
+This cluster resolves DNS using CoreDNS exposed locally on port `5353`. To let the pod resolve the ExternalName, we selectively re-enable DNS egress.
+
+[source,bash]
+----
+cat <<EOF | oc apply -f -
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns
+  namespace: externalname
+spec:
+  podSelector:
+    matchLabels:
+      run: curltester
+  policyTypes:
+  - Egress
+  egress:
+  - ports:
+    - protocol: UDP
+      port: 5353
+    - protocol: TCP
+      port: 5353
+EOF
+----
+
+Now the pod can resolve DNS, but still cannot reach any external IPs.
+
+== Step 5: Allow egress only to the API IP
+
+Next, we tie the ExternalName to a *single* IP and port using NetworkPolicy.
+
+First, look up the current IP for the external API (this can be done by platform/security):
+
+[source]
+----
+api.vulnerawise.ai -> 51.79.73.188
+----
+
+Then allow only that IP on TCP/443:
+
+[source,bash]
+----
+cat <<EOF | oc apply -f -
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-vulnerawise-egress
+  namespace: externalname
+spec:
+  podSelector:
+    matchLabels:
+      run: curltester
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - ipBlock:
+        cidr: 51.79.73.188/32
+    ports:
+    - protocol: TCP
+      port: 443
+EOF
+----
+
+Now the pod can:
+
+* Resolve the ExternalName via DNS.
+* Reach only `51.79.73.188:443` (the external API).
+
+All other egress remains blocked.
+
+== Step 6: Test the secured ExternalName path
+
+Verify each step from the application’s perspective.
+
+DNS resolution using the internal name:
+
+[source,bash]
+----
+oc -n externalname exec curltester -- nslookup vulnerawise-api
+----
+
+Call the ExternalName URL (what developers would use):
+
+[source,bash]
+----
+oc -n externalname exec curltester -- curl -vk \
+  https://vulnerawise-api.externalname.svc/v1/vuln?cve=CVE-2025-2368
+----
+
+Call the direct IP (to confirm the NetworkPolicy behavior):
+
+[source,bash]
+----
+oc -n externalname exec curltester -- curl -vk \
+  https://51.79.73.188/v1/vuln?cve=CVE-2025-2368
+----
+
+Try a blocked destination (should fail):
+
+[source,bash]
+----
+oc -n externalname exec curltester -- curl -vk https://google.com
+----
+
+== What developers see vs. what security controls
+
+From the *developer* point of view:
+
+* They call `https://vulnerawise-api.externalname.svc` like any other internal Service.
+* They never need to track the external hostname, IP, or TLS endpoint.
+* Changing providers or endpoints only requires a platform-level change.
+
+From the *platform/security* point of view:
+
+* Egress is default-deny at the namespace boundary.
+* DNS exposure is limited (port 5353 only, for specific pods).
+* Only the approved external API IP/port is reachable.
+* The ExternalName Service gives a clean abstraction boundary between application code and external infrastructure.
+
+== Summary: Why this pattern
+
+Using an `ExternalName` Service plus strict NetworkPolicies gives you:
+
+* Default-deny namespace egress.
+* Minimal, well-defined DNS access.
+* A single, well-controlled external endpoint per logical service.
+* Clean, internal service names for developers.
+* No reliance on EgressFirewall.
+* A repeatable, auditable pattern for controlled egress in OpenShift using pure NetworkPolicies.
+
+This lets developers focus on writing code against stable internal APIs, while security and platform teams safely manage and lock down the actual external connectivity.

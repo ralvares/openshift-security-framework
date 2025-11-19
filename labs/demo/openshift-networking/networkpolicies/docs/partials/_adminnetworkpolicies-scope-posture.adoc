@@ -1,0 +1,36 @@
+== 1. Scope
+
+The policies in this document apply only to namespaces explicitly marked as application-owned:
+
+[source,yaml]
+----
+business.workload/owned=true
+----
+
+Infrastructure, platform, and operator namespaces are not affected.
+
+== 2. Security Posture
+
+Owned namespaces follow a closed-by-default security model.
+
+
+=== Ingress
+
+No external traffic may enter an application namespace by default. Ingress between application namespaces is only allowed if explicitly passed by AdminNetworkPolicy; all other ingress is denied at the admin tier. Application teams must use standard NetworkPolicies to define pod-level ingress within their namespaces.
+
+
+=== Egress
+
+- DNS: allowed only to the cluster resolver (openshift-dns) for owned namespaces
+- kube-API: allowed only for namespaces explicitly selected by the kubeapi-egress-guardrail ANP
+- Corporate external networks: allowed only for namespaces explicitly selected by the corporate-access-external-networks-guardrail ANP
+- All other egress: denied by the final default-deny ANP at the admin tier
+
+=== Baseline Admin Network Policy (BANP)
+
+In addition to the AdminNetworkPolicies, a BaselineAdminNetworkPolicy (BANP) is enforced as a default-deny fallback for all owned namespaces. The BANP ensures that, unless explicitly allowed by a higher-tier policy, both ingress and egress traffic between owned namespaces is denied by default. This provides a strong safety net and ensures a closed-by-default posture even if no other policies are present.
+
+
+=== Developer NetworkPolicy Privileges
+
+Within the boundaries enforced by AdminNetworkPolicies and the BaselineAdminNetworkPolicy (BANP), application developers have full privileges to create and manage their own Kubernetes NetworkPolicy objects in their namespaces. This allows teams to define pod-level ingress and egress rules for their workloads, enabling service-to-service communication and additional security controls as needed. However, these developer-created policies cannot override the cluster perimeter or default-deny posture set by the admin tier.

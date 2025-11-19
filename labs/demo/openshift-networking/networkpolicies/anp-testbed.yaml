@@ -1,0 +1,315 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: team-a
+  labels:
+    business.workload/owned: "true"
+---
+# ConfigMap for index.html
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: index-html
+  namespace: team-a
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head><title>Connectivity Probe</title></head>
+    <body><h1>ok</h1></body>
+    </html>
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: team-b
+  labels:
+    business.workload/owned: "true"
+---
+# ConfigMap for index.html in team-b
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: index-html
+  namespace: team-b
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head><title>Connectivity Probe</title></head>
+    <body><h1>ok</h1></body>
+    </html>
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: team-c
+  labels:
+    business.workload/owned: "true"
+---
+# ConfigMap for index.html in team-c
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: index-html
+  namespace: team-c
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head><title>Connectivity Probe</title></head>
+    <body><h1>ok</h1></body>
+    </html>
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: external-no-access
+---
+# ConfigMap for index.html in external-no-access
+#
+# IMPORTANT: To avoid 'namespace not found' errors, apply this file in two steps:
+# 1. Apply only the Namespace resources first:
+#      oc apply -f anp-testbed.yaml --prune -l 'kind=Namespace'
+#    or manually extract/apply the Namespace blocks.
+# 2. Wait a few seconds, then apply the full file:
+#      oc apply -f anp-testbed.yaml
+#
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: index-html
+  namespace: external-no-access
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head><title>Connectivity Probe</title></head>
+    <body><h1>ok</h1></body>
+    </html>
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: a-default
+  namespace: team-a
+  labels:
+    app: a-default
+spec:
+  containers:
+  - name: httpd
+    image: registry.access.redhat.com/ubi9/httpd-24
+    ports:
+    - containerPort: 8080
+    volumeMounts:
+    - name: index-html
+      mountPath: /var/www/html/index.html
+      subPath: index.html
+  volumes:
+  - name: index-html
+    configMap:
+      name: index-html
+      defaultMode: 0444
+    volumeMounts:
+    - name: index-html
+      mountPath: /var/www/html/index.html
+      subPath: index.html
+  volumes:
+  - name: index-html
+    configMap:
+      name: index-html
+      defaultMode: 0444
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: a-dns
+  namespace: team-a
+  labels:
+    app: a-dns
+spec:
+  containers:
+  - name: httpd
+    image: registry.access.redhat.com/ubi9/httpd-24
+    ports:
+    - containerPort: 8080
+    volumeMounts:
+    - name: index-html
+      mountPath: /var/www/html/index.html
+      subPath: index.html
+  volumes:
+  - name: index-html
+    configMap:
+      name: index-html
+      defaultMode: 0444
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: a-kapi
+  namespace: team-a
+  labels:
+    app: a-kapi
+spec:
+  containers:
+  - name: httpd
+    image: registry.access.redhat.com/ubi9/httpd-24
+    ports:
+    - containerPort: 8080
+    volumeMounts:
+    - name: index-html
+      mountPath: /var/www/html/index.html
+      subPath: index.html
+  volumes:
+  - name: index-html
+    configMap:
+      name: index-html
+      defaultMode: 0444
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: a-proxy
+  namespace: team-a
+  labels:
+    app: a-proxy
+spec:
+  containers:
+  - name: httpd
+    image: registry.access.redhat.com/ubi9/httpd-24
+    ports:
+    - containerPort: 8080
+    volumeMounts:
+    - name: index-html
+      mountPath: /var/www/html/index.html
+      subPath: index.html
+  volumes:
+  - name: index-html
+    configMap:
+      name: index-html
+      defaultMode: 0444
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: a-ingress
+  namespace: team-a
+  labels:
+    app: a-ingress
+spec:
+  containers:
+  - name: httpd
+    image: registry.access.redhat.com/ubi9/httpd-24
+    ports:
+    - containerPort: 8080
+    volumeMounts:
+    - name: index-html
+      mountPath: /var/www/html/index.html
+      subPath: index.html
+  volumes:
+  - name: index-html
+    configMap:
+      name: index-html
+      defaultMode: 0444
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: b-default
+  namespace: team-b
+  labels:
+    app: b-default
+spec:
+  containers:
+  - name: httpd
+    image: registry.access.redhat.com/ubi9/httpd-24
+    ports:
+    - containerPort: 8080
+    volumeMounts:
+    - name: index-html
+      mountPath: /var/www/html/index.html
+      subPath: index.html
+  volumes:
+  - name: index-html
+    configMap:
+      name: index-html
+      defaultMode: 0444
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: c-proxy
+  namespace: team-c
+  labels:
+    app: c-proxy
+spec:
+  containers:
+  - name: httpd
+    image: registry.access.redhat.com/ubi9/httpd-24
+    ports:
+    - containerPort: 8080
+    volumeMounts:
+    - name: index-html
+      mountPath: /var/www/html/index.html
+      subPath: index.html
+  volumes:
+  - name: index-html
+    configMap:
+      name: index-html
+      defaultMode: 0444
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: c-kapi
+  namespace: team-c
+  labels:
+    app: c-kapi
+spec:
+  containers:
+  - name: httpd
+    image: registry.access.redhat.com/ubi9/httpd-24
+    ports:
+    - containerPort: 8080
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: outsider
+  namespace: external-no-access
+  labels:
+    app: outsider
+spec:
+  containers:
+  - name: httpd
+    image: registry.access.redhat.com/ubi9/httpd-24
+    ports:
+    - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: a-ingress
+  namespace: team-a
+spec:
+  selector:
+    app: a-ingress
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: a-ingress
+  namespace: team-a
+spec:
+  to:
+    kind: Service
+    name: a-ingress
+  port:
+    targetPort: 8080
+  tls:
+    termination: edge

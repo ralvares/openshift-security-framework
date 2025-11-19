@@ -1,0 +1,9 @@
+include::partials/_adminnetworkpolicies-intro.adoc[]
+
+include::partials/_adminnetworkpolicies-scope-posture.adoc[]
+
+include::partials/_adminnetworkpolicies-policy-spec.adoc[]
+
+include::partials/_adminnetworkpolicies-behavior.adoc[]
+
+include::partials/_adminnetworkpolicies-workflow-summary.adoc[]

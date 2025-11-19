@@ -1,0 +1,48 @@
+
+
+== 4. How Rule Types and Priorities Behave
+
+NOTE: The number of AdminNetworkPolicies in a cluster is typically expected to be a maximum of 30–50, based on the use cases for which this API was designed. In OVN-Kubernetes, supported priority values for AdminNetworkPolicies range from 0 to 99.
+
+=== Allow
+
+Traffic is permitted at the Admin tier. Lower-tier policies (BANP or developer NetworkPolicies) cannot override the decision.
+
+Used for:
+
+- DNS egress (for owned namespaces, to openshift-dns)
+- Monitoring ingress (if included in the ANP)
+- Ingress(route) (if included in the ANP)
+- Kube-API egress (for namespaces explicitly selected by the kubeapi-egress-guardrail ANP)
+- Corporate external network egress (for namespaces explicitly selected by the corporate-access-external-networks-guardrail ANP)
+
+=== Deny
+
+Traffic is blocked at the Admin tier and cannot be overridden.
+
+Used for:
+
+- Final deny-all safety net (low-priority default-deny ANP)
+- Default-deny fallback for all owned namespaces (BANP)
+
+=== Pass
+
+Some ANP rules may use the Pass action, which delegates the decision to developer-managed NetworkPolicies or the BANP. This allows teams to define pod-level communication within the boundaries set by the admin tier.
+
+=== Priority and Precedence
+
+AdminNetworkPolicy evaluation is priority-driven:
+
+- Lower number → higher priority (evaluated earlier)
+- Higher number → lower priority (evaluated later)
+
+Within a single ANP object, a deny-all rule always overrides other rules in that same object.
+However, a deny-all in a *lower-priority* ANP does not override allows in a higher-priority ANP.
+
+This is why the final default-deny ANP is assigned a high numeric priority (e.g., 99):
+
+- All allow ANPs (DNS, kube-API, corporate networks) run first
+- Any traffic explicitly allowed is permitted
+- Only traffic not matched by any allow is caught by the final deny-all
+
+The BaselineAdminNetworkPolicy (BANP) acts as a fallback, denying all ingress and egress between owned namespaces unless explicitly allowed by a higher-tier ANP. Developer NetworkPolicies can only further restrict traffic within the boundaries set by these admin policies.

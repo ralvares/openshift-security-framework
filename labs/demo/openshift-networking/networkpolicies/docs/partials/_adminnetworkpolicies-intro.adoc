@@ -1,0 +1,3 @@
+= Network Security Governance Model for Application Namespaces
+
+This document defines the security posture, enforcement model, and operational workflow for controlling ingress and egress traffic in business-owned application namespaces on OpenShift. The goal is to provide strong guardrails while enabling developers to continue managing their own NetworkPolicies inside a controlled and predictable perimeter.
