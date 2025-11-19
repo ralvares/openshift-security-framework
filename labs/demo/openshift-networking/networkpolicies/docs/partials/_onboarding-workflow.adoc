@@ -1,8 +1,4 @@
-== 2. Onboarding Workflow
 
-Below is the exact sequence followed whenever a new application team is onboarded.
-
-- The namespace falls under the AdminNetworkPolicy
 == 2. Onboarding Workflow
 
 This workflow describes how new application namespaces are onboarded and network security is enforced using AdminNetworkPolicies (ANP) and BaselineAdminNetworkPolicy (BANP).
@@ -71,8 +67,3 @@ The AdminNetworkPolicy suite enforces the perimeter and ensures that even if dev
 === Step 7 - Optional: Changes to Namespace Behavior
 
 If application requirements change (e.g., need for kube-API or corporate egress), developers submit a modification request. Security/Platform reviews and updates the namespace label and/or AdminNetworkPolicy as needed.
-- "We need ingress exposure."
-- "We need kube-API access."
-- "We need monitoring to scrape this workload."
-
-Security reviews and updates the AdminNetworkPolicy accordingly.
