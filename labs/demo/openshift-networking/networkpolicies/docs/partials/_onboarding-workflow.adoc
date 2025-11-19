@@ -2,6 +2,11 @@
 
 Below is the exact sequence followed whenever a new application team is onboarded.
 
+- The namespace falls under the AdminNetworkPolicy
+== 2. Onboarding Workflow
+
+This workflow describes how new application namespaces are onboarded and network security is enforced using AdminNetworkPolicies (ANP) and BaselineAdminNetworkPolicy (BANP).
+
 === Step 1 - Developer Requests a Project
 
 The developer submits a request that includes:
@@ -10,124 +15,64 @@ The developer submits a request that includes:
 - Team/owner
 - Namespace name(s) required
 - Whether the application requires:
-  - ingress exposure
-  - kube-API access
-  - monitoring scrapes
-  - external connectivity through the proxy
+  - kube-API access (for operators, migrations, etc.)
+  - egress to corporate networks (for external APIs)
 
-Requests follow the organizations standard intake workflow (ServiceNow, Jira, internal portal, etc.).
+Requests follow the organization's standard intake workflow (ServiceNow, Jira, internal portal, etc.).
 
 === Step 2 - Platform Team Creates the Namespace
 
-The Platform Team creates the project/namespace using the organization-approved template.
-This ensures the namespace is onboarded into the security perimeter automatically.
+The Platform Team creates the project/namespace using the approved template. The following label is always applied:
 
-.Namespace labels added by default
 [source,yaml]
 ----
 business.workload/owned=true
 ----
 
-These labels guarantee:
+This ensures the namespace is included in the ANP/BANP perimeter and all sensitive flows are denied by default.
 
-- The namespace falls under the AdminNetworkPolicy
-- All sensitive flows are denied until explicitly approved
-- Developers can start deploying workloads immediately
-- No exposure or risk exists during the initial setup
+=== Step 3 - Platform Team Applies Baseline Objects
 
-This step is mandatory.
-
-=== Step 3 - Platform Team Applies the Baseline Objects
-
-The following baseline objects are added as part of namespace creation:
+The following baseline objects are added:
 
 - ResourceQuotas
 - LimitRanges
 - Default deny-all (if using namespace NP)
 - Optional templates: ConfigMaps, RBAC, service accounts
-- NetworkPolicy scaffolding (if the organization provides templates)
+- NetworkPolicy scaffolding (if provided)
 
-This ensures consistency for all application namespaces.
+=== Step 4 - Security Reviews Special Network Requirements
 
-=== Step 4 - Security Reviews the Developer Requirements
+If the developer requests kube-API access or corporate egress, Security reviews the request. If approved, Security/Platform applies the appropriate label to the namespace:
 
-Based on the request:
+- `security.allow/kapi: "true"` for kube-API egress
+- `security.allow/networks: "true"` for corporate egress
 
-- If ingress exposure is needed → Security approves and enables
-- If kube-API calls are required → Security evaluates and enables
-- If monitoring scrapes are requested → Security validates and enables
-- If proxy egress is required → no approval needed (always enabled via Admin Policy)
+No label or request is needed for monitoring scrapes: ingress from `openshift-monitoring` and `openshift-user-workload-monitoring` is always allowed by policy for all owned namespaces.
 
-Security confirms that enabling these features does not violate external or internal compliance standards.
+=== Step 5 - Security/Platform Updates AdminNetworkPolicies
 
-=== Step 5 - Security Enables the Required Network Capabilities
+Security/Platform updates the AdminNetworkPolicy suite as needed:
 
-Security enables capabilities by adding labels to the namespace.
+- Monitoring ingress is always allowed from monitoring namespaces
+- DNS egress is always allowed to `openshift-dns`
+- Kube-API egress is allowed only for namespaces with the correct label
+- Corporate egress is allowed only for namespaces with the correct label
+- All other ingress/egress is denied by default
 
-[WARNING]
-====
-Ingress exposure is intentionally controlled.
-Allowing ingress by default could unintentionally make an internal workload reachable through the router, without review or context.
-To prevent accidental exposure, every ingress request must be approved and documented by the Security Team before its enabled.
-====
-
-Examples:
-
-Enable ROUTE / ingress exposure:
-
-[source,shell]
-----
-oc label ns <name> security.allow/ingress=true --overwrite
-----
-
-Enable Monitoring scrapes:
-
-[source,shell]
-----
-oc label ns <name> security.allow/monitoring=true --overwrite
-----
-
-Enable kube-API access:
-
-[source,shell]
-----
-oc label ns <name> security.allow/kapi=true --overwrite
-----
-
-These labels activate the appropriate ALLOW or PASS behavior inside the AdminNetworkPolicy.
+BANP enforces default deny between owned namespaces unless allowed by a higher-tier ANP.
 
 === Step 6 - Developer Deploys Applications
 
-Developers now deploy workloads:
+Developers deploy workloads (Deployments, StatefulSets, CronJobs, Services, Routes, etc.) and create their own NetworkPolicies to define pod-to-pod connectivity within their namespace.
 
-- Deployments, StatefulSets, CronJobs
-- Services, Routes (if ingress enabled)
-- Application-level NetworkPolicies
+The AdminNetworkPolicy suite enforces the perimeter and ensures that even if developers misconfigure policies (e.g., allow-all), the cluster boundary remains secure.
 
-Developers maintain full control over pod-to-pod connectivity within their namespaces. The AdminNetworkPolicy enforces the perimeter boundaries.
+=== Step 7 - Optional: Changes to Namespace Behavior
 
-=== Step 7 - Developer Creates NetworkPolicies
-
-Developers create NetworkPolicies to define internal application topology.
-
-Typical use cases:
-
-- Only allow frontend → backend
-- Only allow app → database
-- Enforce deny-all followed by explicit allows
-- Control monitoring access for specific ports
-- Restrict ingress only to specific workloads
-
-The AdminNetworkPolicy ensures that even if developers misconfigure policies (e.g., allow-all), the perimeter remains intact.
-
-=== Step 8 - Optional: Changes to Namespace Behavior
-
-When application requirements change, developers submit a modification request:
-
-Examples:
-
+If application requirements change (e.g., need for kube-API or corporate egress), developers submit a modification request. Security/Platform reviews and updates the namespace label and/or AdminNetworkPolicy as needed.
 - "We need ingress exposure."
 - "We need kube-API access."
 - "We need monitoring to scrape this workload."
 
-Security reviews and updates the namespace labels accordingly.
+Security reviews and updates the AdminNetworkPolicy accordingly.
