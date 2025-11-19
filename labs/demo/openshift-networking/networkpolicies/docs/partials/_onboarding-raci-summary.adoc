@@ -19,22 +19,17 @@
 | I
 | R
 
-| Managing AdminNetworkPolicy suite
+| Managing AdminNetworkPolicy suite (DNS, kube-API, monitoring, corporate egress, default deny)
 | I
 | A
 | R
 
-| Approving ingress exposure
+| Approving monitoring ingress (openshift-monitoring, user workload monitoring)
 | I
 | A/R
 | C
 
-| Enabling monitoring scrapes
-| I
-| A/R
-| C
-
-| Enabling kube-API access
+| Approving kube-API access
 | I
 | A/R
 | C
@@ -54,12 +49,7 @@
 | A
 | C
 
-| Managing external egress through proxy
-| I
-| A
-| C
-
-| Preventing metadata & unauthorized egress
+| Managing external egress (corporate networks, DNS, default deny)
 | I
 | A
 | C
@@ -91,8 +81,7 @@
 
 This onboarding playbook provides a consistent, secure operational model by combining:
 
--- a strict perimeter enforced by a small suite of AdminNetworkPolicies
-- namespace-level label gating
+- a strict perimeter enforced by a small suite of AdminNetworkPolicies (DNS, kube-API, monitoring, corporate egress, default deny)
 - developer autonomy inside safe boundaries
 - clear separation of responsibilities
 - predictable ingress and egress controls

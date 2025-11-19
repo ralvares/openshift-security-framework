@@ -15,7 +15,7 @@ The developer submits a request that includes:
   - monitoring scrapes
   - external connectivity through the proxy
 
-Requests follow the organizations standard intake workflow (ServiceNow, Jira, internal portal, etc.).
+Requests follow the organizations standard intake workflow (ServiceNow, Jira, internal portal, etc.).
 
 === Step 2 - Platform Team Creates the Namespace
 

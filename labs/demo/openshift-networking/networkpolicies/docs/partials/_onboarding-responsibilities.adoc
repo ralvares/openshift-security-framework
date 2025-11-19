@@ -1,32 +1,32 @@
+
 == 4. Developer Responsibilities
 
 Developers own:
 
-- Application-level NetworkPolicies
+- Application-level NetworkPolicies (pod-level ingress/egress)
 - Service definitions and routing rules
-- Ports, selectors, labels inside their namespace
+- Pod labels/selectors inside their namespace
 - Ensuring their NetworkPolicies do not unintentionally block required traffic
 - Testing internal connectivity
 
 They do not manage:
 
-- kube-API access
-- Route exposure approvals
-- Perimeter egress settings
-- Proxy configuration
-- Internal OpenShift connectivity
-- Namespace labels (restricted by policy)
+- kube-API access (requires Security approval and ANP)
+- Monitoring ingress (requires Security/Platform approval and ANP)
+- Perimeter egress settings (DNS, corporate networks, default deny)
+- Namespace labels
+
 
 == 5. Security Team Responsibilities
 
 Security owns:
 
-- Namespace perimeter enforcement
-- Approving ingress and kube-API exceptions
-- Enabling or denying monitoring access
-- Managing AdminNetworkPolicy configuration
-- Reviewing external requirements
+- Enforcing namespace perimeter via AdminNetworkPolicies and BANP
+- Approving kube-API and monitoring ingress exceptions
+- Managing and reviewing AdminNetworkPolicy configuration
+- Reviewing external requirements and compliance
 - Ensuring compliance with corporate and regulatory standards
+
 
 == 6. Platform Team Responsibilities
 
@@ -35,5 +35,5 @@ Platform owns:
 - Namespace creation (templates, labels, quotas)
 - Initial scaffolding (default policies, RBAC, limits)
 - Maintaining cluster networking configuration
-- Ensuring namespaces consistently inherit baseline security controls
+- Ensuring namespaces consistently inherit baseline security controls (including BANP)
 - Enforcing that developers cannot modify protected namespace labels
