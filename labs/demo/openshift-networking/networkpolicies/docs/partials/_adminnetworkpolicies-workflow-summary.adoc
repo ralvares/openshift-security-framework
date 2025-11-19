@@ -1,4 +1,4 @@
-== 6. Developer Workflow
+== 5. Developer Workflow
 
 Developers continue to own their namespace `NetworkPolicy` objects.
 
@@ -24,7 +24,7 @@ The result is:
 - Reduced risk of accidental broad exposure through permissive NetworkPolicies
 
 
-== 7. Best Practices and Improvements for AdminNetworkPolicies
+== 6. Best Practices and Improvements for AdminNetworkPolicies
 
 AdminNetworkPolicies (ANPs) are powerful tools for enforcing cluster-wide network security. To maximize their effectiveness and avoid common pitfalls, follow these best practices:
 
@@ -54,7 +54,7 @@ AdminNetworkPolicies (ANPs) are powerful tools for enforcing cluster-wide networ
   - Document the intent and effect of each ANP.
   - Regularly review ANPs for unnecessary complexity and update as requirements evolve.
 
-== 8. Example AdminNetworkPolicies in This Environment
+== 7. Example AdminNetworkPolicies in This Environment
 
 The following AdminNetworkPolicies are present in this environment and define the security posture:
 
