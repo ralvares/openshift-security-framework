@@ -862,7 +862,111 @@ Dropped by network policies isolation in namespace connectivity-scenario, direct
 </div>
 </div>
 <div class="sect1">
-<h2 id="_9_summary">9. Summary</h2>
+<h2 id="_9_admission_controls_blocking_allow_all_networkpolicies">9. Admission Controls: Blocking Allow-All NetworkPolicies</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To prevent developers from bypassing security baselines, a ValidatingAdmissionPolicy (VAP) is enforced to block "allow-all" NetworkPolicies in developer-owned namespaces. This ensures that only restrictive or workload-scoped policies are permitted, while any policy that would open the entire namespace is denied.</p>
+</div>
+<div class="paragraph">
+<p><strong>Allowed:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Deny-all policies (ingress: [], egress: [])</p>
+</li>
+<li>
+<p>Normal workload-scoped NetworkPolicies</p>
+</li>
+<li>
+<p>Any restrictive rules</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><strong>Blocked:</strong></p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Any NetworkPolicy that combines:</p>
+</li>
+<li>
+<p>podSelector: {}</p>
+</li>
+<li>
+<p>ingress: [{}] or egress: [{}]
+These patterns reopen the entire namespace and must be prohibited.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The binding ensures the rule applies only to namespaces labeled:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>business.workload/owned=true</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This closes the security gap without breaking developer autonomy.</p>
+</div>
+<div class="sect2">
+<h3 id="_validatingadmissionpolicy_vap">ValidatingAdmissionPolicy (VAP)</h3>
+<div class="paragraph">
+<p>Blocks allow-all but permits deny-all.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-yaml" data-lang="yaml">apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: block-allow-all-netpol
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: ["networking.k8s.io"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE", "PATCH"]
+        resources: ["networkpolicies"]
+  validations:
+    - expression: "!(
+        object.spec.podSelector == {} &amp;&amp;
+        (
+          (has(object.spec.ingress) &amp;&amp; size(object.spec.ingress) == 1 &amp;&amp; object.spec.ingress[0] == {}) ||\n+          (has(object.spec.egress)  &amp;&amp; size(object.spec.egress)  == 1 &amp;&amp; object.spec.egress[0]  == {})
+        )
+      )"
+      message: "Allow-all NetworkPolicies (empty {} ingress/egress rules) are forbidden. Deny-all is allowed."</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_validatingadmissionpolicybinding">ValidatingAdmissionPolicyBinding</h3>
+<div class="paragraph">
+<p>Applies only to developer-owned namespaces.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlight"><code class="language-yaml" data-lang="yaml">apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: block-allow-all-netpol-owned-ns
+spec:
+  policyName: block-allow-all-netpol
+  validationActions:
+    - Deny
+  matchResources:
+    namespaceSelector:
+      matchLabels:
+        business.workload/owned: "true"</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_10_summary">10. Summary</h2>
 <div class="sectionbody">
 <div class="paragraph">
 <p>This plan operationalizes the real network-security model by:</p>
@@ -882,6 +986,9 @@ Dropped by network policies isolation in namespace connectivity-scenario, direct
 <p>Letting application teams define internal traffic with NetworkPolicies under GitOps control</p>
 </li>
 <li>
+<p>Enforcing admission controls with ValidatingAdmissionPolicy (VAP) to block allow-all NetworkPolicies and prevent bypass of security baselines</p>
+</li>
+<li>
 <p>Providing monitoring and feedback loops to keep the posture least-privilege and practical over time</p>
 </li>
 </ul>
@@ -894,7 +1001,7 @@ Dropped by network policies isolation in namespace connectivity-scenario, direct
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-11-20 09:23:48 +0400
+Last updated 2025-11-20 10:12:05 +0400
 </div>
 </div>
 </body>
