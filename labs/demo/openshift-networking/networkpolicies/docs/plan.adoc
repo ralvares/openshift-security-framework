@@ -101,10 +101,32 @@ Goal: give application teams clear patterns for defining traffic inside the peri
 
 Goal: validate that the perimeter and policies behave as intended and support troubleshooting.
 
+
 .Enable flow visibility
 - Use NetObserv (or equivalent) to observe:
   - Allowed flows between namespaces and pods
   - Dropped connections due to AdminNetworkPolicy, BANP, or NetworkPolicy decisions
+
+  If you are using a standard cluster, cycle to the packet drops view. In this output, you may see that the traffic is dropped by OVS:
+
+  [source]
+  ----
+  Dropped Bytes   Dropped Packets   Drop State      Drop Cause         Drop Flags
+  74B             1                 TCP_SYN_SENT    OVS_DROP_EXPLICIT  2
+  74B             1                 TCP_SYN_SENT    OVS_DROP_EXPLICIT  2
+  ----
+
+  You will need to investigate to get to the root cause. Most often, this is due to a configuration issue, such as a missing or misconfigured network policy.
+
+  If you are using the TechPreview feature, cycle to the network events view. In the following output, you may see that the traffic is blocked by a network policy:
+
+  [source]
+  ----
+  Network Events
+  Dropped by network policies isolation in namespace connectivity-scenario, direction Ingress
+  ----
+
+  These views help you quickly determine whether a drop is due to OVS (infrastructure-level) or a specific network policy, and guide your troubleshooting process.
 
 .Operational feedback loop
 - When drops impact applications, teams:
