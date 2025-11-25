@@ -114,7 +114,7 @@ spec:
 == Pattern Format
 Each pattern includes: Explanation, Use Case, Risk (Why it matters), Implementation Checklist, Quick Validation steps.
 
-== Pattern: DENY All Non-Whitelisted Traffic to a Namespace
+=== Pattern: DENY All Non-Whitelisted Traffic to a Namespace
 [mermaid]
 ----
 flowchart LR
@@ -165,7 +165,7 @@ spec:
       port: 8080
 ----
 
-== Pattern: LIMIT Traffic to an Application
+=== Pattern: LIMIT Traffic to an Application
 [mermaid]
 ----
 flowchart LR
@@ -204,7 +204,7 @@ spec:
       port: 8080
 ----
 
-== Pattern: DENY All Traffic from Other Namespaces
+=== Pattern: DENY All Traffic from Other Namespaces
 [mermaid]
 ----
 flowchart LR
@@ -248,7 +248,7 @@ spec:
     - podSelector: {}
 ----
 
-== Pattern: ALLOW Traffic Only to a Metrics Port
+=== Pattern: ALLOW Traffic Only to a Metrics Port
 [mermaid]
 ----
 flowchart LR
@@ -288,7 +288,7 @@ spec:
       port: 5000
 ----
 
-== Pattern: DENY External Egress Traffic
+=== Pattern: DENY External Egress Traffic
 [mermaid]
 ----
 flowchart LR
@@ -325,7 +325,7 @@ spec:
         cidr: 10.0.0.0/16
 ----
 
-== Pattern: DENY All Inbound to an Application (Except Specific Source)
+=== Pattern: DENY All Inbound to an Application (Except Specific Source)
 [mermaid]
 ----
 flowchart LR

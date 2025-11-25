@@ -566,14 +566,17 @@ pre.rouge .gs {
 <li><a href="#_6_modern_additions_and_operational_notes">1.6. 6. Modern Additions and Operational Notes</a></li>
 </ul>
 </li>
-<li><a href="#_pattern_format">2. Pattern Format</a></li>
-<li><a href="#_pattern_deny_all_non_whitelisted_traffic_to_a_namespace">3. Pattern: DENY All Non-Whitelisted Traffic to a Namespace</a></li>
-<li><a href="#_pattern_limit_traffic_to_an_application">4. Pattern: LIMIT Traffic to an Application</a></li>
-<li><a href="#_pattern_deny_all_traffic_from_other_namespaces">5. Pattern: DENY All Traffic from Other Namespaces</a></li>
-<li><a href="#_pattern_allow_traffic_only_to_a_metrics_port">6. Pattern: ALLOW Traffic Only to a Metrics Port</a></li>
-<li><a href="#_pattern_deny_external_egress_traffic">7. Pattern: DENY External Egress Traffic</a></li>
-<li><a href="#_pattern_deny_all_inbound_to_an_application_except_specific_source">8. Pattern: DENY All Inbound to an Application (Except Specific Source)</a></li>
-<li><a href="#_operational_notes">9. Operational Notes</a></li>
+<li><a href="#_pattern_format">2. Pattern Format</a>
+<ul class="sectlevel2">
+<li><a href="#_pattern_deny_all_non_whitelisted_traffic_to_a_namespace">2.1. Pattern: DENY All Non-Whitelisted Traffic to a Namespace</a></li>
+<li><a href="#_pattern_limit_traffic_to_an_application">2.2. Pattern: LIMIT Traffic to an Application</a></li>
+<li><a href="#_pattern_deny_all_traffic_from_other_namespaces">2.3. Pattern: DENY All Traffic from Other Namespaces</a></li>
+<li><a href="#_pattern_allow_traffic_only_to_a_metrics_port">2.4. Pattern: ALLOW Traffic Only to a Metrics Port</a></li>
+<li><a href="#_pattern_deny_external_egress_traffic">2.5. Pattern: DENY External Egress Traffic</a></li>
+<li><a href="#_pattern_deny_all_inbound_to_an_application_except_specific_source">2.6. Pattern: DENY All Inbound to an Application (Except Specific Source)</a></li>
+</ul>
+</li>
+<li><a href="#_operational_notes">3. Operational Notes</a></li>
 </ul>
 </div>
 </div>
@@ -759,11 +762,8 @@ pre.rouge .gs {
 <div class="paragraph">
 <p>Each pattern includes: Explanation, Use Case, Risk (Why it matters), Implementation Checklist, Quick Validation steps.</p>
 </div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_pattern_deny_all_non_whitelisted_traffic_to_a_namespace">3. Pattern: DENY All Non-Whitelisted Traffic to a Namespace</h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="_pattern_deny_all_non_whitelisted_traffic_to_a_namespace">2.1. Pattern: DENY All Non-Whitelisted Traffic to a Namespace</h3>
 <div class="imageblock">
 <div class="content">
 <img src="diag-mermaid-md5-976f55ba709d65b3244a7a3c68aaa64a.png" alt="Diagram" width="665" height="191">
@@ -831,10 +831,8 @@ pre.rouge .gs {
 </div>
 </div>
 </div>
-</div>
-<div class="sect1">
-<h2 id="_pattern_limit_traffic_to_an_application">4. Pattern: LIMIT Traffic to an Application</h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="_pattern_limit_traffic_to_an_application">2.2. Pattern: LIMIT Traffic to an Application</h3>
 <div class="imageblock">
 <div class="content">
 <img src="diag-mermaid-md5-80496e24c4743d4c187eacc0a0d4816c.png" alt="Diagram" width="784" height="62">
@@ -885,10 +883,8 @@ pre.rouge .gs {
 </div>
 </div>
 </div>
-</div>
-<div class="sect1">
-<h2 id="_pattern_deny_all_traffic_from_other_namespaces">5. Pattern: DENY All Traffic from Other Namespaces</h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="_pattern_deny_all_traffic_from_other_namespaces">2.3. Pattern: DENY All Traffic from Other Namespaces</h3>
 <div class="imageblock">
 <div class="content">
 <img src="diag-mermaid-md5-47cd303430ee5a28bd2f5c305df9f373.png" alt="Diagram" width="590" height="343">
@@ -933,10 +929,8 @@ pre.rouge .gs {
 </div>
 </div>
 </div>
-</div>
-<div class="sect1">
-<h2 id="_pattern_allow_traffic_only_to_a_metrics_port">6. Pattern: ALLOW Traffic Only to a Metrics Port</h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="_pattern_allow_traffic_only_to_a_metrics_port">2.4. Pattern: ALLOW Traffic Only to a Metrics Port</h3>
 <div class="imageblock">
 <div class="content">
 <img src="diag-mermaid-md5-8c944efeb0d15de71e5228b50d7d33f6.png" alt="Diagram" width="614" height="244">
@@ -986,10 +980,8 @@ pre.rouge .gs {
 </div>
 </div>
 </div>
-</div>
-<div class="sect1">
-<h2 id="_pattern_deny_external_egress_traffic">7. Pattern: DENY External Egress Traffic</h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="_pattern_deny_external_egress_traffic">2.5. Pattern: DENY External Egress Traffic</h3>
 <div class="imageblock">
 <div class="content">
 <img src="diag-mermaid-md5-d9f56ae9cfee1884a30d97de344679b2.png" alt="Diagram" width="681" height="192">
@@ -1034,10 +1026,8 @@ pre.rouge .gs {
 </div>
 </div>
 </div>
-</div>
-<div class="sect1">
-<h2 id="_pattern_deny_all_inbound_to_an_application_except_specific_source">8. Pattern: DENY All Inbound to an Application (Except Specific Source)</h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="_pattern_deny_all_inbound_to_an_application_except_specific_source">2.6. Pattern: DENY All Inbound to an Application (Except Specific Source)</h3>
 <div class="imageblock">
 <div class="content">
 <img src="diag-mermaid-md5-92e81a575a1811663c9550286f8f819a.png" alt="Diagram" width="427" height="243">
@@ -1088,8 +1078,9 @@ pre.rouge .gs {
 </div>
 </div>
 </div>
+</div>
 <div class="sect1">
-<h2 id="_operational_notes">9. Operational Notes</h2>
+<h2 id="_operational_notes">3. Operational Notes</h2>
 <div class="sectionbody">
 <div class="ulist">
 <ul>
@@ -1109,7 +1100,7 @@ pre.rouge .gs {
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-11-25 13:57:21 +0400
+Last updated 2025-11-25 14:39:51 +0400
 </div>
 </div>
 </body>
