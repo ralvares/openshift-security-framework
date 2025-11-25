@@ -433,6 +433,120 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 #footer-text{color:rgba(0,0,0,.6);font-size:.9em}}
 @media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
 </style>
+<style>
+pre.rouge table td { padding: 5px; }
+pre.rouge table pre { margin: 0; }
+pre.rouge, pre.rouge .w {
+  color: #24292f;
+  background-color: #f6f8fa;
+}
+pre.rouge .k, pre.rouge .kd, pre.rouge .kn, pre.rouge .kp, pre.rouge .kr, pre.rouge .kt, pre.rouge .kv {
+  color: #cf222e;
+}
+pre.rouge .gr {
+  color: #f6f8fa;
+}
+pre.rouge .gd {
+  color: #82071e;
+  background-color: #ffebe9;
+}
+pre.rouge .nb {
+  color: #953800;
+}
+pre.rouge .nc {
+  color: #953800;
+}
+pre.rouge .no {
+  color: #953800;
+}
+pre.rouge .nn {
+  color: #953800;
+}
+pre.rouge .sr {
+  color: #116329;
+}
+pre.rouge .na {
+  color: #116329;
+}
+pre.rouge .nt {
+  color: #116329;
+}
+pre.rouge .gi {
+  color: #116329;
+  background-color: #dafbe1;
+}
+pre.rouge .kc {
+  color: #0550ae;
+}
+pre.rouge .l, pre.rouge .ld, pre.rouge .m, pre.rouge .mb, pre.rouge .mf, pre.rouge .mh, pre.rouge .mi, pre.rouge .il, pre.rouge .mo, pre.rouge .mx {
+  color: #0550ae;
+}
+pre.rouge .sb {
+  color: #0550ae;
+}
+pre.rouge .bp {
+  color: #0550ae;
+}
+pre.rouge .ne {
+  color: #0550ae;
+}
+pre.rouge .nl {
+  color: #0550ae;
+}
+pre.rouge .py {
+  color: #0550ae;
+}
+pre.rouge .nv, pre.rouge .vc, pre.rouge .vg, pre.rouge .vi, pre.rouge .vm {
+  color: #0550ae;
+}
+pre.rouge .o, pre.rouge .ow {
+  color: #0550ae;
+}
+pre.rouge .gh {
+  color: #0550ae;
+  font-weight: bold;
+}
+pre.rouge .gu {
+  color: #0550ae;
+  font-weight: bold;
+}
+pre.rouge .s, pre.rouge .sa, pre.rouge .sc, pre.rouge .dl, pre.rouge .sd, pre.rouge .s2, pre.rouge .se, pre.rouge .sh, pre.rouge .sx, pre.rouge .s1, pre.rouge .ss {
+  color: #0a3069;
+}
+pre.rouge .nd {
+  color: #8250df;
+}
+pre.rouge .nf, pre.rouge .fm {
+  color: #8250df;
+}
+pre.rouge .err {
+  color: #f6f8fa;
+  background-color: #82071e;
+}
+pre.rouge .c, pre.rouge .ch, pre.rouge .cd, pre.rouge .cm, pre.rouge .cp, pre.rouge .cpf, pre.rouge .c1, pre.rouge .cs {
+  color: #6e7781;
+}
+pre.rouge .gl {
+  color: #6e7781;
+}
+pre.rouge .gt {
+  color: #6e7781;
+}
+pre.rouge .ni {
+  color: #24292f;
+}
+pre.rouge .si {
+  color: #24292f;
+}
+pre.rouge .ge {
+  color: #24292f;
+  font-style: italic;
+}
+pre.rouge .gs {
+  color: #24292f;
+  font-weight: bold;
+}
+</style>
 </head>
 <body class="article">
 <div id="header">
@@ -454,7 +568,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-yaml" data-lang="yaml">business.workload/owned=true</code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="s">business.workload/owned=true</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -551,26 +665,26 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h3 id="_3_1_corporate_external_networks_guardrail_anp">3.1 Corporate External Networks Guardrail ANP</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-yaml" data-lang="yaml">apiVersion: policy.networking.k8s.io/v1alpha1
-kind: AdminNetworkPolicy
-metadata:
-  name: corporate-access-external-networks-guardrail
-spec:
-  priority: 12
-  subject:
-    namespaces:
-      matchLabels:
-        security.allow/networks: "true"
-  egress:
-    - name: allow-corporate-external-networks
-      action: Allow
-      to:
-        - networks:
-            - XX.XX.XX.0/24
-      ports:
-        - portNumber:
-            protocol: TCP
-            port: 443</code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">policy.networking.k8s.io/v1alpha1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">AdminNetworkPolicy</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">corporate-access-external-networks-guardrail</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">priority</span><span class="pi">:</span> <span class="m">12</span>
+  <span class="na">subject</span><span class="pi">:</span>
+    <span class="na">namespaces</span><span class="pi">:</span>
+      <span class="na">matchLabels</span><span class="pi">:</span>
+        <span class="na">security.allow/networks</span><span class="pi">:</span> <span class="s2">"</span><span class="s">true"</span>
+  <span class="na">egress</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">allow-corporate-external-networks</span>
+      <span class="na">action</span><span class="pi">:</span> <span class="s">Allow</span>
+      <span class="na">to</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">networks</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s">XX.XX.XX.0/24</span>
+      <span class="na">ports</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">portNumber</span><span class="pi">:</span>
+            <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
+            <span class="na">port</span><span class="pi">:</span> <span class="s">443</span></code></pre>
 </div>
 </div>
 </div>
@@ -578,28 +692,28 @@ spec:
 <h3 id="_3_2_kube_api_egress_guardrail_anp">3.2 Kube API Egress Guardrail ANP</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-yaml" data-lang="yaml">apiVersion: policy.networking.k8s.io/v1alpha1
-kind: AdminNetworkPolicy
-metadata:
-  name: kubeapi-egress-guardrail
-spec:
-  priority: 13
-  subject:
-    namespaces:
-      matchLabels:
-        security.allow/kapi: "true"
-  egress:
-    - name: allow-kubeapi-for-approved-workloads
-      action: Allow
-      to:
-        - nodes:
-            matchExpressions:
-              - key: node-role.kubernetes.io/control-plane
-                operator: Exists
-      ports:
-        - portNumber:
-            protocol: TCP
-            port: 6443</code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">policy.networking.k8s.io/v1alpha1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">AdminNetworkPolicy</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">kubeapi-egress-guardrail</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">priority</span><span class="pi">:</span> <span class="m">13</span>
+  <span class="na">subject</span><span class="pi">:</span>
+    <span class="na">namespaces</span><span class="pi">:</span>
+      <span class="na">matchLabels</span><span class="pi">:</span>
+        <span class="na">security.allow/kapi</span><span class="pi">:</span> <span class="s2">"</span><span class="s">true"</span>
+  <span class="na">egress</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">allow-kubeapi-for-approved-workloads</span>
+      <span class="na">action</span><span class="pi">:</span> <span class="s">Allow</span>
+      <span class="na">to</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">nodes</span><span class="pi">:</span>
+            <span class="na">matchExpressions</span><span class="pi">:</span>
+              <span class="pi">-</span> <span class="na">key</span><span class="pi">:</span> <span class="s">node-role.kubernetes.io/control-plane</span>
+                <span class="na">operator</span><span class="pi">:</span> <span class="s">Exists</span>
+      <span class="na">ports</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">portNumber</span><span class="pi">:</span>
+            <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
+            <span class="na">port</span><span class="pi">:</span> <span class="s">6443</span></code></pre>
 </div>
 </div>
 </div>
@@ -607,75 +721,75 @@ spec:
 <h3 id="_3_3_deny_all_allow_dns_monitoring_and_pass_for_owned_namespaces_anp">3.3 Deny-All, Allow DNS &amp; Monitoring, and Pass for Owned Namespaces ANP</h3>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-yaml" data-lang="yaml">apiVersion: policy.networking.k8s.io/v1alpha1
-kind: AdminNetworkPolicy
-metadata:
-  name: deny-all-allow-dns-monitoring-owned-namespaces
-spec:
-  priority: 99
-  subject:
-    namespaces:
-      matchLabels:
-        business.workload/owned: "true"
-  ingress:
-    - name: allow-openshift-monitoring
-      action: Allow
-      from:
-        - namespaces:
-            matchLabels:
-              kubernetes.io/metadata.name: openshift-monitoring
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">policy.networking.k8s.io/v1alpha1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">AdminNetworkPolicy</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">deny-all-allow-dns-monitoring-owned-namespaces</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">priority</span><span class="pi">:</span> <span class="m">99</span>
+  <span class="na">subject</span><span class="pi">:</span>
+    <span class="na">namespaces</span><span class="pi">:</span>
+      <span class="na">matchLabels</span><span class="pi">:</span>
+        <span class="na">business.workload/owned</span><span class="pi">:</span> <span class="s2">"</span><span class="s">true"</span>
+  <span class="na">ingress</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">allow-openshift-monitoring</span>
+      <span class="na">action</span><span class="pi">:</span> <span class="s">Allow</span>
+      <span class="na">from</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">namespaces</span><span class="pi">:</span>
+            <span class="na">matchLabels</span><span class="pi">:</span>
+              <span class="na">kubernetes.io/metadata.name</span><span class="pi">:</span> <span class="s">openshift-monitoring</span>
 
-    - name: allow-user-workload-monitoring
-      action: Allow
-      from:
-        - namespaces:
-            matchLabels:
-              kubernetes.io/metadata.name: openshift-user-workload-monitoring
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">allow-user-workload-monitoring</span>
+      <span class="na">action</span><span class="pi">:</span> <span class="s">Allow</span>
+      <span class="na">from</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">namespaces</span><span class="pi">:</span>
+            <span class="na">matchLabels</span><span class="pi">:</span>
+              <span class="na">kubernetes.io/metadata.name</span><span class="pi">:</span> <span class="s">openshift-user-workload-monitoring</span>
 
-    - name: pass-from-owned-namespaces
-      action: Pass
-      from:
-        - namespaces:
-            matchLabels:
-              business.workload/owned: "true"
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">pass-from-owned-namespaces</span>
+      <span class="na">action</span><span class="pi">:</span> <span class="s">Pass</span>
+      <span class="na">from</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">namespaces</span><span class="pi">:</span>
+            <span class="na">matchLabels</span><span class="pi">:</span>
+              <span class="na">business.workload/owned</span><span class="pi">:</span> <span class="s2">"</span><span class="s">true"</span>
 
-    - name: deny-ingress
-      action: Deny
-      from:
-        - namespaces: {}
-  egress:
-    - name: allow-dns
-      action: Allow
-      to:
-        - namespaces:
-            matchLabels:
-              kubernetes.io/metadata.name: openshift-dns
-      ports:
-        - portNumber:
-            port: 53
-            protocol: UDP
-        - portNumber:
-            port: 53
-            protocol: TCP
-        - portNumber:
-            port: 5353
-            protocol: UDP
-        - portNumber:
-            port: 5353
-            protocol: TCP
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">deny-ingress</span>
+      <span class="na">action</span><span class="pi">:</span> <span class="s">Deny</span>
+      <span class="na">from</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">namespaces</span><span class="pi">:</span> <span class="pi">{}</span>
+  <span class="na">egress</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">allow-dns</span>
+      <span class="na">action</span><span class="pi">:</span> <span class="s">Allow</span>
+      <span class="na">to</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">namespaces</span><span class="pi">:</span>
+            <span class="na">matchLabels</span><span class="pi">:</span>
+              <span class="na">kubernetes.io/metadata.name</span><span class="pi">:</span> <span class="s">openshift-dns</span>
+      <span class="na">ports</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">portNumber</span><span class="pi">:</span>
+            <span class="na">port</span><span class="pi">:</span> <span class="m">53</span>
+            <span class="na">protocol</span><span class="pi">:</span> <span class="s">UDP</span>
+        <span class="pi">-</span> <span class="na">portNumber</span><span class="pi">:</span>
+            <span class="na">port</span><span class="pi">:</span> <span class="m">53</span>
+            <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
+        <span class="pi">-</span> <span class="na">portNumber</span><span class="pi">:</span>
+            <span class="na">port</span><span class="pi">:</span> <span class="m">5353</span>
+            <span class="na">protocol</span><span class="pi">:</span> <span class="s">UDP</span>
+        <span class="pi">-</span> <span class="na">portNumber</span><span class="pi">:</span>
+            <span class="na">port</span><span class="pi">:</span> <span class="m">5353</span>
+            <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
 
-    - name: pass-to-owned-namespaces
-      action: Pass
-      to:
-        - namespaces:
-            matchLabels:
-              business.workload/owned: "true"
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">pass-to-owned-namespaces</span>
+      <span class="na">action</span><span class="pi">:</span> <span class="s">Pass</span>
+      <span class="na">to</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">namespaces</span><span class="pi">:</span>
+            <span class="na">matchLabels</span><span class="pi">:</span>
+              <span class="na">business.workload/owned</span><span class="pi">:</span> <span class="s2">"</span><span class="s">true"</span>
 
-    - name: deny-egress
-      action: Deny
-      to:
-        - networks:
-            - 0.0.0.0/0</code></pre>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">deny-egress</span>
+      <span class="na">action</span><span class="pi">:</span> <span class="s">Deny</span>
+      <span class="na">to</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">networks</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s">0.0.0.0/0</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -935,128 +1049,128 @@ However, a deny-all in a <strong>lower-priority</strong> ANP does not override a
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-yaml" data-lang="yaml"># corporate-external-networks-guardrail.yaml
-apiVersion: policy.networking.k8s.io/v1alpha1
-kind: AdminNetworkPolicy
-metadata:
-  name: corporate-access-external-networks-guardrail
-spec:
-  [source,yaml]
-  ----
-  # deny-all-allow-dns-monitoring-owned-namespaces.yaml
-  apiVersion: policy.networking.k8s.io/v1alpha1
-  kind: AdminNetworkPolicy
-  metadata:
-    name: deny-all-allow-dns-monitoring-owned-namespaces
-  spec:
-    priority: 99
-    subject:
-      namespaces:
-        matchLabels:
-          business.workload/owned: "true"
-    ingress:
-      - name: allow-openshift-monitoring
-        action: Allow
-        from:
-          - namespaces:
-              matchLabels:
-                kubernetes.io/metadata.name: openshift-monitoring
+<pre class="rouge highlight"><code data-lang="yaml"><span class="c1"># corporate-external-networks-guardrail.yaml</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">policy.networking.k8s.io/v1alpha1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">AdminNetworkPolicy</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">corporate-access-external-networks-guardrail</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="pi">[</span><span class="nv">source</span><span class="pi">,</span><span class="nv">yaml</span><span class="pi">]</span>
+  <span class="s">----</span>
+  <span class="s"># deny-all-allow-dns-monitoring-owned-namespaces.yaml</span>
+  <span class="s">apiVersion</span><span class="err">:</span> <span class="s">policy.networking.k8s.io/v1alpha1</span>
+  <span class="s">kind</span><span class="err">:</span> <span class="s">AdminNetworkPolicy</span>
+  <span class="s">metadata</span><span class="err">:</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">deny-all-allow-dns-monitoring-owned-namespaces</span>
+  <span class="na">spec</span><span class="pi">:</span>
+    <span class="na">priority</span><span class="pi">:</span> <span class="m">99</span>
+    <span class="na">subject</span><span class="pi">:</span>
+      <span class="na">namespaces</span><span class="pi">:</span>
+        <span class="na">matchLabels</span><span class="pi">:</span>
+          <span class="na">business.workload/owned</span><span class="pi">:</span> <span class="s2">"</span><span class="s">true"</span>
+    <span class="na">ingress</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">allow-openshift-monitoring</span>
+        <span class="na">action</span><span class="pi">:</span> <span class="s">Allow</span>
+        <span class="na">from</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="na">namespaces</span><span class="pi">:</span>
+              <span class="na">matchLabels</span><span class="pi">:</span>
+                <span class="na">kubernetes.io/metadata.name</span><span class="pi">:</span> <span class="s">openshift-monitoring</span>
 
-      - name: allow-user-workload-monitoring
-        action: Allow
-        from:
-          - namespaces:
-              matchLabels:
-                kubernetes.io/metadata.name: openshift-user-workload-monitoring
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">allow-user-workload-monitoring</span>
+        <span class="na">action</span><span class="pi">:</span> <span class="s">Allow</span>
+        <span class="na">from</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="na">namespaces</span><span class="pi">:</span>
+              <span class="na">matchLabels</span><span class="pi">:</span>
+                <span class="na">kubernetes.io/metadata.name</span><span class="pi">:</span> <span class="s">openshift-user-workload-monitoring</span>
 
-      - name: pass-from-owned-namespaces
-        action: Pass
-        from:
-          - namespaces:
-              matchLabels:
-                business.workload/owned: "true"
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">pass-from-owned-namespaces</span>
+        <span class="na">action</span><span class="pi">:</span> <span class="s">Pass</span>
+        <span class="na">from</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="na">namespaces</span><span class="pi">:</span>
+              <span class="na">matchLabels</span><span class="pi">:</span>
+                <span class="na">business.workload/owned</span><span class="pi">:</span> <span class="s2">"</span><span class="s">true"</span>
 
-      - name: deny-ingress
-        action: Deny
-        from:
-          - namespaces: {}
-    egress:
-      - name: allow-dns
-        action: Allow
-        to:
-          - namespaces:
-              matchLabels:
-                kubernetes.io/metadata.name: openshift-dns
-        ports:
-          - portNumber:
-              port: 53
-              protocol: UDP
-          - portNumber:
-              port: 53
-              protocol: TCP
-          - portNumber:
-              port: 5353
-              protocol: UDP
-          - portNumber:
-              port: 5353
-              protocol: TCP
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">deny-ingress</span>
+        <span class="na">action</span><span class="pi">:</span> <span class="s">Deny</span>
+        <span class="na">from</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="na">namespaces</span><span class="pi">:</span> <span class="pi">{}</span>
+    <span class="na">egress</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">allow-dns</span>
+        <span class="na">action</span><span class="pi">:</span> <span class="s">Allow</span>
+        <span class="na">to</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="na">namespaces</span><span class="pi">:</span>
+              <span class="na">matchLabels</span><span class="pi">:</span>
+                <span class="na">kubernetes.io/metadata.name</span><span class="pi">:</span> <span class="s">openshift-dns</span>
+        <span class="na">ports</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="na">portNumber</span><span class="pi">:</span>
+              <span class="na">port</span><span class="pi">:</span> <span class="m">53</span>
+              <span class="na">protocol</span><span class="pi">:</span> <span class="s">UDP</span>
+          <span class="pi">-</span> <span class="na">portNumber</span><span class="pi">:</span>
+              <span class="na">port</span><span class="pi">:</span> <span class="m">53</span>
+              <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
+          <span class="pi">-</span> <span class="na">portNumber</span><span class="pi">:</span>
+              <span class="na">port</span><span class="pi">:</span> <span class="m">5353</span>
+              <span class="na">protocol</span><span class="pi">:</span> <span class="s">UDP</span>
+          <span class="pi">-</span> <span class="na">portNumber</span><span class="pi">:</span>
+              <span class="na">port</span><span class="pi">:</span> <span class="m">5353</span>
+              <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
 
-      - name: pass-to-owned-namespaces
-        action: Pass
-        to:
-          - namespaces:
-              matchLabels:
-                business.workload/owned: "true"
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">pass-to-owned-namespaces</span>
+        <span class="na">action</span><span class="pi">:</span> <span class="s">Pass</span>
+        <span class="na">to</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="na">namespaces</span><span class="pi">:</span>
+              <span class="na">matchLabels</span><span class="pi">:</span>
+                <span class="na">business.workload/owned</span><span class="pi">:</span> <span class="s2">"</span><span class="s">true"</span>
 
-      - name: deny-egress
-        action: Deny
-        to:
-          - networks:
-              - 0.0.0.0/0
-  ----
-    - name: pass-from-owned-namespaces
-      action: Pass
-      from:
-        - namespaces:
-            matchLabels:
-              business.workload/owned: "true"
-    - name: deny-ingress
-      action: Deny
-      from:
-        - namespaces: {}
-  egress:
-    - name: allow-dns
-      action: Allow
-      to:
-        - namespaces:
-            matchLabels:
-              kubernetes.io/metadata.name: openshift-dns
-      ports:
-        - portNumber:
-            port: 53
-            protocol: UDP
-        - portNumber:
-            port: 53
-            protocol: TCP
-        - portNumber:
-            port: 5353
-            protocol: UDP
-        - portNumber:
-            port: 5353
-            protocol: TCP
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">deny-egress</span>
+        <span class="na">action</span><span class="pi">:</span> <span class="s">Deny</span>
+        <span class="na">to</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="na">networks</span><span class="pi">:</span>
+              <span class="pi">-</span> <span class="s">0.0.0.0/0</span>
+  <span class="s">----</span>
+    <span class="s">- name</span><span class="err">:</span> <span class="s">pass-from-owned-namespaces</span>
+      <span class="s">action</span><span class="err">:</span> <span class="s">Pass</span>
+      <span class="s">from</span><span class="err">:</span>
+        <span class="pi">-</span> <span class="na">namespaces</span><span class="pi">:</span>
+            <span class="na">matchLabels</span><span class="pi">:</span>
+              <span class="na">business.workload/owned</span><span class="pi">:</span> <span class="s2">"</span><span class="s">true"</span>
+  <span class="err">  </span><span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">deny-ingress</span>
+      <span class="na">action</span><span class="pi">:</span> <span class="s">Deny</span>
+      <span class="na">from</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">namespaces</span><span class="pi">:</span> <span class="pi">{}</span>
+  <span class="na">egress</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">allow-dns</span>
+      <span class="na">action</span><span class="pi">:</span> <span class="s">Allow</span>
+      <span class="na">to</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">namespaces</span><span class="pi">:</span>
+            <span class="na">matchLabels</span><span class="pi">:</span>
+              <span class="na">kubernetes.io/metadata.name</span><span class="pi">:</span> <span class="s">openshift-dns</span>
+      <span class="na">ports</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">portNumber</span><span class="pi">:</span>
+            <span class="na">port</span><span class="pi">:</span> <span class="m">53</span>
+            <span class="na">protocol</span><span class="pi">:</span> <span class="s">UDP</span>
+        <span class="pi">-</span> <span class="na">portNumber</span><span class="pi">:</span>
+            <span class="na">port</span><span class="pi">:</span> <span class="m">53</span>
+            <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
+        <span class="pi">-</span> <span class="na">portNumber</span><span class="pi">:</span>
+            <span class="na">port</span><span class="pi">:</span> <span class="m">5353</span>
+            <span class="na">protocol</span><span class="pi">:</span> <span class="s">UDP</span>
+        <span class="pi">-</span> <span class="na">portNumber</span><span class="pi">:</span>
+            <span class="na">port</span><span class="pi">:</span> <span class="m">5353</span>
+            <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
 
-    - name: pass-to-owned-namespaces
-      action: Pass
-      to:
-        - namespaces:
-            matchLabels:
-              business.workload/owned: "true"
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">pass-to-owned-namespaces</span>
+      <span class="na">action</span><span class="pi">:</span> <span class="s">Pass</span>
+      <span class="na">to</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">namespaces</span><span class="pi">:</span>
+            <span class="na">matchLabels</span><span class="pi">:</span>
+              <span class="na">business.workload/owned</span><span class="pi">:</span> <span class="s2">"</span><span class="s">true"</span>
 
-    - name: deny-egress
-      action: Deny
-      to:
-        - networks:
-            - 0.0.0.0/0</code></pre>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">deny-egress</span>
+      <span class="na">action</span><span class="pi">:</span> <span class="s">Deny</span>
+      <span class="na">to</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">networks</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s">0.0.0.0/0</span></code></pre>
 </div>
 </div>
 <div class="paragraph">

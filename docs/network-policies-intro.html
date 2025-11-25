@@ -435,6 +435,120 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 @media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+pre.rouge table td { padding: 5px; }
+pre.rouge table pre { margin: 0; }
+pre.rouge, pre.rouge .w {
+  color: #24292f;
+  background-color: #f6f8fa;
+}
+pre.rouge .k, pre.rouge .kd, pre.rouge .kn, pre.rouge .kp, pre.rouge .kr, pre.rouge .kt, pre.rouge .kv {
+  color: #cf222e;
+}
+pre.rouge .gr {
+  color: #f6f8fa;
+}
+pre.rouge .gd {
+  color: #82071e;
+  background-color: #ffebe9;
+}
+pre.rouge .nb {
+  color: #953800;
+}
+pre.rouge .nc {
+  color: #953800;
+}
+pre.rouge .no {
+  color: #953800;
+}
+pre.rouge .nn {
+  color: #953800;
+}
+pre.rouge .sr {
+  color: #116329;
+}
+pre.rouge .na {
+  color: #116329;
+}
+pre.rouge .nt {
+  color: #116329;
+}
+pre.rouge .gi {
+  color: #116329;
+  background-color: #dafbe1;
+}
+pre.rouge .kc {
+  color: #0550ae;
+}
+pre.rouge .l, pre.rouge .ld, pre.rouge .m, pre.rouge .mb, pre.rouge .mf, pre.rouge .mh, pre.rouge .mi, pre.rouge .il, pre.rouge .mo, pre.rouge .mx {
+  color: #0550ae;
+}
+pre.rouge .sb {
+  color: #0550ae;
+}
+pre.rouge .bp {
+  color: #0550ae;
+}
+pre.rouge .ne {
+  color: #0550ae;
+}
+pre.rouge .nl {
+  color: #0550ae;
+}
+pre.rouge .py {
+  color: #0550ae;
+}
+pre.rouge .nv, pre.rouge .vc, pre.rouge .vg, pre.rouge .vi, pre.rouge .vm {
+  color: #0550ae;
+}
+pre.rouge .o, pre.rouge .ow {
+  color: #0550ae;
+}
+pre.rouge .gh {
+  color: #0550ae;
+  font-weight: bold;
+}
+pre.rouge .gu {
+  color: #0550ae;
+  font-weight: bold;
+}
+pre.rouge .s, pre.rouge .sa, pre.rouge .sc, pre.rouge .dl, pre.rouge .sd, pre.rouge .s2, pre.rouge .se, pre.rouge .sh, pre.rouge .sx, pre.rouge .s1, pre.rouge .ss {
+  color: #0a3069;
+}
+pre.rouge .nd {
+  color: #8250df;
+}
+pre.rouge .nf, pre.rouge .fm {
+  color: #8250df;
+}
+pre.rouge .err {
+  color: #f6f8fa;
+  background-color: #82071e;
+}
+pre.rouge .c, pre.rouge .ch, pre.rouge .cd, pre.rouge .cm, pre.rouge .cp, pre.rouge .cpf, pre.rouge .c1, pre.rouge .cs {
+  color: #6e7781;
+}
+pre.rouge .gl {
+  color: #6e7781;
+}
+pre.rouge .gt {
+  color: #6e7781;
+}
+pre.rouge .ni {
+  color: #24292f;
+}
+pre.rouge .si {
+  color: #24292f;
+}
+pre.rouge .ge {
+  color: #24292f;
+  font-style: italic;
+}
+pre.rouge .gs {
+  color: #24292f;
+  font-weight: bold;
+}
+</style>
 </head>
 <body class="article">
 <div id="header">
@@ -579,15 +693,15 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-yaml" data-lang="yaml">apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: default-deny
-spec:
-  podSelector: {}
-  policyTypes:
-  - Ingress
-  - Egress</code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">networking.k8s.io/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">NetworkPolicy</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">default-deny</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">podSelector</span><span class="pi">:</span> <span class="pi">{}</span>
+  <span class="na">policyTypes</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">Ingress</span>
+  <span class="pi">-</span> <span class="s">Egress</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -614,26 +728,26 @@ spec:
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-yaml" data-lang="yaml"># ipBlock example: allow traffic from a trusted external CIDR, except a smaller excluded range
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-trusted-external
-spec:
-  podSelector:
-    matchLabels:
-      app: external-facing
-  policyTypes:
-  - Ingress
-  ingress:
-  - from:
-    - ipBlock:
-        cidr: 198.51.100.0/24
-        except:
-        - 198.51.100.128/25
-    ports:
-    - protocol: TCP
-      port: 443</code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="c1"># ipBlock example: allow traffic from a trusted external CIDR, except a smaller excluded range</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">networking.k8s.io/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">NetworkPolicy</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">allow-trusted-external</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">podSelector</span><span class="pi">:</span>
+    <span class="na">matchLabels</span><span class="pi">:</span>
+      <span class="na">app</span><span class="pi">:</span> <span class="s">external-facing</span>
+  <span class="na">policyTypes</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">Ingress</span>
+  <span class="na">ingress</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">from</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">ipBlock</span><span class="pi">:</span>
+        <span class="na">cidr</span><span class="pi">:</span> <span class="s">198.51.100.0/24</span>
+        <span class="na">except</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">198.51.100.128/25</span>
+    <span class="na">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
+      <span class="na">port</span><span class="pi">:</span> <span class="s">443</span></code></pre>
 </div>
 </div>
 </div>
@@ -650,19 +764,9 @@ spec:
 <div class="sect1">
 <h2 id="_pattern_deny_all_non_whitelisted_traffic_to_a_namespace">3. Pattern: DENY All Non-Whitelisted Traffic to a Namespace</h2>
 <div class="sectionbody">
-<div class="listingblock">
+<div class="imageblock">
 <div class="content">
-<pre>flowchart LR
-  subgraph ns_other ["namespace other"]
-    Blog[app=blog]
-  end
-  subgraph ns_default ["namespace default"]
-    API[app=api]
-    Guest[app=guestbook]
-  end
-  Blog -.-&gt; Guest
-  Blog -. ❌ .-&gt; API
-  API -. ❌ .-&gt; Guest</pre>
+<img src="diag-mermaid-md5-976f55ba709d65b3244a7a3c68aaa64a.png" alt="Diagram" width="665" height="191">
 </div>
 </div>
 <div class="dlist">
@@ -702,28 +806,28 @@ spec:
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-yaml" data-lang="yaml"># Allow only blog pods from namespace 'other' to reach guestbook
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-blog-to-guestbook
-spec:
-  podSelector:
-    matchLabels:
-      app: guestbook
-  policyTypes:
-  - Ingress
-  ingress:
-  - from:
-    - namespaceSelector:
-        matchLabels:
-          name: other
-      podSelector:
-        matchLabels:
-          app: blog
-    ports:
-    - protocol: TCP
-      port: 8080</code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="c1"># Allow only blog pods from namespace 'other' to reach guestbook</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">networking.k8s.io/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">NetworkPolicy</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">allow-blog-to-guestbook</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">podSelector</span><span class="pi">:</span>
+    <span class="na">matchLabels</span><span class="pi">:</span>
+      <span class="na">app</span><span class="pi">:</span> <span class="s">guestbook</span>
+  <span class="na">policyTypes</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">Ingress</span>
+  <span class="na">ingress</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">from</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">namespaceSelector</span><span class="pi">:</span>
+        <span class="na">matchLabels</span><span class="pi">:</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">other</span>
+      <span class="na">podSelector</span><span class="pi">:</span>
+        <span class="na">matchLabels</span><span class="pi">:</span>
+          <span class="na">app</span><span class="pi">:</span> <span class="s">blog</span>
+    <span class="na">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
+      <span class="na">port</span><span class="pi">:</span> <span class="s">8080</span></code></pre>
 </div>
 </div>
 </div>
@@ -731,14 +835,9 @@ spec:
 <div class="sect1">
 <h2 id="_pattern_limit_traffic_to_an_application">4. Pattern: LIMIT Traffic to an Application</h2>
 <div class="sectionbody">
-<div class="listingblock">
+<div class="imageblock">
 <div class="content">
-<pre>flowchart LR
-  Coffee[app=coffeeshop\\nrole=api]
-  BookAPI[app=bookstore\\nrole=api]
-  BookFE[app=bookstore\\nrole=frontend]
-  BookAPI -.-&gt; BookFE
-  Coffee -. ❌ .-&gt; BookAPI</pre>
+<img src="diag-mermaid-md5-80496e24c4743d4c187eacc0a0d4816c.png" alt="Diagram" width="784" height="62">
 </div>
 </div>
 <div class="dlist">
@@ -763,26 +862,26 @@ spec:
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-yaml" data-lang="yaml"># Allow frontend role to call bookstore API on port 8080 only
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-frontend-to-bookapi
-spec:
-  podSelector:
-    matchLabels:
-      app: bookstore
-      role: api
-  policyTypes:
-  - Ingress
-  ingress:
-  - from:
-    - podSelector:
-        matchLabels:
-          role: frontend
-    ports:
-    - protocol: TCP
-      port: 8080</code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="c1"># Allow frontend role to call bookstore API on port 8080 only</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">networking.k8s.io/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">NetworkPolicy</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">allow-frontend-to-bookapi</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">podSelector</span><span class="pi">:</span>
+    <span class="na">matchLabels</span><span class="pi">:</span>
+      <span class="na">app</span><span class="pi">:</span> <span class="s">bookstore</span>
+      <span class="na">role</span><span class="pi">:</span> <span class="s">api</span>
+  <span class="na">policyTypes</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">Ingress</span>
+  <span class="na">ingress</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">from</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">podSelector</span><span class="pi">:</span>
+        <span class="na">matchLabels</span><span class="pi">:</span>
+          <span class="na">role</span><span class="pi">:</span> <span class="s">frontend</span>
+    <span class="na">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
+      <span class="na">port</span><span class="pi">:</span> <span class="s">8080</span></code></pre>
 </div>
 </div>
 </div>
@@ -790,25 +889,9 @@ spec:
 <div class="sect1">
 <h2 id="_pattern_deny_all_traffic_from_other_namespaces">5. Pattern: DENY All Traffic from Other Namespaces</h2>
 <div class="sectionbody">
-<div class="listingblock">
+<div class="imageblock">
 <div class="content">
-<pre>flowchart LR
-  subgraph ns_foo ["namespace: foo"]
-    FooPod[Any Pod]
-  end
-  subgraph ns_default ["namespace: default"]
-    Web[app=web]
-    DB[app=db]
-  end
-  subgraph ns_bar ["namespace: bar"]
-    BarPod[Any Pod]
-  end
-  Web -.-&gt; DB
-  DB -.-&gt; Web
-  FooPod -. ❌ .-&gt; Web
-  FooPod -. ❌ .-&gt; DB
-  BarPod -. ❌ .-&gt; Web
-  BarPod -. ❌ .-&gt; DB</pre>
+<img src="diag-mermaid-md5-47cd303430ee5a28bd2f5c305df9f373.png" alt="Diagram" width="590" height="343">
 </div>
 </div>
 <div class="dlist">
@@ -833,20 +916,20 @@ spec:
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-yaml" data-lang="yaml"># Allow only same-namespace pods to reach web service
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-same-namespace-to-web
-spec:
-  podSelector:
-    matchLabels:
-      app: web
-  policyTypes:
-  - Ingress
-  ingress:
-  - from:
-    - podSelector: {}</code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="c1"># Allow only same-namespace pods to reach web service</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">networking.k8s.io/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">NetworkPolicy</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">allow-same-namespace-to-web</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">podSelector</span><span class="pi">:</span>
+    <span class="na">matchLabels</span><span class="pi">:</span>
+      <span class="na">app</span><span class="pi">:</span> <span class="s">web</span>
+  <span class="na">policyTypes</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">Ingress</span>
+  <span class="na">ingress</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">from</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">podSelector</span><span class="pi">:</span> <span class="pi">{}</span></code></pre>
 </div>
 </div>
 </div>
@@ -854,16 +937,9 @@ spec:
 <div class="sect1">
 <h2 id="_pattern_allow_traffic_only_to_a_metrics_port">6. Pattern: ALLOW Traffic Only to a Metrics Port</h2>
 <div class="sectionbody">
-<div class="listingblock">
+<div class="imageblock">
 <div class="content">
-<pre>flowchart LR
-  Prom[app=prometheus\\nrole=monitoring]
-  subgraph API ["app=api"]
-    Metrics[":5000 (metrics)"]
-    HTTP[":8000 (http)"]
-  end
-  Prom -.-&gt; Metrics
-  Prom -. ❌ .-&gt; HTTP</pre>
+<img src="diag-mermaid-md5-8c944efeb0d15de71e5228b50d7d33f6.png" alt="Diagram" width="614" height="244">
 </div>
 </div>
 <div class="dlist">
@@ -888,25 +964,25 @@ spec:
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-yaml" data-lang="yaml"># Allow Prometheus monitoring pods to scrape metrics port 5000
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-prometheus-metrics
-spec:
-  podSelector:
-    matchLabels:
-      app: api
-  policyTypes:
-  - Ingress
-  ingress:
-  - from:
-    - podSelector:
-        matchLabels:
-          role: monitoring
-    ports:
-    - protocol: TCP
-      port: 5000</code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="c1"># Allow Prometheus monitoring pods to scrape metrics port 5000</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">networking.k8s.io/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">NetworkPolicy</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">allow-prometheus-metrics</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">podSelector</span><span class="pi">:</span>
+    <span class="na">matchLabels</span><span class="pi">:</span>
+      <span class="na">app</span><span class="pi">:</span> <span class="s">api</span>
+  <span class="na">policyTypes</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">Ingress</span>
+  <span class="na">ingress</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">from</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">podSelector</span><span class="pi">:</span>
+        <span class="na">matchLabels</span><span class="pi">:</span>
+          <span class="na">role</span><span class="pi">:</span> <span class="s">monitoring</span>
+    <span class="na">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
+      <span class="na">port</span><span class="pi">:</span> <span class="s">5000</span></code></pre>
 </div>
 </div>
 </div>
@@ -914,18 +990,9 @@ spec:
 <div class="sect1">
 <h2 id="_pattern_deny_external_egress_traffic">7. Pattern: DENY External Egress Traffic</h2>
 <div class="sectionbody">
-<div class="listingblock">
+<div class="imageblock">
 <div class="content">
-<pre>flowchart LR
-  subgraph ns_default ["namespace: default"]
-    App1[app=web]
-    App2[app=db]
-  end
-  External[External services / Internet]
-  App1 -.-&gt; App2
-  App2 -.-&gt; App1
-  App1 -. ❌ .-&gt; External
-  App2 -. ❌ .-&gt; External</pre>
+<img src="diag-mermaid-md5-d9f56ae9cfee1884a30d97de344679b2.png" alt="Diagram" width="681" height="192">
 </div>
 </div>
 <div class="dlist">
@@ -950,20 +1017,20 @@ spec:
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-yaml" data-lang="yaml"># Deny external egress except internal namespace and a trusted CIDR (example)
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: restrict-egress
-spec:
-  podSelector: {}
-  policyTypes:
-  - Egress
-  egress:
-  - to:
-    - podSelector: {}
-    - ipBlock:
-        cidr: 10.0.0.0/16</code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="c1"># Deny external egress except internal namespace and a trusted CIDR (example)</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">networking.k8s.io/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">NetworkPolicy</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">restrict-egress</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">podSelector</span><span class="pi">:</span> <span class="pi">{}</span>
+  <span class="na">policyTypes</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">Egress</span>
+  <span class="na">egress</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">to</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">podSelector</span><span class="pi">:</span> <span class="pi">{}</span>
+    <span class="pi">-</span> <span class="na">ipBlock</span><span class="pi">:</span>
+        <span class="na">cidr</span><span class="pi">:</span> <span class="s">10.0.0.0/16</span></code></pre>
 </div>
 </div>
 </div>
@@ -971,20 +1038,9 @@ spec:
 <div class="sect1">
 <h2 id="_pattern_deny_all_inbound_to_an_application_except_specific_source">8. Pattern: DENY All Inbound to an Application (Except Specific Source)</h2>
 <div class="sectionbody">
-<div class="listingblock">
+<div class="imageblock">
 <div class="content">
-<pre>flowchart LR
-  subgraph ns_default ["namespace: default"]
-    Web[app=web]
-  end
-  subgraph ns_foo ["namespace: foo"]
-    FooPod[Any Pod]
-  end
-  AnyOther[Any Pod]
-  FooPod -.-&gt; Web
-  Web -.-&gt; AnyOther
-  Web -. ❌ .-&gt; FooPod
-  Web -. ❌ .-&gt; AnyOther</pre>
+<img src="diag-mermaid-md5-92e81a575a1811663c9550286f8f819a.png" alt="Diagram" width="427" height="243">
 </div>
 </div>
 <div class="dlist">
@@ -1009,25 +1065,25 @@ spec:
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-yaml" data-lang="yaml"># Allow only FooPod from namespace 'foo' to reach web
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: allow-foo-to-web
-spec:
-  podSelector:
-    matchLabels:
-      app: web
-  policyTypes:
-  - Ingress
-  ingress:
-  - from:
-    - namespaceSelector:
-        matchLabels:
-          name: foo
-      podSelector:
-        matchLabels:
-          app: foo-pod</code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="c1"># Allow only FooPod from namespace 'foo' to reach web</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">networking.k8s.io/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">NetworkPolicy</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">allow-foo-to-web</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">podSelector</span><span class="pi">:</span>
+    <span class="na">matchLabels</span><span class="pi">:</span>
+      <span class="na">app</span><span class="pi">:</span> <span class="s">web</span>
+  <span class="na">policyTypes</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">Ingress</span>
+  <span class="na">ingress</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">from</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">namespaceSelector</span><span class="pi">:</span>
+        <span class="na">matchLabels</span><span class="pi">:</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">foo</span>
+      <span class="na">podSelector</span><span class="pi">:</span>
+        <span class="na">matchLabels</span><span class="pi">:</span>
+          <span class="na">app</span><span class="pi">:</span> <span class="s">foo-pod</span></code></pre>
 </div>
 </div>
 </div>

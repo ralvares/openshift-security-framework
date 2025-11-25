@@ -435,6 +435,120 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 @media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+pre.rouge table td { padding: 5px; }
+pre.rouge table pre { margin: 0; }
+pre.rouge, pre.rouge .w {
+  color: #24292f;
+  background-color: #f6f8fa;
+}
+pre.rouge .k, pre.rouge .kd, pre.rouge .kn, pre.rouge .kp, pre.rouge .kr, pre.rouge .kt, pre.rouge .kv {
+  color: #cf222e;
+}
+pre.rouge .gr {
+  color: #f6f8fa;
+}
+pre.rouge .gd {
+  color: #82071e;
+  background-color: #ffebe9;
+}
+pre.rouge .nb {
+  color: #953800;
+}
+pre.rouge .nc {
+  color: #953800;
+}
+pre.rouge .no {
+  color: #953800;
+}
+pre.rouge .nn {
+  color: #953800;
+}
+pre.rouge .sr {
+  color: #116329;
+}
+pre.rouge .na {
+  color: #116329;
+}
+pre.rouge .nt {
+  color: #116329;
+}
+pre.rouge .gi {
+  color: #116329;
+  background-color: #dafbe1;
+}
+pre.rouge .kc {
+  color: #0550ae;
+}
+pre.rouge .l, pre.rouge .ld, pre.rouge .m, pre.rouge .mb, pre.rouge .mf, pre.rouge .mh, pre.rouge .mi, pre.rouge .il, pre.rouge .mo, pre.rouge .mx {
+  color: #0550ae;
+}
+pre.rouge .sb {
+  color: #0550ae;
+}
+pre.rouge .bp {
+  color: #0550ae;
+}
+pre.rouge .ne {
+  color: #0550ae;
+}
+pre.rouge .nl {
+  color: #0550ae;
+}
+pre.rouge .py {
+  color: #0550ae;
+}
+pre.rouge .nv, pre.rouge .vc, pre.rouge .vg, pre.rouge .vi, pre.rouge .vm {
+  color: #0550ae;
+}
+pre.rouge .o, pre.rouge .ow {
+  color: #0550ae;
+}
+pre.rouge .gh {
+  color: #0550ae;
+  font-weight: bold;
+}
+pre.rouge .gu {
+  color: #0550ae;
+  font-weight: bold;
+}
+pre.rouge .s, pre.rouge .sa, pre.rouge .sc, pre.rouge .dl, pre.rouge .sd, pre.rouge .s2, pre.rouge .se, pre.rouge .sh, pre.rouge .sx, pre.rouge .s1, pre.rouge .ss {
+  color: #0a3069;
+}
+pre.rouge .nd {
+  color: #8250df;
+}
+pre.rouge .nf, pre.rouge .fm {
+  color: #8250df;
+}
+pre.rouge .err {
+  color: #f6f8fa;
+  background-color: #82071e;
+}
+pre.rouge .c, pre.rouge .ch, pre.rouge .cd, pre.rouge .cm, pre.rouge .cp, pre.rouge .cpf, pre.rouge .c1, pre.rouge .cs {
+  color: #6e7781;
+}
+pre.rouge .gl {
+  color: #6e7781;
+}
+pre.rouge .gt {
+  color: #6e7781;
+}
+pre.rouge .ni {
+  color: #24292f;
+}
+pre.rouge .si {
+  color: #24292f;
+}
+pre.rouge .ge {
+  color: #24292f;
+  font-style: italic;
+}
+pre.rouge .gs {
+  color: #24292f;
+  font-weight: bold;
+}
+</style>
 </head>
 <body class="article">
 <div id="header">
@@ -522,54 +636,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="paragraph">
 <p>This diagram shows a typical OpenShift deployment where separate compute node pools (DMZ, general-purpose, secured) segregate workloads and network exposure. We explain architecture first so the NetworkPolicy examples have context, placement and ingress controller topology influence policy scope.</p>
 </div>
-<div class="listingblock">
+<div class="imageblock">
 <div class="content">
-<pre>flowchart LR
-  Internet --&gt; EdgeLB[External load balancer]
-  EdgeLB --&gt; IngressDMZ[Ingress traffic to DMZ pool]
-  EdgeLB --&gt; IngressA[Ingress traffic to general pool]
-  EdgeLB --&gt; IngressB[Ingress traffic to secured pool]
-  subgraph OpenShift Cluster
-    direction LR
-    subgraph Control_Planes
-      CP[Control planes]
-    end
-    subgraph Compute_Pools
-      direction LR
-      subgraph DMZ_Pool[DMZ pool]
-        IC_DMZ[Ingress controller - DMZ]
-        D1[Workload DMZ1]
-        D2[Workload DMZ2]
-      end
-      subgraph General_Pool[General-purpose pool]
-        ICA[Ingress controller - general]
-        A1[Workload G1]
-        A2[Workload G2]
-      end
-      subgraph Secured_Pool[Secured pool]
-        ICB[Ingress controller - secured]
-        B1[Workload S1]
-        B2[Workload S2]
-      end
-    end
-  end
-  IngressDMZ --&gt; IC_DMZ
-  IC_DMZ --&gt; D1
-  IC_DMZ --&gt; D2
-  IngressA --&gt; ICA
-  ICA --&gt; A1
-  ICA --&gt; A2
-  IngressB --&gt; ICB
-  ICB --&gt; B1
-  ICB --&gt; B2
-  Bastion[Bastion host] --&gt; CP
-  ExternalServices[External services]
-  D1 --&gt; ExternalServices
-  D2 --&gt; ExternalServices
-  A1 --&gt; ExternalServices
-  A2 --&gt; ExternalServices
-  B1 --&gt; ExternalServices
-  B2 --&gt; ExternalServices</pre>
+<img src="diag-mermaid-md5-bb3955bedfd265d44f21ea05e41815cf.png" alt="Diagram" width="784" height="501">
 </div>
 </div>
 <div class="paragraph">
@@ -601,19 +670,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sect1">
 <h2 id="_pattern_deny_all_non_whitelisted_traffic_to_a_namespace">4. Pattern: DENY All Non-Whitelisted Traffic to a Namespace</h2>
 <div class="sectionbody">
-<div class="listingblock">
+<div class="imageblock">
 <div class="content">
-<pre>flowchart LR
-  subgraph ns_other ["namespace other"]
-    Blog[app=blog]
-  end
-  subgraph ns_default ["namespace default"]
-    API[app=api]
-    Guest[app=guestbook]
-  end
-  Blog -.-&gt; Guest
-  Blog -. ❌ .-&gt; API
-  API -. ❌ .-&gt; Guest</pre>
+<img src="diag-mermaid-md5-976f55ba709d65b3244a7a3c68aaa64a.png" alt="Diagram" width="665" height="191">
 </div>
 </div>
 <div class="dlist">
@@ -656,14 +715,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sect1">
 <h2 id="_pattern_limit_traffic_to_an_application">5. Pattern: LIMIT Traffic to an Application</h2>
 <div class="sectionbody">
-<div class="listingblock">
+<div class="imageblock">
 <div class="content">
-<pre>flowchart LR
-  Coffee[app=coffeeshop\\nrole=api]
-  BookAPI[app=bookstore\\nrole=api]
-  BookFE[app=bookstore\\nrole=frontend]
-  BookAPI -.-&gt; BookFE
-  Coffee -. ❌ .-&gt; BookAPI</pre>
+<img src="diag-mermaid-md5-80496e24c4743d4c187eacc0a0d4816c.png" alt="Diagram" width="784" height="62">
 </div>
 </div>
 <div class="dlist">
@@ -691,25 +745,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sect1">
 <h2 id="_pattern_deny_all_traffic_from_other_namespaces">6. Pattern: DENY All Traffic from Other Namespaces</h2>
 <div class="sectionbody">
-<div class="listingblock">
+<div class="imageblock">
 <div class="content">
-<pre>flowchart LR
-  subgraph ns_foo ["namespace: foo"]
-    FooPod[Any Pod]
-  end
-  subgraph ns_default ["namespace: default"]
-    Web[app=web]
-    DB[app=db]
-  end
-  subgraph ns_bar ["namespace: bar"]
-    BarPod[Any Pod]
-  end
-  Web -.-&gt; DB
-  DB -.-&gt; Web
-  FooPod -. ❌ .-&gt; Web
-  FooPod -. ❌ .-&gt; DB
-  BarPod -. ❌ .-&gt; Web
-  BarPod -. ❌ .-&gt; DB</pre>
+<img src="diag-mermaid-md5-47cd303430ee5a28bd2f5c305df9f373.png" alt="Diagram" width="590" height="343">
 </div>
 </div>
 <div class="dlist">
@@ -737,16 +775,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sect1">
 <h2 id="_pattern_allow_traffic_only_to_a_metrics_port">7. Pattern: ALLOW Traffic Only to a Metrics Port</h2>
 <div class="sectionbody">
-<div class="listingblock">
+<div class="imageblock">
 <div class="content">
-<pre>flowchart LR
-  Prom[app=prometheus\\nrole=monitoring]
-  subgraph API ["app=api"]
-    Metrics[":5000 (metrics)"]
-    HTTP[":8000 (http)"]
-  end
-  Prom -.-&gt; Metrics
-  Prom -. ❌ .-&gt; HTTP</pre>
+<img src="diag-mermaid-md5-8c944efeb0d15de71e5228b50d7d33f6.png" alt="Diagram" width="614" height="244">
 </div>
 </div>
 <div class="dlist">
@@ -774,18 +805,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sect1">
 <h2 id="_pattern_deny_external_egress_traffic">8. Pattern: DENY External Egress Traffic</h2>
 <div class="sectionbody">
-<div class="listingblock">
+<div class="imageblock">
 <div class="content">
-<pre>flowchart LR
-  subgraph ns_default ["namespace: default"]
-    App1[app=web]
-    App2[app=db]
-  end
-  External[External services / Internet]
-  App1 -.-&gt; App2
-  App2 -.-&gt; App1
-  App1 -. ❌ .-&gt; External
-  App2 -. ❌ .-&gt; External</pre>
+<img src="diag-mermaid-md5-d9f56ae9cfee1884a30d97de344679b2.png" alt="Diagram" width="681" height="192">
 </div>
 </div>
 <div class="dlist">
@@ -813,20 +835,9 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sect1">
 <h2 id="_pattern_deny_all_inbound_to_an_application_except_specific_source">9. Pattern: DENY All Inbound to an Application (Except Specific Source)</h2>
 <div class="sectionbody">
-<div class="listingblock">
+<div class="imageblock">
 <div class="content">
-<pre>flowchart LR
-  subgraph ns_default ["namespace: default"]
-    Web[app=web]
-  end
-  subgraph ns_foo ["namespace: foo"]
-    FooPod[Any Pod]
-  end
-  AnyOther[Any Pod]
-  FooPod -.-&gt; Web
-  Web -.-&gt; AnyOther
-  Web -. ❌ .-&gt; FooPod
-  Web -. ❌ .-&gt; AnyOther</pre>
+<img src="diag-mermaid-md5-92e81a575a1811663c9550286f8f819a.png" alt="Diagram" width="427" height="243">
 </div>
 </div>
 <div class="dlist">
@@ -882,11 +893,11 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="sectionbody">
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-sh" data-lang="sh"># Test an allowed path
-oc exec pod/frontend -- curl -s -o /dev/null -w '%{http_code}\n' http://api:8080
+<pre class="rouge highlight"><code data-lang="sh"><span class="c"># Test an allowed path</span>
+oc <span class="nb">exec </span>pod/frontend <span class="nt">--</span> curl <span class="nt">-s</span> <span class="nt">-o</span> /dev/null <span class="nt">-w</span> <span class="s1">'%{http_code}\n'</span> http://api:8080
 
-# Test a blocked path with timeout fallback
-oc exec pod/untrusted -- curl -s --max-time 3 http://api:8080 || echo BLOCKED</code></pre>
+<span class="c"># Test a blocked path with timeout fallback</span>
+oc <span class="nb">exec </span>pod/untrusted <span class="nt">--</span> curl <span class="nt">-s</span> <span class="nt">--max-time</span> 3 http://api:8080 <span class="o">||</span> <span class="nb">echo </span>BLOCKED</code></pre>
 </div>
 </div>
 </div>
