@@ -7,10 +7,7 @@
 == Network Policies
 
 === 1. What Are Network Policies
-
-NetworkPolicies control which pods can talk to which pods, and which external networks they’re allowed to reach. They operate at the Kubernetes API/network-plugin layer using labels and selectors; they do not replace node-level or cloud firewall rules, but they are the native, in-cluster mechanism for segmentation.
-
-If you don’t define any NetworkPolicies, your cluster behaves like the "everything talks to everything" house: pods can freely connect to each other and to external IPs unless other layers restrict them. Modern clusters need segmentation; NetworkPolicies are the native way to build it.
+ 
 
 === 2. How to Write Network Policies
 
@@ -79,8 +76,7 @@ spec:
 ----
 
 An empty `podSelector: {}` selects all pods in the namespace and activates the deny-by-default behavior for the listed `policyTypes`.
-
-=== 6. Modern Additions and Operational Notes
+ 
 
 * `ipBlock` for external networks - CIDR-based allowances for external destinations/sources.
 * DNS is not implicitly allowed; egress to DNS (e.g., 53/UDP) must be explicitly permitted when needed.
@@ -169,9 +165,9 @@ spec:
 [mermaid]
 ----
 flowchart LR
-  Coffee[app=coffeeshop\\nrole=api]
-  BookAPI[app=bookstore\\nrole=api]
-  BookFE[app=bookstore\\nrole=frontend]
+  Coffee["app=coffeeshop<br>role=api"]
+  BookAPI["app=bookstore<br>role=api"]
+  BookFE["app=bookstore<br>role=frontend"]
   BookAPI -.-> BookFE
   Coffee -. ❌ .-> BookAPI
 ----
@@ -252,7 +248,7 @@ spec:
 [mermaid]
 ----
 flowchart LR
-  Prom[app=prometheus\\nrole=monitoring]
+  Prom["app=prometheus<br>role=monitoring"]
   subgraph API ["app=api"]
     Metrics[":5000 (metrics)"]
     HTTP[":8000 (http)"]

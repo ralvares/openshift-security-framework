@@ -563,7 +563,6 @@ pre.rouge .gs {
 <li><a href="#_3_anatomy_of_a_networkpolicy">1.3. 3. Anatomy of a NetworkPolicy</a></li>
 <li><a href="#_4_how_networkpolicies_work_the_rules">1.4. 4. How NetworkPolicies Work (The Rules)</a></li>
 <li><a href="#_5_deny_all_example">1.5. 5. Deny-All Example</a></li>
-<li><a href="#_6_modern_additions_and_operational_notes">1.6. 6. Modern Additions and Operational Notes</a></li>
 </ul>
 </li>
 <li><a href="#_pattern_format">2. Pattern Format</a>
@@ -586,12 +585,7 @@ pre.rouge .gs {
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_1_what_are_network_policies">1.1. 1. What Are Network Policies</h3>
-<div class="paragraph">
-<p>NetworkPolicies control which pods can talk to which pods, and which external networks they’re allowed to reach. They operate at the Kubernetes API/network-plugin layer using labels and selectors; they do not replace node-level or cloud firewall rules, but they are the native, in-cluster mechanism for segmentation.</p>
-</div>
-<div class="paragraph">
-<p>If you don’t define any NetworkPolicies, your cluster behaves like the "everything talks to everything" house: pods can freely connect to each other and to external IPs unless other layers restrict them. Modern clusters need segmentation; NetworkPolicies are the native way to build it.</p>
-</div>
+
 </div>
 <div class="sect2">
 <h3 id="_2_how_to_write_network_policies">1.2. 2. How to Write Network Policies</h3>
@@ -710,9 +704,6 @@ pre.rouge .gs {
 <div class="paragraph">
 <p>An empty <code>podSelector: {}</code> selects all pods in the namespace and activates the deny-by-default behavior for the listed <code>policyTypes</code>.</p>
 </div>
-</div>
-<div class="sect2">
-<h3 id="_6_modern_additions_and_operational_notes">1.6. 6. Modern Additions and Operational Notes</h3>
 <div class="ulist">
 <ul>
 <li>
@@ -835,7 +826,7 @@ pre.rouge .gs {
 <h3 id="_pattern_limit_traffic_to_an_application">2.2. Pattern: LIMIT Traffic to an Application</h3>
 <div class="imageblock">
 <div class="content">
-<img src="diag-mermaid-md5-80496e24c4743d4c187eacc0a0d4816c.png" alt="Diagram" width="784" height="62">
+<img src="diag-mermaid-md5-8e6c38a4c2a10ccb21c27d54603d1ba8.png" alt="Diagram" width="640" height="94">
 </div>
 </div>
 <div class="dlist">
@@ -933,7 +924,7 @@ pre.rouge .gs {
 <h3 id="_pattern_allow_traffic_only_to_a_metrics_port">2.4. Pattern: ALLOW Traffic Only to a Metrics Port</h3>
 <div class="imageblock">
 <div class="content">
-<img src="diag-mermaid-md5-8c944efeb0d15de71e5228b50d7d33f6.png" alt="Diagram" width="614" height="244">
+<img src="diag-mermaid-md5-409a628fed7b936e8c1297a71c08a3ba.png" alt="Diagram" width="485" height="244">
 </div>
 </div>
 <div class="dlist">
@@ -1100,7 +1091,7 @@ pre.rouge .gs {
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-11-25 14:39:51 +0400
+Last updated 2025-11-25 14:44:40 +0400
 </div>
 </div>
 </body>
