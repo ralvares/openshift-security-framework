@@ -6,10 +6,53 @@
 
 == Network Policies
 
-=== 1. What Are Network Policies
- 
+=== What Are Network Policies
 
-=== 2. How to Write Network Policies
+By default, Kubernetes behaves as if it trusts everything in your cluster. All pods can talk to all other pods, on all ports, at all times.
+
+Network Policies flip this around. They let you define, at L3/L4 (IP + port):
+
+* Which pods may receive traffic (Ingress)
+
+* Which pods may send traffic (Egress)
+
+* Which namespaces or external IPs are allowed
+
+* Which ports and protocols are open
+
+If your namespace has no Network Policies, then:
+
+* All pods are considered non-isolated
+
+* All traffic is allowed in and out
+
+This is still true in the latest GA API.
+
+Once any NetworkPolicy selects a pod for ingress or egress isolation, that traffic direction becomes restricted, and you must explicitly allow what you want.
+
+A NetworkPolicy flips that model:
+
+* It selects a group of pods
+
+* It defines whether we’re controlling ingress, egress, or both
+
+* It lists exactly who is allowed to communicate
+
+Anything not explicitly allowed becomes denied.
+
+NetworkPolicies give you:
+
+* Isolation — pods only receive the traffic you approve
+
+* Least privilege — each workload gets the minimal network access it needs
+
+* Auditability — allowed flows are declared in YAML and tracked in Git
+
+* Segmentation — clean boundaries between teams, apps, and environments
+
+In short: NetworkPolicies turn Kubernetes traffic from “anything goes” to “only what we approve.”
+
+=== How to Write Network Policies
 
 Writing NetworkPolicies starts with labels and selectors.
 
@@ -34,7 +77,7 @@ Kubernetes supports these source/destination selectors:
 
 `ipBlock` allows policies to explicitly allow or deny external CIDRs (note: NetworkPolicies are allow-only; ipBlock entries are used to permit external ranges).
 
-=== 3. Anatomy of a NetworkPolicy
+=== Anatomy of a NetworkPolicy
 
 Every NetworkPolicy answers three questions:
 
@@ -44,7 +87,7 @@ Every NetworkPolicy answers three questions:
 
 The GA structure is familiar and stable: policies select pods and express allow rules for ingress and/or egress.
 
-=== 4. How NetworkPolicies Work (The Rules)
+=== How NetworkPolicies Work (The Rules)
 
 We modernize the wording but keep the conceptual rules intact.
 
@@ -58,7 +101,7 @@ Rule 4 - Rules within a policy are OR’ed: matching any rule is sufficient to a
 
 Rule 5 - Policies are namespace-scoped. Cross-namespace flows require `namespaceSelector` to permit traffic across namespace boundaries.
 
-=== 5. Deny-All Example
+=== Deny-All Example
 
 A default-deny policy is still the recommended first step to move pods into an explicit isolation posture:
 
