@@ -18,32 +18,40 @@
     This page provides quick access to the main documentation topics for OpenShift Network Policies. Each section below includes a link and a brief overview of the content, focused on cluster, admin, and developer network policy controls and workflows.
   </p>
 
+  <h2>Network Policies</h2>
   <div class="doc-link">
-    <h2><a href="adminnetworkpolicies.html">Admin Network Policies</a></h2>
-    <p>
-      Comprehensive guide to the AdminNetworkPolicy (ANP) and BaselineAdminNetworkPolicy (BANP) model in OpenShift. Explains the cluster perimeter, default-deny posture, how admin and developer policies interact, and provides examples and best practices for enforcing network security at scale.
-    </p>
+    <h3><a href="network-policies-intro.html">Network Policies - Intro</a></h3>
+    <p>Compact primer on Kubernetes NetworkPolicies: labels, selectors, deny-by-default, and core patterns with YAML examples.</p>
   </div>
 
+  <h2>Compliance Operator</h2>
   <div class="doc-link">
-    <h2><a href="externalNameService.html">ExternalName Service Egress Control</a></h2>
-    <p>
-      Describes how to securely enable egress to external services (such as APIs) using the ExternalName pattern. Focuses on using AdminNetworkPolicy to allow egress only for approved namespaces, with clear, auditable controls for external connectivity.
-    </p>
+    <h3><a href="compliance-operator-custom.html">Compliance Operator - Customization</a></h3>
+    <p>Practical examples and templates for tailoring the Compliance Operator to your environment and policies.</p>
   </div>
 
+  <h2>Admin Policies</h2>
   <div class="doc-link">
-    <h2><a href="onboarding.html">Onboarding Workflow</a></h2>
-    <p>
-      Step-by-step onboarding process for application teams and administrators. Covers namespace preparation, policy enforcement, requesting exceptions (like kube-API or corporate egress), and explains the developer experience under the enforced security model.
-    </p>
+    <h3><a href="adminnetworkpolicies.html">Admin Network Policies</a></h3>
+    <p>Comprehensive guide to AdminNetworkPolicy (ANP) and BaselineAdminNetworkPolicy (BANP): cluster perimeter, default-deny posture and best practices.</p>
+  </div>
+  <div class="doc-link">
+    <h3><a href="externalNameService.html">ExternalName Service Egress Control</a></h3>
+    <p>How to securely enable egress to external services using ExternalName and AdminNetworkPolicy controls.</p>
+  </div>
+  <div class="doc-link">
+    <h3><a href="onboarding.html">Onboarding Workflow</a></h3>
+    <p>Namespace preparation, policy enforcement, and the developer experience under enforced security.</p>
+  </div>
+  <div class="doc-link">
+    <h3><a href="plan.html">Operationalization Plan</a></h3>
+    <p>Phased approach to rolling out and governing network security controls and AdminNetworkPolicy lifecycle.</p>
   </div>
 
+  <h2>Extra Topics</h2>
   <div class="doc-link">
-    <h2><a href="plan.html">Operationalization Plan</a></h2>
-    <p>
-      Outlines the phased approach to rolling out and governing network security controls in OpenShift. Details objectives, principles, governance lifecycle, and how to maintain and evolve the AdminNetworkPolicy suite over time.
-    </p>
+    <h3><a href="coo.html">CCO - Compliance & Customization Overview</a></h3>
+    <p>High-level guidance for customizing the compliance-operator, profiles, and integrations for scan automation.</p>
   </div>
 </body>
 </html>
