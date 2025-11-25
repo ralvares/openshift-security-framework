@@ -1,0 +1,806 @@
+= Kubernetes Security Playbook: Addressing the Top 10 Risks
+
+This playbook provides a high-level guide for addressing the Kubernetes Top 10 security risks within OpenShift environments, leveraging Red Hat Advanced Cluster Security (RHACS) capabilities. It is designed for pre-sales engineers, developers, platform administrators, and security teams to implement robust security practices. The focus is on Kubernetes and OpenShift native features, integrated with RHACS for threat detection, compliance enforcement, and operational visibility.
+
+The playbook covers each of the Top 10 risks with intent, associated risks, required controls, operational practices, evidence patterns, and common failure modes. It emphasizes first-class treatment of Multus/User-Defined Networks (UDN), Service Mesh, and GitOps workflows. Key areas such as image trust, workload hardening, RBAC, network segmentation, resource governance, vulnerability lifecycle management, runtime threat detection, secret exposure prevention, logging and evidence collection, and compute zone classification are integrated throughout.
+
+Operator roles are defined as follows:
+
+- *Developer*: Responsible for application code, container images, and workload definitions.
+- *Platform Administrator*: Manages cluster infrastructure, networking, and policy enforcement.
+- *Security Team*: Oversees threat detection, incident response, and security policy design.
+- *Pre-Sales Engineer*: Advises on solution architecture and risk mitigation strategies during sales engagements.
+
+== 1. Misconfigurations
+
+*Intent*: Ensure cluster and workload configurations align with security best practices to prevent unintended exposures or weaknesses.
+
+*Risks*: Inadvertent settings in Kubernetes manifests, OpenShift configurations, or RHACS policies can lead to unauthorized access, data breaches, or service disruptions. Misconfigurations in Multus/UDN setups may expose inter-namespace traffic, while Service Mesh misalignments can bypass encryption or authentication.
+
+*Required Controls*:
+- Implement admission controllers (e.g., OpenShift's Security Context Constraints) to enforce configuration standards.
+- Use RHACS policy engine to scan and block deployments with misconfigurations, such as privileged containers or hostPath mounts.
+- Enforce GitOps-driven configuration management to maintain consistency across environments.
+
+*Operational Practices*:
+- Developers: Validate manifests using tools like `kubectl dry-run` and RHACS pre-deployment scans.
+- Platform Administrators: Configure cluster-wide defaults for security contexts, resource limits, and network policies.
+- Security Team: Regularly audit configurations via RHACS dashboards and integrate with CI/CD pipelines for automated checks.
+- Pre-Sales Engineers: Demonstrate configuration hardening in proof-of-concepts to highlight risk reduction.
+
+*Evidence Patterns*:
+- RHACS violation reports showing blocked misconfigured deployments.
+- Audit logs from OpenShift API server indicating admission controller rejections.
+- GitOps commit history reflecting configuration changes and approvals.
+
+*Failure Modes*:
+- Overriding defaults without review, leading to privilege escalation; avoid by mandating peer reviews in GitOps workflows.
+- Ignoring RHACS alerts due to alert fatigue; mitigate with tuned policies and automated remediation.
+
+== 2. Supply Chain Vulnerabilities
+
+*Intent*: Secure the software supply chain from source code to runtime to prevent injection of malicious or vulnerable components.
+
+*Risks*: Compromised base images, untrusted registries, or tampered dependencies can introduce vulnerabilities or backdoors. In GitOps pipelines, unverified manifests may propagate risks across clusters.
+
+*Required Controls*:
+- Enforce image scanning and trust policies using RHACS to verify signatures and block vulnerable images.
+- Integrate with OpenShift Image Registry and external trusted registries.
+- Implement SBOM (Software Bill of Materials) generation and validation in CI/CD pipelines.
+
+*Operational Practices*:
+- Developers: Use signed images and include SBOMs in container builds.
+- Platform Administrators: Configure registry allowlists and enforce image pull policies.
+- Security Team: Monitor supply chain events via RHACS threat intelligence feeds.
+- Pre-Sales Engineers: Showcase supply chain security in demos, emphasizing zero-trust image deployment.
+
+*Evidence Patterns*:
+- RHACS scan results indicating clean image vulnerabilities and signature validations.
+- CI/CD logs showing SBOM checks and policy enforcement.
+- Incident response logs from detected supply chain compromises.
+
+*Failure Modes*:
+- Relying on public registries without scanning; prevent by enforcing RHACS as a gatekeeper.
+- Skipping signature verification in high-velocity deployments; address with automated tooling.
+
+== 3. Overly Permissive or Misconfigured RBAC
+
+*Intent*: Restrict access to cluster resources based on least privilege to prevent unauthorized actions.
+
+*Risks*: Broad permissions can enable lateral movement or escalation. In Service Mesh environments, misconfigured service accounts may bypass identity checks.
+
+*Required Controls*:
+- Define granular RBAC roles and bindings using OpenShift's integrated RBAC.
+- Leverage RHACS for RBAC policy enforcement and anomaly detection.
+- Implement identity providers (e.g., LDAP, OAuth) for user authentication.
+
+*Operational Practices*:
+- Developers: Request minimal permissions for workloads via service accounts.
+- Platform Administrators: Audit and rotate RBAC configurations regularly.
+- Security Team: Use RHACS to monitor RBAC changes and detect privilege misuse.
+- Pre-Sales Engineers: Illustrate RBAC modeling in architecture discussions.
+
+*Evidence Patterns*:
+- RHACS access logs showing authorized vs. denied operations.
+- OpenShift audit logs capturing RBAC enforcement events.
+- Role binding change histories from GitOps repositories.
+
+*Failure Modes*:
+- Granting cluster-admin roles indiscriminately; avoid with role-based approvals.
+- Inadequate auditing leading to undetected abuses; enable comprehensive logging.
+
+== 4. Exposed Secrets
+
+*Intent*: Protect sensitive data such as API keys, certificates, and passwords from unauthorized access.
+
+*Risks*: Hardcoded secrets in code or manifests can be leaked via logs or repositories. Runtime exposure in Multus/UDN traffic may occur without encryption.
+
+*Required Controls*:
+- Use OpenShift Secrets or external secret management (e.g., Vault integration).
+- Enforce RHACS policies to detect and block secret exposures.
+- Implement encryption at rest and in transit for secrets.
+
+*Operational Practices*:
+- Developers: Avoid embedding secrets in code; use environment variables or mounted secrets.
+- Platform Administrators: Configure secret rotation and access controls.
+- Security Team: Scan for exposed secrets using RHACS runtime detection.
+- Pre-Sales Engineers: Highlight secret management integrations in proposals.
+
+*Evidence Patterns*:
+- RHACS alerts on secret access patterns.
+- Audit logs from secret API calls.
+- Compliance reports on encryption status.
+
+*Failure Modes*:
+- Storing secrets in ConfigMaps; replace with dedicated secret objects.
+- Weak rotation policies leading to stale credentials; automate rotations.
+
+== 5. Lack of Network Segmentation
+
+*Intent*: Isolate workloads and traffic to contain breaches and enforce least privilege networking.
+
+*Risks*: Flat networks allow unrestricted lateral movement. Multus/UDN misconfigurations can expose east-west traffic.
+
+*Required Controls*:
+- Deploy NetworkPolicies and AdminNetworkPolicies in OpenShift.
+- Utilize Service Mesh for encrypted, authenticated service-to-service communication.
+- Integrate RHACS for network policy validation and runtime monitoring.
+
+*Operational Practices*:
+- Developers: Define application-specific NetworkPolicies.
+- Platform Administrators: Implement cluster-wide segmentation using UDNs and Multus.
+- Security Team: Monitor traffic flows via RHACS network graphs.
+- Pre-Sales Engineers: Demonstrate segmentation in network topology diagrams.
+
+*Evidence Patterns*:
+- RHACS network flow visualizations showing enforced segments.
+- Policy enforcement logs from OpenShift CNI plugins.
+- Incident isolation reports post-breach.
+
+*Failure Modes*:
+- Default-allow policies; enforce default-deny with exceptions.
+- Overlooking Multus interfaces; audit all network attachments.
+
+== 6. Vulnerable Workloads
+
+*Intent*: Mitigate vulnerabilities in running applications and containers to reduce attack surfaces.
+
+*Risks*: Unpatched software can be exploited. Workload hardening gaps may allow container escapes.
+
+*Required Controls*:
+- Apply security contexts, AppArmor/SELinux profiles via OpenShift SCCs.
+- Use RHACS for continuous vulnerability scanning and patching recommendations.
+- Enforce resource governance to prevent resource exhaustion attacks.
+
+*Operational Practices*:
+- Developers: Build hardened images with minimal attack surfaces.
+- Platform Administrators: Set cluster resource quotas and limits.
+- Security Team: Integrate vulnerability management into GitOps pipelines.
+- Pre-Sales Engineers: Quantify risk reduction from hardening in ROI calculations.
+
+*Evidence Patterns*:
+- RHACS vulnerability reports with remediation statuses.
+- Runtime logs from hardened workloads.
+- Patch deployment histories.
+
+*Failure Modes*:
+- Ignoring non-critical vulnerabilities; prioritize based on exploitability.
+- Over-provisioning resources; monitor and adjust quotas.
+
+== 7. Insufficient Logging and Monitoring
+
+*Intent*: Capture and analyze events for threat detection, forensics, and operational visibility.
+
+*Risks*: Lack of visibility hinders incident response. Incomplete logs in Service Mesh may miss inter-service issues.
+
+*Required Controls*:
+- Enable comprehensive logging via OpenShift Logging and RHACS event collection.
+- Implement centralized monitoring with Prometheus and Grafana.
+- Use RHACS for security event correlation.
+
+*Operational Practices*:
+- Developers: Instrument applications for structured logging.
+- Platform Administrators: Configure log aggregation and retention.
+- Security Team: Define alerting rules for security events.
+- Pre-Sales Engineers: Showcase monitoring dashboards in presentations.
+
+*Evidence Patterns*:
+- RHACS security event timelines.
+- Log queries showing incident chains.
+- Audit trails for compliance evidence.
+
+*Failure Modes*:
+- High log volumes causing storage issues; implement sampling and archiving.
+- Misconfigured alerts leading to noise; tune based on baselines.
+
+== 8. Inadequate Image Security
+
+*Intent*: Ensure container images are trusted, scanned, and free from vulnerabilities.
+
+*Risks*: Malicious or outdated images can compromise deployments. Lack of trust in GitOps may introduce risks.
+
+*Required Controls*:
+- Mandate image signing and scanning with RHACS.
+- Enforce registry policies in OpenShift.
+- Integrate with CI/CD for automated image builds and scans.
+
+*Operational Practices*:
+- Developers: Use trusted base images and sign builds.
+- Platform Administrators: Manage image registries and policies.
+- Security Team: Monitor image usage via RHACS.
+- Pre-Sales Engineers: Demonstrate image security in secure supply chain narratives.
+
+*Evidence Patterns*:
+- RHACS image scan reports.
+- Signature validation logs.
+- Deployment approvals tied to scan results.
+
+*Failure Modes*:
+- Allowing unsigned images; enforce signing requirements.
+- Delayed scans in fast-paced environments; parallelize scanning.
+
+== 9. Weak Identity and Access Management
+
+*Intent*: Authenticate and authorize users and services to prevent unauthorized access.
+
+*Risks*: Poor identity controls enable impersonation. Service Mesh identity gaps can allow spoofing.
+
+*Required Controls*:
+- Integrate with OpenShift OAuth and external IdPs.
+- Use RHACS for identity-based policy enforcement.
+- Implement multi-factor authentication (MFA) where applicable.
+
+*Operational Practices*:
+- Developers: Use service accounts with minimal scopes.
+- Platform Administrators: Configure authentication backends.
+- Security Team: Audit identity events and anomalies.
+- Pre-Sales Engineers: Address IAM in security architecture designs.
+
+*Evidence Patterns*:
+- Authentication logs from OpenShift.
+- RHACS identity violation reports.
+- Access control decision logs.
+
+*Failure Modes*:
+- Shared credentials; promote individual identities.
+- Inadequate MFA; enforce for privileged access.
+
+== 10. Runtime Threats
+
+*Intent*: Detect and respond to active threats in running workloads.
+
+*Risks*: Malware, intrusions, or anomalous behavior can lead to data loss. Runtime detection gaps in compute zones may allow persistence.
+
+*Required Controls*:
+- Deploy RHACS runtime sensors for behavioral analysis.
+- Classify compute zones (e.g., trusted vs. untrusted) with policy enforcement.
+- Enable automated response actions like pod termination.
+
+*Operational Practices*:
+- Developers: Design applications with runtime security in mind.
+- Platform Administrators: Segment compute zones using node selectors and taints.
+- Security Team: Monitor runtime alerts and perform threat hunting.
+- Pre-Sales Engineers: Illustrate threat detection in scenario-based demos.
+
+*Evidence Patterns*:
+- RHACS runtime violation logs.
+- Incident response playbooks executed.
+- Forensic data from terminated workloads.
+
+*Failure Modes*:
+- False positives overwhelming teams; fine-tune detection rules.
+- Unclassified zones allowing risky workloads; enforce zone policies.
+## 0. How to Use & Scope
+This guide normalizes overlapping framework language into actionable security “themes”. For each theme you get: intent, risk, platform + RHACS capabilities, key actions, and incremental evidence. Use the quick reference + appendices to translate into specific control IDs.
+
+### 0.1 Lifecycle Alignment: Build → Deploy → Run → Detect & Respond (NIST-Inspired)
+
+If the 9 Theme model feels heavy, you can operate day-to-day with a streamlined lifecycle lens. These phases loosely map to NIST CSF Core Functions (Identify/Protect/Detect/Respond) while preserving all underlying controls. Use this as your “quick mental model,” then dive into Theme sections when you need depth.
+
+
+[cols="1,1,1,1,1,1",options="header"]
+|===
+| Lifecycle Phase | NIST CSF Emphasis (Primary) | Source Themes (Detail) | Core Questions | Representative Actions (Examples) | Key Evidence (Minimal Bundle)
+| Build | Identify / Protect | 1 (image trust), 2 (baseline config), 3 (RBAC), 5 (resource defaults) | Is the artifact trustworthy & minimal? | Enforce signed & scanned images; codify policy-as-code; least-priv RBAC; set default limits | Policy repo commit (signed); image provenance scan report; RBAC diff; quota/limit manifest
+| Deploy (Gate) | Protect | 1,2,4 (initial segmentation), 5,6 (CVE gate), 8 (secret leak check) | Should this be allowed in? | Block fixable Critical CVEs; deny privileged/host mounts; digest pinning; namespace deny-all base | Blocked deployment log; admission policy export; network deny base YAML; secret violation trend
+| Run (Operate) | Protect / Detect | 4 (segmentation maintenance), 5 (resource fairness), 7 (runtime), 8 (late secrets) | Is behavior within approved boundaries? | Maintain 100% NetworkPolicy & sensor coverage; observe resource anomalies; prune stale privileges | NetworkPolicy coverage metric; runtime sensor coverage; resource quota vs usage report
+| Detect & Respond | Detect / Respond | 6 (aging vuln deltas), 7 (runtime alerts/actions), 9 (logging & evidence), Exceptions Register | Did something unexpected happen & did we act? | Runtime anomaly → ticket; SLA vulnerability aging; automated response (kill/scale); exception expiry enforcement | Runtime alert + ticket link; vuln SLA dashboard; response action log; nightly compliance export + hash
+|===
+
+Condensed “Top 10 Moves” (mapped to phases):
+
+1. Enforce digest pinning & ban `:latest` (Build/Deploy)
+2. Require signatures (progressively) for high-risk namespaces (Build/Deploy)
+3. Block privileged & host mount misconfigs (Deploy)
+4. Deny-by-default ingress & egress (Deploy → Run)
+5. Block deploys with fixable Critical CVEs (Deploy)
+6. Reduce cluster-admin to one group + quarterly diff (Build)
+7. Achieve & monitor 100% runtime sensor/node coverage (Run / Detect)
+8. Secret-in-env detection + migration to vault (Deploy / Run)
+9. Nightly compliance export
+10. Exception register with expiry + alert on overdue (Detect & Respond)
+
+“5 Fast Health Metrics” (executive snapshot):
+
+[cols="1,1,1,1",options="header"]
+|===
+| Metric | Phase Signal | Healthy Target | Why It Matters
+| % Running images scanned <24h | Build/Deploy hygiene | ≥98% | Fresh vuln intel pre & post deploy
+| Fixable Critical CVEs in SLA | Deploy/Detect | ≥95% in SLA | Prevent aging high risk
+| Namespace ingress+egress baseline coverage | Deploy/Run | 100% | Lateral movement constraint
+| Runtime sensor coverage (nodes) | Run/Detect | 100% | No blind operational zones
+| Overdue exceptions | Detect & Respond | 0 | Governance integrity
+|===
+
+
+Use this lifecycle table for rapid onboarding & stakeholder decks; keep the deeper Theme sections authoritative for audits and appendices crosswalks. When updating controls, modify the Theme section first—then adjust the lifecycle summary if the change is material (>policy shift or new enforcement capability).
+
+
+> Coverage Model Clarification: The scope combines (a) OpenShift / RHCOS platform primitives ("OCP" – SCC/Pod Security, RBAC, NetworkPolicy, MachineConfig/OSTree, ClusterImagePolicy & signature admission, Compliance & Security Profiles Operators, ingress TLS, optional mesh mTLS) and (b) Red Hat Advanced Cluster Security ("RHACS") overlay capabilities (image & component scanning, deploy misconfig & vuln gating, runtime anomaly detection, secret pattern detection, policy & compliance evidence exports). Tables now show three columns (OCP | RHACS | External). A blank cell means “no substantive contribution.” The External column lists items outside the combined in‑scope boundary that must be evidenced via Appendix E (External Control Register).
+
+### Covered vs External Responsibilities
+
+[cols="1,1,1,1",options="header"]
+|===
+| Category | RHACS Primary | RHACS Partial (Evidence Component) | External / Platform (Document Separately)
+| Image / Supply Chain Policy | Scan, policy gate, risk scoring | SBOM association, signature policy tie‑in | Signing infra, build provenance chain (Cosign/Sigstore, pipeline attestation)
+| Runtime Detection & Response | Process / network anomaly, policy enforcement | Alert forwarding / correlation | Full SIEM correlation, SOAR workflows, WAF/RASP
+| Vulnerability Management | Prioritization, fixable metrics, gating | SLA tracking exports | Patch orchestration, inventory governance (CMDB)
+| Access / RBAC Hygiene | Visibility, cluster-admin minimization check | Mapping service accounts to namespace scope | Enterprise IAM (MFA, SSO session controls, PAM)
+| Network Segmentation | NetworkPolicy coverage analytics | Flow visualization for validation | East/West deep inspection, service mesh mTLS policy authority
+| Secrets Exposure | Secret-in-env detection | Partial detection of embedded credentials | Enterprise vault, key lifecycle management
+| Logging / Evidence | Policy + violation export, compliance summaries | Supplemental security event stream | Immutable log store, retention, anti‑tamper, TRA artifacts
+|===
+
+
+*Clarification (SBOM & Signature Scope – concise):* With a Signature Integration, RHACS verifies Cosign signatures (public key / cert / keyless) and, if enabled, Rekor transparency log inclusion on discovery and periodic (~4h) re-checks, and can block unverified images ("Not verified by trusted image signers"). It does **not** generate or sign SBOMs, manage long‑term keys / Fulcio roots, or build full SLSA / in‑toto provenance beyond the configured signature + optional Rekor check. Pipelines (RHTAP + RHTAS) supply SBOM + attestation + key lifecycle; RHACS enforces signed & pinned images and exports verification evidence.
+
+### Baseline Evidence Pattern (Applies Unless Theme Lists “Additional Evidence”)
+
+Unless a theme explicitly lists “Additional Evidence”, capture this baseline set:
+
+1. Current (date-stamped) compliance report excerpt for relevant checks
+2. Policy configuration snapshot (JSON export or signed Git version)
+3. Sample (sanitized) prior violation + its remediation closure proof
+4. External SIEM log / ticket reference linking alert → action
+5. Change history (Git / ticket ID) for material control adjustments
+
+### Enforcement Failure Modes & Resilience (Consolidated)
+
+Understanding how controls behave under partial failure prevents silent coverage gaps. The table below summarizes typical failure / degradation scenarios and recommended guardrails.
+
+[cols="1,1,1,1,1,1,1",options="header"]
+|===
+| Stage / Function | Component(s) | Potential Failure / Condition | Typical Default Behavior | Risk | Recommended Control / Setting | Monitoring Signal
+| Build / CI Policy Evaluation | CI plugin / API call to Central | Central/API unreachable, latency, auth error | Pipeline step fails (hard fail) or is skipped | Unsanctioned image proceeds | Fail pipeline on evaluation error (treat as deny) | CI job logs; alert on evaluation errors
+| Image Scanning | Scanner deployment / external scanner integration | Scanner crash, version drift, registry credential failure | Image marked unscanned / stale scan retained | Blind to new CVEs | Alert if any deployed image lacks < N hour scan | Unscanned images delta
+| Admission Enforcement (Deploy Stage) | Validating webhook chain | Webhook timeout / DNS / cert expiry | Fail-open unless failurePolicy=Fail | Risky deploy allowed | Set failurePolicy=Fail for critical gates | Admission error rate metric
+| Admission Ordering | Multiple controllers (SCC, PodSecurity, Gatekeeper, RHACS) | Conflicting deny reasons / mutation ordering | Inconsistent error surfaced | Mis-triage & bypass attempts | Ownership matrix; remove duplicate rules | Admission audit comparison
+| Runtime Collection | Sensor / Collector DaemonSet | Pod eviction / version mismatch / partition | Gaps in runtime events | Undetected anomaly / incident | Monitor heartbeat & coverage; alert <100% | Node coverage dashboard
+| Notifier Delivery | Slack / PagerDuty / SIEM forwarding | Credential rotation / endpoint outage | Alerts buffered or dropped | Delayed response, lost evidence | Synthetic health alert daily | Notifier failure counter
+| Vulnerability Export / Reports | Scheduled job / API script | Script/auth token error | Missing daily artifact | Evidence gap | External SHA-256 hash chain + gap alert | Object store listing diff
+| Logging Pipeline | Forwarder / SIEM ingestion | Buffer full / parse / TLS failure | Partial ingest | Incomplete forensic trail | Failure alerting & health checks | SIEM ingestion error rate
+| Policy Exception Expiry | Exception register | Expiry passes unnoticed | Control gap persists | Indefinite risk acceptance | Automated past due flag + ticket | Daily exception aging report
+|===
+
+> Principle: Treat *inability to evaluate* the same as *deny* for critical gates; fail-closed where business impact is acceptable, fail-open only with compensating detection and explicit, time-bound exception.
+
+### Capability Boundaries & Disclaimers
+
+RHACS provides *container & Kubernetes workload* focused security evidence. It does **not**:
+
+- Replace host OS / kernel hardening (CIS benchmark, kernel module integrity, eBPF constraint outside sensor scope)
+- Enforce file-level FIM (File Integrity Monitoring) for host paths
+- Provide full WAF, RASP, or API schema validation (pair with ingress/WAF layer)
+- Manage IAM / MFA / SSO life-cycle (external IdP / IAM system authoritative)
+- Offer data-at-rest encryption or key lifecycle management (delegate to platform KMS / vault)
+- Guarantee retention / immutability (external WORM/object-lock store required)
+
+Where such controls appear in mapping tables, RHACS contributes *partial* (P) evidence only (telemetry, detection triggers, or gating context) and relies on external systems for full compliance.
+
+### Enforcement Modes & Fallback Nuances
+
+Add these context notes anywhere you operationalize policies so expectations stay realistic (see also the Enforcement Failure Modes & Resilience table above for consolidated behavior references):
+
+- **Progressive Enforcement:**
+Most teams start high-impact policies (privileged container, unsigned image, critical CVE) in “alert / warn (no block)” mode for 1–2 sprints before switching to enforce. Document the promotion decision (date, risk rationale) for audit.
+
+- **Admission vs Sensor Fallback:** RHACS admission webhook can time out (network, DNS, cert expiry). If `failurePolicy=Ignore` (fail-open) the deploy may proceed; sensor-side (“deploy-time”) enforcement may still catch some conditions but timing differs. Critical policies should usually set `failurePolicy=Fail` + alert on webhook error rate.
+
+- **Hard vs Soft Actions:** Some runtime policies use “scale-to-zero” or alert-only actions—these are *soft* responses compared to an admission block. Mark each policy with its action class in your policy register.
+
+- **Break-Glass / Exceptions:** Temporary allowance (e.g., adding a dangerous capability) must reference an exception ID and expiry. Avoid ad‑hoc manual toggles; prefer Git-based changes.
+
+- **Latency & Race Windows:** A very rapid deploy after image push may momentarily lack latest scan results; mitigate by scanning in CI (pre-push) and failing build on unacceptable issues.
+
+- **Version / Feature Gating:** Some advanced enforcement (e.g., signature policy integration, specific runtime kill actions) depends on cluster + RHACS version parity; annotate policies with minimum version where relevant.
+
+> Tag policy YAML (or JSON export) with labels: `enforcementPhase=warn|block`, `criticality=high|medium|low`, `failurePolicy=Fail|Ignore` for clarity.
+
+### Multi-Controller Policy Interplay (Brief Note)
+
+If you run multiple admission / policy controllers (e.g., SCC / PodSecurity, RHACS admission webhook, Gatekeeper/Kyverno, Sigstore verification), document for each enforced rule WHICH controller is authoritative. Undocumented overlap creates:
+
+- Confusing or duplicated deny messages
+- Race conditions / ordering ambiguity (different failurePolicy settings)
+- Hidden gaps (assumed “other controller” covers it)
+
+Minimal recommended doc set (kept in Git): controller inventory, per-control owner, failurePolicy, deny message prefix convention, change approval process. Remove redundant enforcement—prefer one authoritative source and treat others as visibility only.
+
+### Policy Bypass / Exception Audit Requirements
+
+All bypasses or temporary relaxations must produce *auditable artifacts*:
+
+1. **Exception Register Entry:** ID, control/policy name, rationale, risk rating, approver, creation date, expiry date.
+
+2. **Mechanism:** Prefer Git-managed policy change (PR includes exception metadata) over ad-hoc UI toggles.
+
+3. **Annotations (Optional):** If using Kubernetes annotations to tag exceptioned workloads (pattern `security.exception/<policy-id>=<exception-id>`), log and export these in inventory reports.
+4. **Expiry Enforcement:** Scheduled job checks for past-due exceptions; generate alert + auto-create ticket for review.
+5. **Evidence:** Retain original denied manifest (redacted if needed) + post-remediation manifest proving closure.
+
+### External Control Register (Summary)
+
+Controls marked (E) in mappings require explicit tracking. Maintain a register (sample in Appendix E) with: Control Domain, External Owner/System, Evidence Artifact Type, Review Cadence, Last Verified Date. Link each external domain to authoritative documentation (e.g., SOC2 policies, platform hardening guides). This prevents “silent gaps” where a dependency was assumed but never evidenced.
+
+Key External Domains (illustrative): Host OS Hardening, Kernel Patching, Node CIS Benchmark, IAM & MFA, Key Management (KMS/Vault), Data Encryption (at rest / in transit), WAF / API Gateway, SAST/DAST, License Compliance & Legal Review, Backup & DR, Log Retention / WORM, SIEM Correlation Rules, Secrets Lifecycle (rotation), Incident Runbooks, Targeted Risk Analyses, Data Masking / Tokenization.
+
+> Action: Add an *External Owner* column to internal audit prep spreadsheets; absence of a named owner flags a governance risk.
+
+### Reading Order Recommendation
+
+Review Themes 1–9 in sequence for operational rollout; use Section 11 (Control Mapping Quick Reference) for framework control ID cross-references, and Appendices for detailed per-framework translation.
+
+## 1. Image Provenance & Supply Chain Integrity (Build & Trust)
+
+### Intent
+Assure only approved, scanned, signed, minimal, immutable images from trusted sources reach deploy.
+
+### Risk (If Ignored)
+Tampered or vulnerable images deliver exploitable components early; signature gaps reduce provenance confidence; drift invites silent privilege or dependency expansion.
+
+### RHACS Levers
+- Image & component scanning; CVE severity & fixability classification
+- Policy gating (e.g., disallow unsigned images, disallowed registries, fixable critical CVEs)
+- Detection of risky config in manifests (privileged, root user, mutable FS) *before* deploy
+- Report assertion: “All deployed images have scanner + registry coverage”
+
+### OpenShift / Platform Levers
+- Signature & attestation verification (Cosign/Sigstore admission integration)
+- ImageContentSourcePolicy for controlled registry mirrors
+- Build pipeline isolation + SBOM generation via Red Hat Trusted Application Pipeline (RHTAP) + GitOps deployment pinning by digest
+
+> Sigstore / ClusterImagePolicy Precondition: Ensure keys, root-of-trust configuration, and any required MachineConfig or operator enablement are completed; signature verification is **not** implicitly active. Document the signing key custody & rotation process.
+
+### Key Actions
+
+1. Inventory registries → integrate all in RHACS; block unknown registries.
+2. Enforce “no :latest tag” & digest pinning (policy + manifest review).
+3. Require signatures/attestations for high-risk namespaces (progressively roll out).
+4. Enable and enforce policies for disallowed critical CVEs & unsigned images.
+5. Generate SBOM at build; store artifact + externally computed SHA-256 digest. External pipeline tooling (e.g., Red Hat Trusted Application Pipeline) should create, sign, and (optionally) hash them. Current RHACS correlation is vulnerability-centric—treat SBOM retention, hashing, and attestation verification as an external control.
+6. Track mean time from image build → deploy for provenance freshness metric.
+
+### Additional Evidence
+
+- Signed SBOM artifact (external SHA-256 digest + timestamp)
+- Example signature verification admission log (success + rejection)
+ - Exception (if any) showing controlled temporary fallback from block→warn with expiry
+ - (If applicable) Secure coding pipeline evidence (SAST/DAST report + external SHA-256 digest) for public-facing apps
+
+---
+## 2. Baseline Configuration & Drift Control
+
+### Intent
+Codify & continuously enforce hardened deployment settings; surface deviations quickly.
+
+### RHACS Levers
+- Deploy-stage misconfiguration policies (privileged, host mounts, escalation, absent limits)
+- “Unresolved deploy violations” feed for live drift awareness
+
+### OpenShift Levers
+- SCC & Pod Security profiles (restrict privilege + capabilities)
+- Admission controllers enforcing resource limits & forbidding host networking
+
+### Key Actions
+1. Map internal hardening standard → RHACS policy set (clone, label, commit to Git).
+2. Enforce (initially warn, then block) top 5 riskiest misconfigs.
+3. Daily triage of new high/critical deploy violations (≤24h closure goal).
+4. Quarterly review: prune obsolete custom policies & document rationale changes.
+
+### Additional Evidence
+- Drift metrics: count of high-severity misconfigs over trailing 30 days (trend downward)
+
+---
+## 3. Least Privilege & RBAC Governance
+
+### Intent
+
+Restrict administrative & broad-impact permissions; ensure explicit approvals & periodic review.
+
+### RHACS Levers
+
+- RBAC visualization; detection of multiple cluster‑admin subjects
+- Policies detecting privilege escalation vectors at container runtime
+
+### OpenShift Levers
+
+- Granular ClusterRoles + namespace RoleBindings; group-based binding strategy
+- SCC layering to enforce default non‑privileged runtime contexts
+
+### Key Actions
+
+1. Consolidate cluster-admin to one group; remove direct USER bindings.
+2. Quarterly RBAC diff review (export → compare → sign-off in ticket).
+3. Enforce policy on privilege escalation (no additional capabilities, disallow escalate). 
+4. Service account scope minimization: restrict * verbs & delete wildcards.
+
+### Additional Evidence
+
+- Signed RBAC diff report (before/after) for quarterly review cycle
+
+---
+## 4. Network Segmentation & Boundary Protection
+
+### Intent
+
+Enforce explicit ingress/egress flows; deny-by-default to limit lateral movement.
+
+### RHACS Levers
+
+- Coverage checks: deployments missing ingress and/or egress NetworkPolicies
+- Network graph to validate allowed vs observed flows (lateral movement visualization)
+- Suggested NetworkPolicy generation from current observed traffic (candidate baseline)
+- Post-deployment drift detection: unexpected new connections after baseline
+
+### OpenShift Levers
+
+- NetworkPolicy: Primary L3/L4 segmentation primitive inside the cluster
+- Namespaces: Provide administrative scoping only — no isolation unless combined with NetworkPolicy
+- Service Mesh (optional): Adds mTLS identity and L7 authorization policies (external to RHACS)
+- Multus: Enables secondary network interfaces; traffic on those interfaces bypasses primary cluster NetworkPolicy controls
+- User Defined Networks (UDN): Extends OVN-Kubernetes to support multiple logical networks:
+	- A UDN may serve as the alternate primary network for a namespace (only one primary) or as a secondary attachment
+	- Backends can be:
+		- localnet – VLAN-backed segment bridging into physical infrastructure
+		- Overlay (L2/L3 VRF) – logical networks isolated from other overlays
+		- Routed L3 fabric segment
+	- Security stance: treat each UDN as a separate security zone. Maintain an inventory of workloads per UDN, define ACL/firewall policies, and document all cross-UDN flows as explicit “inter-zone” rules.
+
+### Key Actions
+
+1. Apply a deny-all ingress + deny-all egress NetworkPolicy in every namespace.
+2. Use RHACS to generate candidate NetworkPolicies from current traffic; review, tighten selectors, store in Git, and only then apply.
+3. Simulate coverage and policy changes before enforcing; record approvals as evidence.
+4. Flag and document any use of hostNetwork, hostPID, or hostIPC.
+5. Weekly: measure % of workloads with both ingress and egress policies (target = 100%).
+
+> Segmentation Clarification & Governance: Namespaces alone do not isolate traffic. True segmentation begins only when NetworkPolicies (or service mesh authz rules) explicitly deny by default and allow required flows. Multus and UDN attachments create parallel paths outside the default pod network—treat each as its own security zone. For every Multus secondary network or UDN logical network, create an External Control Register row (owner, firewall/ACL policy scope, change approval workflow, review cadence). A missing owner constitutes a segmentation compliance gap.
+
+> Policy Generation Caveat: RHACS policies are based on observed traffic. Cold-start or low-traffic services may omit legitimate flows. Stage in warn-only mode, monitor denied traffic alerts, then promote. Periodically regenerate and diff to detect real architecture changes vs anomalous lateral communication.
+
+### Segmentation Scope & Limitations
+
+Kubernetes NetworkPolicies operate at L3/L4 (namespace/pod/port). They do not:
+
+- Inspect payloads or enforce application protocol semantics
+- Provide DPI / IDS / IPS capabilities
+- Perform data classification / DLP
+
+Use:
+
+- Service Mesh for L7 identity + mTLS authorization
+- IDS/IPS or eBPF platforms for deep packet east-west threat detection
+
+Document each extended control (owner + evidence) in the External Control Register (Appendix E).
+
+### Additional Evidence
+
+- NetworkPolicy coverage percentage over time (e.g., last 8 weeks)
+- Sample generated NetworkPolicy YAML + review ticket approval + before/after coverage diff
+- Example drift detection alert showing unexpected new connection
+
+### Workload Classification & Node Placement ("Compute Zones")
+
+When multiple data sensitivity or regulatory classifications (e.g., Public, Internal, Confidential, Restricted) must coexist on a single cluster, NetworkPolicies alone do not mitigate all residual risks (kernel escape, side-channel, noisy neighbor, forensic contamination). Introduce explicit compute zones that combine node-level segregation, scheduling constraints, and policy enforcement. Treat unapproved co-residency as a violation.
+
+Key Elements:
+
+1. Taxonomy: Publish ordered classification levels with examples + handling rules.
+2. Node Segmentation: Label & taint nodes per zone (`classification=restricted`, taint `classification=restricted:NoSchedule`).
+3. Scheduling Controls: Require pod label `data-classification=<level>` AND nodeSelector / affinity matching that label; higher classification pods tolerate only their zone taint.
+4. Admission / Policy Guardrails: RHACS deploy-time custom policy (or Gatekeeper/Kyverno – choose one authoritative) to enforce presence & consistency of classification labels, forbid privileged/hostNetwork in high zones.
+5. Namespace Strategy: Separate namespaces per classification (e.g., `apps-restricted`) plus deny-all ingress/egress; only explicit inter-zone NetworkPolicies allowed (justify each exception).
+6. Differential Enforcement: Stricter runtime actions (block vs alert) and shorter vuln SLAs for higher zones (e.g., Critical fix ≤48h for restricted, ≤7d baseline elsewhere).
+7. Secrets Handling: Enforce external vault references; block plain env secrets in restricted zone.
+8. Drift Detection: Daily job enumerates pods where `data-classification` label mismatches node label; zero tolerance—auto ticket.
+9. Residual Risk Register: Document shared kernel exposure & trigger conditions for migrating a zone to its own cluster (e.g., inability to meet accelerated patch SLA, regulatory mandate).
+10. Exception Workflow: Temporary co-residency requires exception ID, risk rationale, expiry, and approval (tracked in Exception Register).
+
+> Example enforcement logic (illustrative pseudocode – adapt to actual policy engine):
+> IF namespace matches /(apps-confidential|apps-restricted)/ THEN
+>  require label data-classification present AND
+>  require node selector key classification == data-classification label AND
+>  forbid privileged OR hostNetwork=true for data-classification in (restricted)
+> VIOLATION if any condition fails
+> (Store actual JSON export in Git; reference commit hash in evidence.)
+
+Additional Evidence for Compute Zones:
+
+- Node label & taint inventory export (hash + timestamp)
+- RHACS classification enforcement policy export
+- Daily drift report (pod↔node classification mismatch) with uninterrupted date chain
+- Inter-zone flow matrix (approved NetworkPolicy exceptions) + ticket links
+- Vulnerability SLA matrix per zone + sample accelerated remediation proof
+- Exception register entries (if any) governing temporary deviations
+
+Escalate to Separate Clusters When:
+
+- Regulatory / contractual requirement for isolation beyond logical segmentation
+- Inability to consistently meet hardened SLA / patch cadence for shared nodes
+- Frequent contention or noisy neighbor undermining zone guarantees
+
+Document the decision criteria so auditors see a rational progression plan from single-cluster multi-zone to multi-cluster architecture if/when triggers occur.
+
+---
+## 5. Resource Governance & Availability
+
+### Intent
+
+Prevent noisy-neighbor risk & resource exhaustion through enforced CPU/memory boundaries.
+
+### RHACS Levers
+
+- Policies: missing resource limits / requests
+
+### OpenShift Levers
+
+- LimitRange + ResourceQuota for namespaces
+
+### Key Actions
+
+1. Enforce policy requiring both CPU & memory limits.
+2. Add namespace quotas aligned to capacity planning assumptions.
+3. Alert on deployments lacking limits >24h after introduction.
+
+### Additional Evidence
+
+- Namespace quota report + variance to actual usage
+
+---
+## 6. Vulnerability Remediation Lifecycle (Fix & Prove Closure)
+
+### Intent
+
+Quickly identify and block the riskiest (fixable) vulnerabilities and prove you are rebuilding images instead of letting risk age out.
+
+### RHACS Capabilities (Focus Only)
+
+- Continuous image & component scanning (all connected registries)
+- Policy gating: block deploy/build if image has fixable Critical (and later High) CVEs
+- Severity + fixable filtering & age views; exportable reports / API
+- Notifier-driven alert when a vulnerability breaches SLA
+
+### OpenShift / Pipeline Capabilities
+
+- Automated image rebuild on updated base image
+- GitOps promotion restricted to images that passed RHACS policy (digest pinning)
+
+### Simple Action Pattern
+
+1. Publish a minimal SLA (Critical 7 days, High 30 days). Medium/Low = track only.
+2. Enforce: block new images with fixable Critical CVEs; warn on High (plan date to move High → block).
+3. Daily export a vulnerability summary (keep last 30 days + external SHA-256 digests for tamper-evidence) – optional but useful.
+4. Rebuild & redeploy images failing policy; verify new digest shows “no fixable Critical”.
+5. Track two metrics: (a) % fixable Critical within SLA (aim ≥95%), (b) Median days to fix Critical (TTRc) trending down.
+
+### Evidence (Lightweight)
+
+- Policy export (showing Critical=block)
+- Sample blocked deployment (log or RHACS violation) with timestamp
+- 30‑day vulnerability summary snippet (counts new/fixed/remaining Critical)
+
+### Notes
+
+- RHACS enforces & measures; it does not patch—your pipeline rebuilds.
+- Any accepted exception must have an expiry (see Exception Register section).
+
+---
+## 7. Runtime Threat Detection & Automated Response
+
+### Intent
+
+Detect anomalous or malicious runtime activity and (optionally) apply automated containment.
+
+### RHACS Levers
+
+- Runtime process & network baseline anomalies, exec into container, crypto miner patterns
+- Policy actions (scale-to-zero / block / alert) + notifier integrations
+
+### Detection (Simple View)
+
+RHACS does two things:
+1. Baseline: learns normal processes / connections; anything new is flagged (new ≠ automatically bad, just unexpected).
+2. Prebuilt risky patterns: detects obvious attacker / abuse behaviors (crypto miner names, curl|wget pipe to shell, package manager installs, reverse shell hints, privilege escalation attempts).
+
+Not in scope: deep packet inspection, syscall tracing, full lateral movement analysis. Use other tools for those (list them as external controls).
+> Caveat: RHACS uses kernel instrumentation (eBPF-based collection) to observe process executions and network connections, but its detection logic operates at the process/command + connection abstraction layer (baseline anomalies, known risky patterns) rather than exposing arbitrary raw syscall sequence rule authoring or deep packet payload inspection.
+
+### OpenShift / Platform Levers
+
+- Cluster audit logs for correlated identity context
+- Network isolation reducing noise + containment domain
+
+### Key Actions
+
+1. Enable top critical runtime policies; attach at least one high-urgency notifier.
+2. Test alert → ticket workflow end-to-end (document timing metrics).
+3. Consider selective enforcement for high-confidence miner / privilege escalation.
+4. Quarterly tune false positives (measure alert precision & drop noise >20%).
+
+### Additional Evidence
+
+- Alert precision metric (true positive / total high severity alerts) over last 30 days
+
+## 8. Secrets & Sensitive Data Exposure Prevention
+
+### Intent
+
+Prevent embedding or accidental leakage of secrets inside images or environment variables.
+
+### RHACS Levers
+
+- Secret pattern detection in env vars / config
+- Deploy/build-stage blocking policy for explicit secret strings
+
+### OpenShift / Platform Levers
+
+- External secret operators (vault integration) & sealed secrets
+- Encrypted storage for secret data at rest (platform managed)
+
+### Key Actions
+
+1. Enable secret-in-env detection; whitelist benign tokens.
+2. Enforce policy for high-sensitivity keys (e.g., private keys) at deploy.
+3. Migrate static credentials to external vault references; remove from Git.
+
+### Detection Limitations
+
+Secret pattern detection is heuristic/string-pattern based. It may *miss*:
+
+- Encrypted or base64-obfuscated sensitive blobs masquerading as benign strings
+- Secrets stored inside binary layers or compressed archives
+- Proprietary token formats not matching default regexes
+
+Additional Caveat: RHACS does **not** analyze the cryptographic strength, rotation interval, or entropy of values stored inside Kubernetes Secret objects; weak or long-lived keys must be governed by external secret management and rotation processes.
+Explicit Out-of-Scope: Entropy assessment, key age tracking, automatic rotation enforcement, and revocation workflows all sit outside RHACS; treat these as External Control Register entries (Secrets Lifecycle & Rotation).
+
+Do **not** rely on this as primary control—treat it as a compensating “last line” safety net. Primary controls: external vault, short-lived credentials, automated rotation.
+
+### Additional Evidence
+
+- Reduction count of secrets flagged in last 90 days
+
+## 9. Logging, Reporting & Continuous Evidence
+
+### Intent
+
+Maintain immutable, correlated, reviewable evidence of control operation & exceptions.
+
+### RHACS Levers
+
+- Scheduled compliance & policy exports
+- Alert forwarding to SIEM / ticketing
+
+### OpenShift / Platform Levers
+
+- External SIEM pipeline, log integrity (external hashing + WORM), retention policy enforcement
+- Time sync (NTP/chrony) for consistent event ordering
+
+### Key Actions
+
+1. Nightly compliance export (compute external SHA-256 digest + store artifact).
+2. Forward policy + runtime alerts to SIEM; alert on pipeline failures.
+3. Implement log integrity verification (externally maintained SHA-256 hash chain / object lock). 
+4. Quarterly Targeted Risk Analysis (TRA) if deviating from default review cadence.
+
+### Additional Evidence
+
+- Log pipeline health check report + failure alert test case
+ - Admission webhook availability SLO report (ties to enforcement reliability)
+ - Statement/evidence of external immutable storage (object lock / WORM) since in-cluster logging stacks are not inherently immutable
+
+## 10. Quick Start Checklist
+
+[cols="1,2,2",options="header"]
+|===
+| Objective | Action (Do This) | Proof to Capture (Simple Evidence)
+| Full scan coverage | Add all registries & enable RHACS scanner; rescan running images | 0 unscanned running images export
+| Baseline config enforced | Enforce misconfig policies (privileged, host mount, root, no limits) | Policy export (Enforced=true) + zero critical violations
+| Vulnerability gate active | Block fixable Critical CVEs (warn High initially) | Blocked deployment log + policy JSON (Critical=block)
+| Runtime visibility working | Enable runtime policies; trigger safe test alert | Runtime alert + notifier delivery record
+| Network segmentation started | Apply namespace deny-all + first allow rules | NetworkPolicy manifests + coverage screenshot
+| RBAC hygiene | Consolidate cluster-admin; remove direct user bindings | Before/after clusterrolebinding diff (single group)
+| Secret leak prevention | Enable secret-in-env detection; remediate flagged vars | Secret violation trend (to zero)
+| Evidence automation | Nightly compliance export + forward alerts/logs | Stored report + SHA-256 digest + SIEM alert entry
+|===

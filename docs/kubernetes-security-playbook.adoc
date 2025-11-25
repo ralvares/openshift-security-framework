@@ -1,0 +1,272 @@
+= Kubernetes Security Playbook: Addressing the Top 10 Risks
+
+This playbook provides a high-level guide for addressing the Kubernetes Top 10 security risks within OpenShift environments, leveraging Red Hat Advanced Cluster Security (RHACS) capabilities. It is designed for pre-sales engineers, developers, platform administrators, and security teams to implement robust security practices. The focus is on Kubernetes and OpenShift native features, integrated with RHACS for threat detection, compliance enforcement, and operational visibility.
+
+The playbook covers each of the Top 10 risks with intent, associated risks, required controls, operational practices, evidence patterns, and common failure modes. It emphasizes first-class treatment of Multus/User-Defined Networks (UDN), Service Mesh, and GitOps workflows. Key areas such as image trust, workload hardening, RBAC, network segmentation, resource governance, vulnerability lifecycle management, runtime threat detection, secret exposure prevention, logging and evidence collection, and compute zone classification are integrated throughout.
+
+Operator roles are defined as follows:
+
+- *Developer*: Responsible for application code, container images, and workload definitions.
+- *Platform Administrator*: Manages cluster infrastructure, networking, and policy enforcement.
+- *Security Team*: Oversees threat detection, incident response, and security policy design.
+- *Pre-Sales Engineer*: Advises on solution architecture and risk mitigation strategies during sales engagements.
+
+== 1. Misconfigurations
+
+*Intent*: Ensure cluster and workload configurations align with security best practices to prevent unintended exposures or weaknesses.
+
+*Risks*: Inadvertent settings in Kubernetes manifests, OpenShift configurations, or RHACS policies can lead to unauthorized access, data breaches, or service disruptions. Misconfigurations in Multus/UDN setups may expose inter-namespace traffic, while Service Mesh misalignments can bypass encryption or authentication.
+
+*Required Controls*:
+- Implement admission controllers (e.g., OpenShift's Security Context Constraints) to enforce configuration standards.
+- Use RHACS policy engine to scan and block deployments with misconfigurations, such as privileged containers or hostPath mounts.
+- Enforce GitOps-driven configuration management to maintain consistency across environments.
+
+*Operational Practices*:
+- Developers: Validate manifests using tools like `kubectl dry-run` and RHACS pre-deployment scans.
+- Platform Administrators: Configure cluster-wide defaults for security contexts, resource limits, and network policies.
+- Security Team: Regularly audit configurations via RHACS dashboards and integrate with CI/CD pipelines for automated checks.
+- Pre-Sales Engineers: Demonstrate configuration hardening in proof-of-concepts to highlight risk reduction.
+
+*Evidence Patterns*:
+- RHACS violation reports showing blocked misconfigured deployments.
+- Audit logs from OpenShift API server indicating admission controller rejections.
+- GitOps commit history reflecting configuration changes and approvals.
+
+*Failure Modes*:
+- Overriding defaults without review, leading to privilege escalation; avoid by mandating peer reviews in GitOps workflows.
+- Ignoring RHACS alerts due to alert fatigue; mitigate with tuned policies and automated remediation.
+
+== 2. Supply Chain Vulnerabilities
+
+*Intent*: Secure the software supply chain from source code to runtime to prevent injection of malicious or vulnerable components.
+
+*Risks*: Compromised base images, untrusted registries, or tampered dependencies can introduce vulnerabilities or backdoors. In GitOps pipelines, unverified manifests may propagate risks across clusters.
+
+*Required Controls*:
+- Enforce image scanning and trust policies using RHACS to verify signatures and block vulnerable images.
+- Integrate with OpenShift Image Registry and external trusted registries.
+- Implement SBOM (Software Bill of Materials) generation and validation in CI/CD pipelines.
+
+*Operational Practices*:
+- Developers: Use signed images and include SBOMs in container builds.
+- Platform Administrators: Configure registry allowlists and enforce image pull policies.
+- Security Team: Monitor supply chain events via RHACS threat intelligence feeds.
+- Pre-Sales Engineers: Showcase supply chain security in demos, emphasizing zero-trust image deployment.
+
+*Evidence Patterns*:
+- RHACS scan results indicating clean image vulnerabilities and signature validations.
+- CI/CD logs showing SBOM checks and policy enforcement.
+- Incident response logs from detected supply chain compromises.
+
+*Failure Modes*:
+- Relying on public registries without scanning; prevent by enforcing RHACS as a gatekeeper.
+- Skipping signature verification in high-velocity deployments; address with automated tooling.
+
+== 3. Overly Permissive or Misconfigured RBAC
+
+*Intent*: Restrict access to cluster resources based on least privilege to prevent unauthorized actions.
+
+*Risks*: Broad permissions can enable lateral movement or escalation. In Service Mesh environments, misconfigured service accounts may bypass identity checks.
+
+*Required Controls*:
+- Define granular RBAC roles and bindings using OpenShift's integrated RBAC.
+- Leverage RHACS for RBAC policy enforcement and anomaly detection.
+- Implement identity providers (e.g., LDAP, OAuth) for user authentication.
+
+*Operational Practices*:
+- Developers: Request minimal permissions for workloads via service accounts.
+- Platform Administrators: Audit and rotate RBAC configurations regularly.
+- Security Team: Use RHACS to monitor RBAC changes and detect privilege misuse.
+- Pre-Sales Engineers: Illustrate RBAC modeling in architecture discussions.
+
+*Evidence Patterns*:
+- RHACS access logs showing authorized vs. denied operations.
+- OpenShift audit logs capturing RBAC enforcement events.
+- Role binding change histories from GitOps repositories.
+
+*Failure Modes*:
+- Granting cluster-admin roles indiscriminately; avoid with role-based approvals.
+- Inadequate auditing leading to undetected abuses; enable comprehensive logging.
+
+== 4. Exposed Secrets
+
+*Intent*: Protect sensitive data such as API keys, certificates, and passwords from unauthorized access.
+
+*Risks*: Hardcoded secrets in code or manifests can be leaked via logs or repositories. Runtime exposure in Multus/UDN traffic may occur without encryption.
+
+*Required Controls*:
+- Use OpenShift Secrets or external secret management (e.g., Vault integration).
+- Enforce RHACS policies to detect and block secret exposures.
+- Implement encryption at rest and in transit for secrets.
+
+*Operational Practices*:
+- Developers: Avoid embedding secrets in code; use environment variables or mounted secrets.
+- Platform Administrators: Configure secret rotation and access controls.
+- Security Team: Scan for exposed secrets using RHACS runtime detection.
+- Pre-Sales Engineers: Highlight secret management integrations in proposals.
+
+*Evidence Patterns*:
+- RHACS alerts on secret access patterns.
+- Audit logs from secret API calls.
+- Compliance reports on encryption status.
+
+*Failure Modes*:
+- Storing secrets in ConfigMaps; replace with dedicated secret objects.
+- Weak rotation policies leading to stale credentials; automate rotations.
+
+== 5. Lack of Network Segmentation
+
+*Intent*: Isolate workloads and traffic to contain breaches and enforce least privilege networking.
+
+*Risks*: Flat networks allow unrestricted lateral movement. Multus/UDN misconfigurations can expose east-west traffic.
+
+*Required Controls*:
+- Deploy NetworkPolicies and AdminNetworkPolicies in OpenShift.
+- Utilize Service Mesh for encrypted, authenticated service-to-service communication.
+- Integrate RHACS for network policy validation and runtime monitoring.
+
+*Operational Practices*:
+- Developers: Define application-specific NetworkPolicies.
+- Platform Administrators: Implement cluster-wide segmentation using UDNs and Multus.
+- Security Team: Monitor traffic flows via RHACS network graphs.
+- Pre-Sales Engineers: Demonstrate segmentation in network topology diagrams.
+
+*Evidence Patterns*:
+- RHACS network flow visualizations showing enforced segments.
+- Policy enforcement logs from OpenShift CNI plugins.
+- Incident isolation reports post-breach.
+
+*Failure Modes*:
+- Default-allow policies; enforce default-deny with exceptions.
+- Overlooking Multus interfaces; audit all network attachments.
+
+== 6. Vulnerable Workloads
+
+*Intent*: Mitigate vulnerabilities in running applications and containers to reduce attack surfaces.
+
+*Risks*: Unpatched software can be exploited. Workload hardening gaps may allow container escapes.
+
+*Required Controls*:
+- Apply security contexts, AppArmor/SELinux profiles via OpenShift SCCs.
+- Use RHACS for continuous vulnerability scanning and patching recommendations.
+- Enforce resource governance to prevent resource exhaustion attacks.
+
+*Operational Practices*:
+- Developers: Build hardened images with minimal attack surfaces.
+- Platform Administrators: Set cluster resource quotas and limits.
+- Security Team: Integrate vulnerability management into GitOps pipelines.
+- Pre-Sales Engineers: Quantify risk reduction from hardening in ROI calculations.
+
+*Evidence Patterns*:
+- RHACS vulnerability reports with remediation statuses.
+- Runtime logs from hardened workloads.
+- Patch deployment histories.
+
+*Failure Modes*:
+- Ignoring non-critical vulnerabilities; prioritize based on exploitability.
+- Over-provisioning resources; monitor and adjust quotas.
+
+== 7. Insufficient Logging and Monitoring
+
+*Intent*: Capture and analyze events for threat detection, forensics, and operational visibility.
+
+*Risks*: Lack of visibility hinders incident response. Incomplete logs in Service Mesh may miss inter-service issues.
+
+*Required Controls*:
+- Enable comprehensive logging via OpenShift Logging and RHACS event collection.
+- Implement centralized monitoring with Prometheus and Grafana.
+- Use RHACS for security event correlation.
+
+*Operational Practices*:
+- Developers: Instrument applications for structured logging.
+- Platform Administrators: Configure log aggregation and retention.
+- Security Team: Define alerting rules for security events.
+- Pre-Sales Engineers: Showcase monitoring dashboards in presentations.
+
+*Evidence Patterns*:
+- RHACS security event timelines.
+- Log queries showing incident chains.
+- Audit trails for compliance evidence.
+
+*Failure Modes*:
+- High log volumes causing storage issues; implement sampling and archiving.
+- Misconfigured alerts leading to noise; tune based on baselines.
+
+== 8. Inadequate Image Security
+
+*Intent*: Ensure container images are trusted, scanned, and free from vulnerabilities.
+
+*Risks*: Malicious or outdated images can compromise deployments. Lack of trust in GitOps may introduce risks.
+
+*Required Controls*:
+- Mandate image signing and scanning with RHACS.
+- Enforce registry policies in OpenShift.
+- Integrate with CI/CD for automated image builds and scans.
+
+*Operational Practices*:
+- Developers: Use trusted base images and sign builds.
+- Platform Administrators: Manage image registries and policies.
+- Security Team: Monitor image usage via RHACS.
+- Pre-Sales Engineers: Demonstrate image security in secure supply chain narratives.
+
+*Evidence Patterns*:
+- RHACS image scan reports.
+- Signature validation logs.
+- Deployment approvals tied to scan results.
+
+*Failure Modes*:
+- Allowing unsigned images; enforce signing requirements.
+- Delayed scans in fast-paced environments; parallelize scanning.
+
+== 9. Weak Identity and Access Management
+
+*Intent*: Authenticate and authorize users and services to prevent unauthorized access.
+
+*Risks*: Poor identity controls enable impersonation. Service Mesh identity gaps can allow spoofing.
+
+*Required Controls*:
+- Integrate with OpenShift OAuth and external IdPs.
+- Use RHACS for identity-based policy enforcement.
+- Implement multi-factor authentication (MFA) where applicable.
+
+*Operational Practices*:
+- Developers: Use service accounts with minimal scopes.
+- Platform Administrators: Configure authentication backends.
+- Security Team: Audit identity events and anomalies.
+- Pre-Sales Engineers: Address IAM in security architecture designs.
+
+*Evidence Patterns*:
+- Authentication logs from OpenShift.
+- RHACS identity violation reports.
+- Access control decision logs.
+
+*Failure Modes*:
+- Shared credentials; promote individual identities.
+- Inadequate MFA; enforce for privileged access.
+
+== 10. Runtime Threats
+
+*Intent*: Detect and respond to active threats in running workloads.
+
+*Risks*: Malware, intrusions, or anomalous behavior can lead to data loss. Runtime detection gaps in compute zones may allow persistence.
+
+*Required Controls*:
+- Deploy RHACS runtime sensors for behavioral analysis.
+- Classify compute zones (e.g., trusted vs. untrusted) with policy enforcement.
+- Enable automated response actions like pod termination.
+
+*Operational Practices*:
+- Developers: Design applications with runtime security in mind.
+- Platform Administrators: Segment compute zones using node selectors and taints.
+- Security Team: Monitor runtime alerts and perform threat hunting.
+- Pre-Sales Engineers: Illustrate threat detection in scenario-based demos.
+
+*Evidence Patterns*:
+- RHACS runtime violation logs.
+- Incident response playbooks executed.
+- Forensic data from terminated workloads.
+
+*Failure Modes*:
+- False positives overwhelming teams; fine-tune detection rules.
+- Unclassified zones allowing risky workloads; enforce zone policies.

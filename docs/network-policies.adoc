@@ -4,20 +4,20 @@
 :icons: font
 :description: Practical rationale and patterns for OpenShift / Kubernetes network segmentation with NetworkPolicies.
 
-== Why Segregation and Network Segmentation Matter — A Short Story
+== Why Segregation and Network Segmentation Matter - A Short Story
 I once sat in a room where an engineer and a regulator tried to describe the same system and kept talking past each other. The engineer saw pods, services, and APIs. The regulator saw data flows, responsibilities, and risk boundaries. What neither of them could afford was ambiguity: Where is the sensitive data? Who can access it? What happens if an internet-facing component is compromised?
 
 Segregation answers those questions.
 
 Imagine your platform as a small city. Streets are the network, buildings are workloads, and gates control who enters neighborhoods. Without gates and clear neighborhoods, any intruder who sneaks in can wander from the market to the bank.
 
-Standards like IEC 62443 and PCI don’t prescribe your architecture—they demand outcomes: zones of control, documented flows, and proven enforcement. Network segmentation is the practical way to deliver those outcomes. It limits blast radius, makes inspections possible, and turns vague risk into auditable controls.
+Standards like IEC 62443 and PCI don’t prescribe your architecture, they demand outcomes: zones of control, documented flows, and proven enforcement. Network segmentation is the practical way to deliver those outcomes. It limits blast radius, makes inspections possible, and turns vague risk into auditable controls.
 
 === Why Compute Pools?
 Separating workloads onto different node pools (DMZ, general, secured) gives both technical and operational separation. You can run ingress controllers in a DMZ pool that faces the internet, keep critical services in a hardened secured pool, and use general pools for less sensitive apps. Labels, taints, and nodeSelectors become the street signs that keep traffic on the right roads.
 
 === Why Default-Deny Networking?
-By default, Kubernetes lets pods talk freely. Convenient for early development—risky at scale. Flip the model: deny by default, allow explicitly. Now every conversation between services is intentional, reviewed, and recorded—a huge win for security and compliance.
+By default, Kubernetes lets pods talk freely. Convenient for early development, risky at scale. Flip the model: deny by default, allow explicitly. Now every conversation between services is intentional, reviewed, and recorded, a huge win for security and compliance.
 
 === Practical Benefits
 * Containment: A compromised internet-facing service in the DMZ cannot freely talk to secured payroll or control systems.
@@ -28,7 +28,7 @@ By default, Kubernetes lets pods talk freely. Convenient for early development�
 Lead with outcomes: reduced risk, auditability, operational clarity. Then show the city map (compute pools + ingress diagram below) and map each lane and gate to policy or control. Name the standards (IEC 62443, PCI, NIS2) as drivers; keep architecture and enforcement the star.
 
 == Cluster Architecture: Compute Pools & Ingress Layout
-This diagram shows a typical OpenShift deployment where separate compute node pools (DMZ, general-purpose, secured) segregate workloads and network exposure. We explain architecture first so the NetworkPolicy examples have context—placement and ingress controller topology influence policy scope.
+This diagram shows a typical OpenShift deployment where separate compute node pools (DMZ, general-purpose, secured) segregate workloads and network exposure. We explain architecture first so the NetworkPolicy examples have context, placement and ingress controller topology influence policy scope.
 
 [mermaid]
 ----
@@ -81,6 +81,7 @@ flowchart LR
 ----
 
 Why it matters for NetworkPolicies:
+
 * Node pool segmentation changes exposure: ingress controllers in DMZ receive external traffic; secured pool workloads should not.
 * NetworkPolicies are namespace/pod scoped; combine workload labels with placement (taints/tolerations) for clarity.
 * Architecture overview helps map each later policy diagram to where it is intended to run.

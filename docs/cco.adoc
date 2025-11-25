@@ -1,0 +1,54 @@
+
+
+= OpenShift Cloud Credential Operator (CCO) =
+
+The CCO manages cloud credentials for OpenShift components, enabling secure, least-privilege access to cloud APIs. It supports several modes, each with different trade-offs.
+
+== Modes of Operation (Summary)
+
+*Mint Mode*::
+  - CCO mints fine-grained credentials for each component using admin cloud creds.
+  - *Pros:* Least privilege, automatic rotation, strong security.
+  - *Cons:* Requires admin creds in cluster (can be removed after install/upgrade).
+  - *Clouds:* AWS, GCP
+
+*Passthrough Mode*::
+  - One credential with broad permissions is shared with all components.
+  - *Pros:* Simple, no admin creds in cluster, works on most clouds.
+  - *Cons:* Large blast radius, manual updates if permissions change.
+  - *Clouds:* AWS, GCP, Azure, vSphere, KubeVirt, OpenStack, oVirt, Nutanix
+
+*Manual Mode*::
+  - You manually create and manage all credentials and secrets.
+  - *Pros:* No admin creds in cluster, full control.
+  - *Cons:* Tedious, error-prone, high maintenance.
+  - *Clouds:* AWS, IBMCloud, Nutanix
+
+*Short-Lived Tokens (STS/Workload Identity)*::
+  - Uses OIDC and cloud-native identity for short-lived, auto-rotated tokens.
+  - *Pros:* No long-lived secrets, best security, auto-rotation.
+  - *Cons:* Requires extra cloud setup, not always "push-button".
+  - *Clouds:* AWS, Azure, GCP
+
+== Support Matrix (Simplified)
+
+[options="header",cols="1,1,1,1,1,1"]
+|===
+| Cloud     | Mint | Passthrough | Manual | Token (STS) | Notes
+| AWS       | Y    | Y           | Y      | Y           | Best support
+| GCP       | Y    | Y           | Y      | Y           |
+| Azure     | N    | Y           | Y      | Y           | Mint removed
+| vSphere   | N    | Y           | N      | N           |
+| KubeVirt  | N    | Y           | N      | N           |
+| OpenStack | N    | Y           | N      | N           |
+| oVirt     | N    | Y           | N      | N           |
+| IBMCloud  | N    | N           | Y      | N           |
+| Nutanix   | N    | N           | Y      | N           |
+|===
+
+== TL;DR Guidance
+
+* Use *Mint Mode* for best security and automation (if your cloud supports it).
+* Use *Passthrough* for simplicity or unsupported clouds.
+* Use *Manual* only if required by compliance.
+* Use *STS/Workload Identity* for future-proof, keyless security (if you can set it up).

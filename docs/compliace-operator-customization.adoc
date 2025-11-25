@@ -1,0 +1,436 @@
+
+
+= Compliance Beyond Built-in Profiles: Automating Unique Compliance Checks with OpenShift using CustomRule
+
+== Introduction
+
+For security teams responsible for Red Hat OpenShift, the Compliance Operator provides automated baseline checks for common standards (CIS, PCI-DSS, etc.) and produces evidence auditors expect. But auditors and internal policy owners often ask for controls that live outside those standard profiles — organization-specific requirements such as mandatory resource labeling, restricting which users can access cardholder-data-processing applications, or enforcing use of a single, central database.
+
+Historically, these requests result in manual, brittle checks: ad-hoc scripts, grepping `oc` outputs, or marking items as "manually verified." The CustomRule Custom Resource (CRD) addresses this gap by letting you codify custom checks using the Common Expression Language (CEL) and run them with the Compliance Operator alongside built-in checks.
+
+This article shows how to turn auditor requests into executable CustomRule manifests, add them to a TailoredProfile, and include them in Compliance Operator scans so they produce repeatable, auditable evidence.
+
+[important]
+.Note on Feature Status
+The CustomRule feature is Tech Preview. It is available for testing and evaluation only and is not supported by Red Hat Technical Support. The API and behavior may change before General Availability (GA). Avoid using Tech Preview features in production clusters.
+
+== Understanding the CustomRule CRD
+
+CustomRule behaves similarly to the existing Rule CRD but uses CEL expressions as the evaluation engine. Key fields in a CustomRule manifest include:
+
+- `expression`: the CEL expression that evaluates to `true` for compliant resources.
+- `inputs`: the Kubernetes API resources the expression evaluates (keeps scans efficient).
+- `scannerType`: must be `CEL` for CEL-based rules.
+- `title`, `description`, `severity`, and `failureReason`: metadata and actionable guidance when a check fails.
+
+CEL is a small, expressive language well-suited to policy evaluation; you may have seen it in Kubernetes admission policy contexts.
+
+== Examples
+
+=== Example 1: Audit cluster-admin Access with an Allow-List (aligns to CIS 5.1.1)
+
+This CustomRule enforces an allow-list of principals permitted to hold the `cluster-admin` binding. The rule passes only if every subject bound to the `cluster-admin` ClusterRole is present in an approved list.
+
+[source,yaml]
+----
+apiVersion: compliance.openshift.io/v1alpha1
+kind: CustomRule
+metadata:
+	name: cluster-admin-allow-list
+	namespace: openshift-compliance
+spec:
+	description: |-
+		Audits subjects bound to the 'cluster-admin' role against a
+		pre-defined allow-list. This aligns with CIS OpenShift
+		Benchmark 5.1.1, which recommends restricting 'cluster-admin'
+		access. Customize the list for your organization.
+	failureReason: |-
+		Found subject(s) bound to 'cluster-admin' that are NOT
+		on the organizational allow-list.
+	expression: |-
+		crbs.items.filter(crb, crb.metadata.name == 'cluster-admin')[0]
+			.subjects.all(subject,
+				(subject.kind == 'User' && subject.name in [
+					'kubeadmin',
+					'system:admin',
+					'alice@my-company.com'
+				]) ||
+				(subject.kind == 'Group' && subject.name in [
+					'system:masters',
+					'ocp-sre-team'
+				]) ||
+				(subject.kind == 'ServiceAccount' &&
+					has(subject.namespace) &&
+					(subject.namespace + '/' + subject.name) in [
+						'openshift-monitoring/prometheus-k8s'
+					]
+				)
+			)
+	id: cluster_admin_allow_list
+	checkType: Platform
+	inputs:
+		- kubernetesInputSpec:
+				apiVersion: rbac.authorization.k8s.io/v1
+				resource: clusterrolebindings
+			name: crbs
+	scannerType: CEL
+	severity: high
+	title: Audit cluster-admin access against an allow-list
+----
+
+=== Example 2: Discover Unapproved (Shadow) Databases
+
+This rule checks for pods running common database images outside approved namespaces (for example, `central-dba-prod`). If a pod runs a database image in a non-approved namespace, the rule fails and the `failureReason` explains investigation and remediation steps.
+
+[source,yaml]
+----
+apiVersion: compliance.openshift.io/v1alpha1
+kind: CustomRule
+metadata:
+	name: disallow-shadow-databases
+	namespace: openshift-compliance
+spec:
+	description: |-
+		Ensures application teams do not deploy their own 'shadow'
+		database instances (e.g., postgres, mysql, mongo, redis). Applications
+		must use the centrally managed instance in 'central-dba-prod'.
+	failureReason: |-
+		One or more pods were found running a disallowed database image
+		in a namespace not approved for database workloads.
+
+		To find non-compliant pods:
+		`oc get pods -A -o json | jq -r '.items[] | "Namespace: \(.metadata.namespace) Pod: \(.metadata.name) Images: \([.spec.containers[].image] | join(","))"' | grep -E "postgres|mysql|mariadb|mongo|redis" | grep -vE "central-dba-prod|openshift-monitoring"`
+
+		Remediation:
+		1. Review identified pods.
+		2. Delete or reconfigure non-compliant pods to use the approved DB.
+		3. Consider admission policies to prevent regressions.
+	expression: |
+		pods.items.all(pod,
+			pod.metadata.namespace in [
+			'central-dba-prod',
+			'openshift-monitoring'
+			] ||
+			pod.spec.containers.all(container,
+				!['postgres', 'mysql', 'mariadb', 'mongo', 'redis'].exists(
+					db, container.image.contains(db)
+				)
+			)
+		)
+	id: disallow_shadow_databases
+	checkType: Platform
+	inputs:
+		- kubernetesInputSpec:
+				apiVersion: v1
+				resource: pods
+			name: pods
+	scannerType: CEL
+	severity: high
+	title: Disallow Unapproved Database Pods in App Namespaces
+----
+
+=== Example 3: Verify Allowed Registries Configured
+
+Ensure the cluster's image configuration includes required trusted registries.
+
+[source,yaml]
+----
+apiVersion: compliance.openshift.io/v1alpha1
+kind: CustomRule
+metadata:
+	name: allowed-registries-configured
+	namespace: openshift-compliance
+spec:
+	title: "Allowed registries are configured"
+	description: |-
+		Ensure allowed registries are configured so the container runtime
+		only pulls from trusted registries.
+	severity: medium
+	failureReason: |-
+		The trusted registry 'my-trusted-registry.internal.example.com' was not
+		found in 'spec.registrySources.allowedRegistries' for
+		the 'image.config.openshift.io/cluster' resource. Patch the cluster image
+		configuration to add this registry.
+	id: allowed-registries-configured
+	checkType: Platform
+	scannerType: CEL
+	inputs:
+		- kubernetesInputSpec:
+				apiVersion: config.openshift.io/v1
+				resource: images
+			name: imageConfigs
+	expression: |
+		imageConfigs.items.exists(
+			img, img.metadata.name == 'cluster' &&
+			has(img.spec.registrySources) &&
+			img.spec.registrySources != null &&
+			has(img.spec.registrySources.allowedRegistries) &&
+			img.spec.registrySources.allowedRegistries != null &&
+			type(img.spec.registrySources.allowedRegistries) == list &&
+			'my-trusted-registry.internal.example.com' in img.spec.registrySources.allowedRegistries
+		)
+----
+
+These examples can be combined: enforce that only trusted registries are used while preventing unapproved database images in application namespaces.
+
+== Integrating CustomRule Resources into a Scan
+
+Three steps:
+
+.Step 1: Create the CustomRule
+Apply each `CustomRule` manifest to the `openshift-compliance` namespace:
+
+```
+oc apply -f <your-customrule>.yaml -n openshift-compliance
+```
+
+.Step 2: Add the rules to a `TailoredProfile`
+CustomRule resources are included by adding them to a `TailoredProfile`. Note: a single `TailoredProfile` cannot mix standard `Rule` resources and `CustomRule` resources; keep them separate.
+
+[source,yaml]
+----
+apiVersion: compliance.openshift.io/v1alpha1
+kind: TailoredProfile
+metadata:
+	name: custom-security-checks
+	namespace: openshift-compliance
+spec:
+	description: Custom security compliance profile using CEL-based CustomRules
+	enableRules:
+		- kind: CustomRule
+			name: cluster-admin-allow-list
+			rationale: CIS 5.1.1 requires auditing cluster-admin bindings against an allow-list
+		- kind: CustomRule
+			name: disallow-shadow-databases
+			rationale: Ensure the usage of a central, managed database
+		- kind: CustomRule
+			name: allowed-registries-configured
+			rationale: Ensure the cluster only pulls images from trusted registries
+	title: Custom Security Profile
+----
+
+.Step 3: Execute the scan with a `ScanSettingBinding`
+Create a `ScanSettingBinding` to link the `TailoredProfile` to scan settings (for example, the `default` ScanSetting).
+
+[source,yaml]
+----
+apiVersion: compliance.openshift.io/v1alpha1
+kind: ScanSettingBinding
+metadata:
+	name: custom-security-scan
+	namespace: openshift-compliance
+profiles:
+	- apiGroup: compliance.openshift.io/v1alpha1
+		kind: TailoredProfile
+		name: custom-security-checks
+settingsRef:
+	apiGroup: compliance.openshift.io/v1alpha1
+	kind: ScanSetting
+	name: default
+----
+
+== Reviewing Scan Results
+
+After the `ScanSettingBinding` is applied the Compliance Operator will run the scan. To view results:
+
+```
+oc get compliancecheckresults
+```
+
+Example output:
+
+[source]
+----
+NAME                                                      STATUS   SEVERITY
+custom-security-scan-cluster-admin-allow-list             FAIL     high
+custom-security-scan-disallow-shadow-databases            FAIL     high
+custom-security-scan-allowed-registries-configured        FAIL     high
+----
+
+A `FAIL` indicates the rule executed and identified non-compliant resources.
+
+== Best Practices for Authoring CustomRules
+
+- **Passing logic:** CEL expressions should evaluate to `true` when compliant.
+- **Descriptive names:** Use specific `metadata.name` values (e.g., `disallow-hostpath-volumes`).
+- **Helpful descriptions:** Use `spec.description` to explain the risk and include commands to find violating resources.
+- **Actionable `failureReason`:** Describe exact remediation steps administrators should take.
+- **Resource efficiency:** In `spec.inputs`, request only the resources required by the expression.
+- **Keep IDs consistent:** Make `spec.id` and `metadata.name` similar to reduce ambiguity.
+
+== Basic Troubleshooting
+
+- **CustomRule status:** `oc get customrule <your-rule> -o yaml` — an invalid CEL expression will put the rule into an Error state; the rule must be `Ready` to be added to a `TailoredProfile`.
+- **TailoredProfile status:** Ensure the `TailoredProfile` is `Ready` before referencing it in a `ScanSettingBinding`.
+- **Do not mix types:** A `TailoredProfile` cannot include both `Rule` and `CustomRule` kinds.
+- **Rescanning:** After modifying a CustomRule, re-run scans by annotating `ComplianceScan` resources to re-generate `ComplianceCheckResult` objects.
+
+== Scope & Limitations
+
+CustomRule currently supports platform-level checks against Kubernetes and OpenShift API resources (Pods, Roles, cluster configuration, etc.). It does not support host-level checks (files, host processes, permissions). For host-level checks continue using existing node `Rule` resources shipped with the Compliance Operator. Host-level scanning may be considered in future releases.
+
+== Support & Feedback
+
+This feature is Tech Preview. For feedback, file issues, or questions, contact Red Hat Support through the Red Hat Customer Portal.
+
+== Next Steps
+
+- Install the Compliance Operator from OperatorHub via OLM if not already present.
+- Start by applying example `CustomRule` manifests and creating a `TailoredProfile` and `ScanSettingBinding` in a test cluster.
+- Share feedback and example rules with the project to help stabilize the feature.
+
+== References
+
+- CustomRule example repository: https://github.com/ComplianceAsCode/compliance-operator/tree/master/config/samples/custom-rules
+
+== NetworkPolicy Rules: detect allow-all and require deny-all in scoped namespaces
+
+You can enforce NetworkPolicy requirements using two approaches:
+
+- A `CustomRule` (CEL) that scans existing `NetworkPolicy` resources and flags "allow-all" policies in namespaces you choose via a namespace label.
+- A separate `CustomRule` that ensures each labeled namespace has a "deny-all" policy (a `NetworkPolicy` that selects all pods and has no ingress/egress rules), ensuring isolation.
+
+Below are two `CustomRule` examples that scope enforcement to namespaces with the label `compliance/enforce-networkpolicies=true`. Modify the label key/value to match your organization.
+
+=== Detect allow-all NetworkPolicies in labeled namespaces
+
+This rule passes only when no "allow-all" NetworkPolicies exist in namespaces labeled `compliance/enforce-networkpolicies=true`.
+
+[source,yaml]
+----
+apiVersion: compliance.openshift.io/v1alpha1
+kind: CustomRule
+metadata:
+	name: netpol-disallow-allow-all-in-labeled-namespaces
+	namespace: openshift-compliance
+spec:
+	title: Disallow allow-all NetworkPolicies in labeled namespaces
+	description: |-
+		Flags NetworkPolicies that permit all traffic (empty podSelector plus
+		empty ingress/egress rules) in namespaces labeled
+		`compliance/enforce-networkpolicies=true`.
+	failureReason: |-
+		One or more "allow-all" NetworkPolicies were found in namespaces
+		labeled `compliance/enforce-networkpolicies=true`. Replace them with
+		more restrictive NetworkPolicies or remove the namespace label to opt-out.
+	id: netpol_disallow_allow_all_labeled
+	checkType: Platform
+	scannerType: CEL
+	inputs:
+		- kubernetesInputSpec:
+				apiVersion: networking.k8s.io/v1
+				resource: networkpolicies
+			name: netpols
+		- kubernetesInputSpec:
+				apiVersion: v1
+				resource: namespaces
+			name: namespaces
+	expression: |
+		!netpols.items.exists(np,
+			namespaces.items.exists(ns,
+				ns.metadata.name == np.metadata.namespace &&
+				ns.metadata.labels['compliance/enforce-networkpolicies'] == 'true'
+			) &&
+			np.spec.podSelector == {} &&
+			(
+				(has(np.spec.ingress) && size(np.spec.ingress) == 1 && np.spec.ingress[0] == {}) ||
+				(has(np.spec.egress)  && size(np.spec.egress)  == 1 && np.spec.egress[0]  == {})
+			)
+		)
+	severity: high
+----
+
+Notes:
+
+- The expression returns `true` (pass) only if there are no matching allow-all NetworkPolicies in labeled namespaces.
+- Adjust the label key/value to match your environment.
+
+=== Require a deny-all NetworkPolicy in labeled namespaces
+
+This rule ensures every namespace labeled `compliance/enforce-networkpolicies=true` has at least one "deny-all" NetworkPolicy that selects all pods and defines no ingress/egress rules (i.e., defaults to denying traffic).
+
+[source,yaml]
+----
+apiVersion: compliance.openshift.io/v1alpha1
+kind: CustomRule
+metadata:
+	name: netpol-require-deny-all-in-labeled-namespaces
+	namespace: openshift-compliance
+spec:
+	title: Require deny-all NetworkPolicy in labeled namespaces
+	description: |-
+		Validates that namespaces labeled `compliance/enforce-networkpolicies=true`
+		include at least one NetworkPolicy that selects all pods and contains no
+		ingress/egress rules (deny-all). This helps ensure network isolation.
+	failureReason: |-
+		One or more labeled namespaces do not contain a deny-all NetworkPolicy.
+		Add a NetworkPolicy with `podSelector: {}` and no `ingress`/`egress`
+		rules (and `policyTypes: ["Ingress","Egress"]` if you need both).
+	id: netpol_require_deny_all_labeled
+	checkType: Platform
+	scannerType: CEL
+	inputs:
+		- kubernetesInputSpec:
+				apiVersion: networking.k8s.io/v1
+				resource: networkpolicies
+			name: netpols
+		- kubernetesInputSpec:
+				apiVersion: v1
+				resource: namespaces
+			name: namespaces
+	expression: |
+		namespaces.items.all(ns,
+			ns.metadata.labels['compliance/enforce-networkpolicies'] != 'true' ||
+			netpols.items.exists(np,
+				np.metadata.namespace == ns.metadata.name &&
+				np.spec.podSelector == {} &&
+				(!has(np.spec.ingress) || size(np.spec.ingress) == 0) &&
+				(!has(np.spec.egress)  || size(np.spec.egress)  == 0)
+			)
+		)
+	severity: high
+----
+
+Notes:
+
+- This expression evaluates to `true` only when every labeled namespace either
+	has a deny-all NetworkPolicy or is not labeled for enforcement.
+- You may prefer separate deny-all policies for ingress and egress depending on
+	operational constraints; adjust the expression accordingly.
+
+=== Scoping a ValidatingAdmissionPolicy to labeled namespaces
+
+If you also use `ValidatingAdmissionPolicy` (admission-time blocking) you can limit enforcement to namespaces with a label using `matchConstraints.namespaceSelector`. Example (Kubernetes `admissionregistration.k8s.io/v1`):
+
+[source,yaml]
+----
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+	name: block-allow-all-netpol
+spec:
+	failurePolicy: Fail
+	matchConstraints:
+		resourceRules:
+			- apiGroups: ["networking.k8s.io"]
+				apiVersions: ["v1"]
+				operations: ["CREATE", "UPDATE", "PATCH"]
+				resources: ["networkpolicies"]
+		namespaceSelector:
+			matchLabels:
+				compliance/enforce-networkpolicies: "true"
+	validations:
+		- expression: "!(
+				object.spec.podSelector == {} &&
+				(
+					(has(object.spec.ingress) && size(object.spec.ingress) == 1 && object.spec.ingress[0] == {}) ||
+					(has(object.spec.egress)  && size(object.spec.egress)  == 1 && object.spec.egress[0]  == {})
+				)
+			)"
+			message: "Allow-all NetworkPolicies (empty {} ingress/egress rules) are forbidden in labeled namespaces. Deny-all is allowed."
+----
+
+Note: `namespaceSelector` limits the admission policy to matching namespaces; adapt the label to your convention.
+
+== End of NetworkPolicy Rules
+
