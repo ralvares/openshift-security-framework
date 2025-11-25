@@ -433,6 +433,120 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 #footer-text{color:rgba(0,0,0,.6);font-size:.9em}}
 @media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
 </style>
+<style>
+pre.rouge table td { padding: 5px; }
+pre.rouge table pre { margin: 0; }
+pre.rouge, pre.rouge .w {
+  color: #24292f;
+  background-color: #f6f8fa;
+}
+pre.rouge .k, pre.rouge .kd, pre.rouge .kn, pre.rouge .kp, pre.rouge .kr, pre.rouge .kt, pre.rouge .kv {
+  color: #cf222e;
+}
+pre.rouge .gr {
+  color: #f6f8fa;
+}
+pre.rouge .gd {
+  color: #82071e;
+  background-color: #ffebe9;
+}
+pre.rouge .nb {
+  color: #953800;
+}
+pre.rouge .nc {
+  color: #953800;
+}
+pre.rouge .no {
+  color: #953800;
+}
+pre.rouge .nn {
+  color: #953800;
+}
+pre.rouge .sr {
+  color: #116329;
+}
+pre.rouge .na {
+  color: #116329;
+}
+pre.rouge .nt {
+  color: #116329;
+}
+pre.rouge .gi {
+  color: #116329;
+  background-color: #dafbe1;
+}
+pre.rouge .kc {
+  color: #0550ae;
+}
+pre.rouge .l, pre.rouge .ld, pre.rouge .m, pre.rouge .mb, pre.rouge .mf, pre.rouge .mh, pre.rouge .mi, pre.rouge .il, pre.rouge .mo, pre.rouge .mx {
+  color: #0550ae;
+}
+pre.rouge .sb {
+  color: #0550ae;
+}
+pre.rouge .bp {
+  color: #0550ae;
+}
+pre.rouge .ne {
+  color: #0550ae;
+}
+pre.rouge .nl {
+  color: #0550ae;
+}
+pre.rouge .py {
+  color: #0550ae;
+}
+pre.rouge .nv, pre.rouge .vc, pre.rouge .vg, pre.rouge .vi, pre.rouge .vm {
+  color: #0550ae;
+}
+pre.rouge .o, pre.rouge .ow {
+  color: #0550ae;
+}
+pre.rouge .gh {
+  color: #0550ae;
+  font-weight: bold;
+}
+pre.rouge .gu {
+  color: #0550ae;
+  font-weight: bold;
+}
+pre.rouge .s, pre.rouge .sa, pre.rouge .sc, pre.rouge .dl, pre.rouge .sd, pre.rouge .s2, pre.rouge .se, pre.rouge .sh, pre.rouge .sx, pre.rouge .s1, pre.rouge .ss {
+  color: #0a3069;
+}
+pre.rouge .nd {
+  color: #8250df;
+}
+pre.rouge .nf, pre.rouge .fm {
+  color: #8250df;
+}
+pre.rouge .err {
+  color: #f6f8fa;
+  background-color: #82071e;
+}
+pre.rouge .c, pre.rouge .ch, pre.rouge .cd, pre.rouge .cm, pre.rouge .cp, pre.rouge .cpf, pre.rouge .c1, pre.rouge .cs {
+  color: #6e7781;
+}
+pre.rouge .gl {
+  color: #6e7781;
+}
+pre.rouge .gt {
+  color: #6e7781;
+}
+pre.rouge .ni {
+  color: #24292f;
+}
+pre.rouge .si {
+  color: #24292f;
+}
+pre.rouge .ge {
+  color: #24292f;
+  font-style: italic;
+}
+pre.rouge .gs {
+  color: #24292f;
+  font-weight: bold;
+}
+</style>
 </head>
 <body class="article">
 <div id="header">
@@ -531,7 +645,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">cat &lt;&lt;EOF | oc apply -f -
+<pre class="rouge highlight"><code data-lang="bash"><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | oc apply -f -
 apiVersion: v1
 kind: Service
 metadata:
@@ -540,7 +654,7 @@ metadata:
 spec:
   type: ExternalName
   externalName: api.vulnerawise.ai
-EOF</code></pre>
+EOF</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -548,7 +662,7 @@ EOF</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>https://vulnerawise-api.externalname.svc</code></pre>
+<pre class="rouge highlight"><code>https://vulnerawise-api.externalname.svc</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -564,10 +678,10 @@ EOF</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">oc -n externalname run curltester \
-  --image=quay.io/curl/curl \
-  --restart=Never \
-  --command -- sleep infinity</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">oc <span class="nt">-n</span> externalname run curltester <span class="se">\</span>
+  <span class="nt">--image</span><span class="o">=</span>quay.io/curl/curl <span class="se">\</span>
+  <span class="nt">--restart</span><span class="o">=</span>Never <span class="se">\</span>
+  <span class="nt">--command</span> <span class="nt">--</span> <span class="nb">sleep </span>infinity</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -575,7 +689,7 @@ EOF</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>run=curltester</code></pre>
+<pre class="rouge highlight"><code>run=curltester</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -591,7 +705,7 @@ EOF</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code>api.vulnerawise.ai -&gt; 51.79.73.188/32</code></pre>
+<pre class="rouge highlight"><code>api.vulnerawise.ai -&gt; 51.79.73.188/32</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -599,26 +713,26 @@ EOF</code></pre>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-yaml" data-lang="yaml">apiVersion: policy.networking.k8s.io/v1alpha1
-kind: AdminNetworkPolicy
-metadata:
-  name: corporate-external-networks-guardrail
-spec:
-  priority: 12
-  subject:
-    namespaces:
-      matchLabels:
-        security.allow/networks: "true"
-  egress:
-    - name: allow-vulnerawise-api
-      action: Allow
-      to:
-        - networks:
-            - 51.79.73.188/32
-      ports:
-        - portNumber:
-            protocol: TCP
-            port: 443</code></pre>
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">policy.networking.k8s.io/v1alpha1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">AdminNetworkPolicy</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">corporate-external-networks-guardrail</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">priority</span><span class="pi">:</span> <span class="m">12</span>
+  <span class="na">subject</span><span class="pi">:</span>
+    <span class="na">namespaces</span><span class="pi">:</span>
+      <span class="na">matchLabels</span><span class="pi">:</span>
+        <span class="na">security.allow/networks</span><span class="pi">:</span> <span class="s2">"</span><span class="s">true"</span>
+  <span class="na">egress</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">allow-vulnerawise-api</span>
+      <span class="na">action</span><span class="pi">:</span> <span class="s">Allow</span>
+      <span class="na">to</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">networks</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s">51.79.73.188/32</span>
+      <span class="na">ports</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">portNumber</span><span class="pi">:</span>
+            <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
+            <span class="na">port</span><span class="pi">:</span> <span class="s">443</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -637,7 +751,7 @@ spec:
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">oc -n externalname exec curltester -- nslookup vulnerawise-api</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">oc <span class="nt">-n</span> externalname <span class="nb">exec </span>curltester <span class="nt">--</span> nslookup vulnerawise-api</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -645,8 +759,8 @@ spec:
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">oc -n externalname exec curltester -- curl -vk \
-  https://vulnerawise-api.externalname.svc/v1/vuln?cve=CVE-2025-2368</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">oc <span class="nt">-n</span> externalname <span class="nb">exec </span>curltester <span class="nt">--</span> curl <span class="nt">-vk</span> <span class="se">\</span>
+  https://vulnerawise-api.externalname.svc/v1/vuln?cve<span class="o">=</span>CVE-2025-2368</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -654,8 +768,8 @@ spec:
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">oc -n externalname exec curltester -- curl -vk \
-  https://51.79.73.188/v1/vuln?cve=CVE-2025-2368</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">oc <span class="nt">-n</span> externalname <span class="nb">exec </span>curltester <span class="nt">--</span> curl <span class="nt">-vk</span> <span class="se">\</span>
+  https://51.79.73.188/v1/vuln?cve<span class="o">=</span>CVE-2025-2368</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -663,7 +777,7 @@ spec:
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="highlight"><code class="language-bash" data-lang="bash">oc -n externalname exec curltester -- curl -vk https://google.com</code></pre>
+<pre class="rouge highlight"><code data-lang="bash">oc <span class="nt">-n</span> externalname <span class="nb">exec </span>curltester <span class="nt">--</span> curl <span class="nt">-vk</span> https://google.com</code></pre>
 </div>
 </div>
 </div>
