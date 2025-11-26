@@ -478,7 +478,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_4_network_segmentation_traffic_governance">4. Network Segmentation &amp; Traffic Governance</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Workload identity is not enough; the network must enforce boundaries. NetworkPolicy provides the foundation: namespaces default to deny-all ingress and deny-all egress, and only required connections are explicitly allowed. When Multus or User-Defined Networks are used, each attachment becomes its own network zone with its own access rules. Service Mesh can add encrypted and authenticated service-to-service communication when needed. Segmentation becomes explicit, documented, and testable—exactly what compliance frameworks expect when assessing lateral-movement risk.</p>
+<p>The network must enforce boundaries. By default, OpenShift allows unrestricted traffic between all pods. NetworkPolicy is the primary tool to restrict this, allowing teams to implement a "default deny" posture where only necessary connections are permitted. To ensure consistent governance across the cluster, AdminNetworkPolicy allows security teams to enforce mandatory rules that developers cannot override, while BaselineAdminNetworkPolicy provides a default fallback for any traffic not explicitly handled. Segmentation becomes explicit, documented, and testable—exactly what compliance frameworks expect when assessing lateral-movement risk.</p>
 </div>
 </div>
 </div>
@@ -543,7 +543,7 @@ This is the security posture that all major compliance frameworks expect, implem
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-11-26 17:42:54 +0400
+Last updated 2025-11-26 17:46:56 +0400
 </div>
 </div>
 </body>
