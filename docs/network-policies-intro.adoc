@@ -42,13 +42,13 @@ Anything not explicitly allowed becomes denied.
 
 NetworkPolicies give you:
 
-* Isolation — pods only receive the traffic you approve
+* Isolation - pods only receive the traffic you approve
 
-* Least privilege — each workload gets the minimal network access it needs
+* Least privilege - each workload gets the minimal network access it needs
 
-* Auditability — allowed flows are declared in YAML and tracked in Git
+* Auditability - allowed flows are declared in YAML and tracked in Git
 
-* Segmentation — clean boundaries between teams, apps, and environments
+* Segmentation - clean boundaries between teams, apps, and environments
 
 In short: NetworkPolicies turn Kubernetes traffic from “anything goes” to “only what we approve.”
 

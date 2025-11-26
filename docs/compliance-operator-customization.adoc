@@ -36,46 +36,46 @@ This CustomRule enforces an allow-list of principals permitted to hold the `clus
 apiVersion: compliance.openshift.io/v1alpha1
 kind: CustomRule
 metadata:
-	name: cluster-admin-allow-list
-	namespace: openshift-compliance
+    name: cluster-admin-allow-list
+    namespace: openshift-compliance
 spec:
-	description: |-
-		Audits subjects bound to the 'cluster-admin' role against a
-		pre-defined allow-list. This aligns with CIS OpenShift
-		Benchmark 5.1.1, which recommends restricting 'cluster-admin'
-		access. Customize the list for your organization.
-	failureReason: |-
-		Found subject(s) bound to 'cluster-admin' that are NOT
-		on the organizational allow-list.
-	expression: |-
-		crbs.items.filter(crb, crb.metadata.name == 'cluster-admin')[0]
-			.subjects.all(subject,
-				(subject.kind == 'User' && subject.name in [
-					'kubeadmin',
-					'system:admin',
-					'alice@my-company.com'
-				]) ||
-				(subject.kind == 'Group' && subject.name in [
-					'system:masters',
-					'ocp-sre-team'
-				]) ||
-				(subject.kind == 'ServiceAccount' &&
-					has(subject.namespace) &&
-					(subject.namespace + '/' + subject.name) in [
-						'openshift-monitoring/prometheus-k8s'
-					]
-				)
-			)
-	id: cluster_admin_allow_list
-	checkType: Platform
-	inputs:
-		- kubernetesInputSpec:
-				apiVersion: rbac.authorization.k8s.io/v1
-				resource: clusterrolebindings
-			name: crbs
-	scannerType: CEL
-	severity: high
-	title: Audit cluster-admin access against an allow-list
+    description: |-
+        Audits subjects bound to the 'cluster-admin' role against a
+        pre-defined allow-list. This aligns with CIS OpenShift
+        Benchmark 5.1.1, which recommends restricting 'cluster-admin'
+        access. Customize the list for your organization.
+    failureReason: |-
+        Found subject(s) bound to 'cluster-admin' that are NOT
+        on the organizational allow-list.
+    expression: |-
+        crbs.items.filter(crb, crb.metadata.name == 'cluster-admin')[0]
+            .subjects.all(subject,
+                (subject.kind == 'User' && subject.name in [
+                    'kubeadmin',
+                    'system:admin',
+                    'alice@my-company.com'
+                ]) ||
+                (subject.kind == 'Group' && subject.name in [
+                    'system:masters',
+                    'ocp-sre-team'
+                ]) ||
+                (subject.kind == 'ServiceAccount' &&
+                    has(subject.namespace) &&
+                    (subject.namespace + '/' + subject.name) in [
+                        'openshift-monitoring/prometheus-k8s'
+                    ]
+                )
+            )
+    id: cluster_admin_allow_list
+    checkType: Platform
+    inputs:
+        - kubernetesInputSpec:
+                apiVersion: rbac.authorization.k8s.io/v1
+                resource: clusterrolebindings
+            name: crbs
+    scannerType: CEL
+    severity: high
+    title: Audit cluster-admin access against an allow-list
 ----
 
 === Example 2: Discover Unapproved (Shadow) Databases
@@ -87,46 +87,46 @@ This rule checks for pods running common database images outside approved namesp
 apiVersion: compliance.openshift.io/v1alpha1
 kind: CustomRule
 metadata:
-	name: disallow-shadow-databases
-	namespace: openshift-compliance
+    name: disallow-shadow-databases
+    namespace: openshift-compliance
 spec:
-	description: |-
-		Ensures application teams do not deploy their own 'shadow'
-		database instances (e.g., postgres, mysql, mongo, redis). Applications
-		must use the centrally managed instance in 'central-dba-prod'.
-	failureReason: |-
-		One or more pods were found running a disallowed database image
-		in a namespace not approved for database workloads.
+    description: |-
+        Ensures application teams do not deploy their own 'shadow'
+        database instances (e.g., postgres, mysql, mongo, redis). Applications
+        must use the centrally managed instance in 'central-dba-prod'.
+    failureReason: |-
+        One or more pods were found running a disallowed database image
+        in a namespace not approved for database workloads.
 
-		To find non-compliant pods:
-		`oc get pods -A -o json | jq -r '.items[] | "Namespace: \(.metadata.namespace) Pod: \(.metadata.name) Images: \([.spec.containers[].image] | join(","))"' | grep -E "postgres|mysql|mariadb|mongo|redis" | grep -vE "central-dba-prod|openshift-monitoring"`
+        To find non-compliant pods:
+        `oc get pods -A -o json | jq -r '.items[] | "Namespace: \(.metadata.namespace) Pod: \(.metadata.name) Images: \([.spec.containers[].image] | join(","))"' | grep -E "postgres|mysql|mariadb|mongo|redis" | grep -vE "central-dba-prod|openshift-monitoring"`
 
-		Remediation:
-		1. Review identified pods.
-		2. Delete or reconfigure non-compliant pods to use the approved DB.
-		3. Consider admission policies to prevent regressions.
-	expression: |
-		pods.items.all(pod,
-			pod.metadata.namespace in [
-			'central-dba-prod',
-			'openshift-monitoring'
-			] ||
-			pod.spec.containers.all(container,
-				!['postgres', 'mysql', 'mariadb', 'mongo', 'redis'].exists(
-					db, container.image.contains(db)
-				)
-			)
-		)
-	id: disallow_shadow_databases
-	checkType: Platform
-	inputs:
-		- kubernetesInputSpec:
-				apiVersion: v1
-				resource: pods
-			name: pods
-	scannerType: CEL
-	severity: high
-	title: Disallow Unapproved Database Pods in App Namespaces
+        Remediation:
+        1. Review identified pods.
+        2. Delete or reconfigure non-compliant pods to use the approved DB.
+        3. Consider admission policies to prevent regressions.
+    expression: |
+        pods.items.all(pod,
+            pod.metadata.namespace in [
+            'central-dba-prod',
+            'openshift-monitoring'
+            ] ||
+            pod.spec.containers.all(container,
+                !['postgres', 'mysql', 'mariadb', 'mongo', 'redis'].exists(
+                    db, container.image.contains(db)
+                )
+            )
+        )
+    id: disallow_shadow_databases
+    checkType: Platform
+    inputs:
+        - kubernetesInputSpec:
+                apiVersion: v1
+                resource: pods
+            name: pods
+    scannerType: CEL
+    severity: high
+    title: Disallow Unapproved Database Pods in App Namespaces
 ----
 
 === Example 3: Verify Allowed Registries Configured
@@ -138,37 +138,37 @@ Ensure the cluster's image configuration includes required trusted registries.
 apiVersion: compliance.openshift.io/v1alpha1
 kind: CustomRule
 metadata:
-	name: allowed-registries-configured
-	namespace: openshift-compliance
+    name: allowed-registries-configured
+    namespace: openshift-compliance
 spec:
-	title: "Allowed registries are configured"
-	description: |-
-		Ensure allowed registries are configured so the container runtime
-		only pulls from trusted registries.
-	severity: medium
-	failureReason: |-
-		The trusted registry 'my-trusted-registry.internal.example.com' was not
-		found in 'spec.registrySources.allowedRegistries' for
-		the 'image.config.openshift.io/cluster' resource. Patch the cluster image
-		configuration to add this registry.
-	id: allowed-registries-configured
-	checkType: Platform
-	scannerType: CEL
-	inputs:
-		- kubernetesInputSpec:
-				apiVersion: config.openshift.io/v1
-				resource: images
-			name: imageConfigs
-	expression: |
-		imageConfigs.items.exists(
-			img, img.metadata.name == 'cluster' &&
-			has(img.spec.registrySources) &&
-			img.spec.registrySources != null &&
-			has(img.spec.registrySources.allowedRegistries) &&
-			img.spec.registrySources.allowedRegistries != null &&
-			type(img.spec.registrySources.allowedRegistries) == list &&
-			'my-trusted-registry.internal.example.com' in img.spec.registrySources.allowedRegistries
-		)
+    title: "Allowed registries are configured"
+    description: |-
+        Ensure allowed registries are configured so the container runtime
+        only pulls from trusted registries.
+    severity: medium
+    failureReason: |-
+        The trusted registry 'my-trusted-registry.internal.example.com' was not
+        found in 'spec.registrySources.allowedRegistries' for
+        the 'image.config.openshift.io/cluster' resource. Patch the cluster image
+        configuration to add this registry.
+    id: allowed-registries-configured
+    checkType: Platform
+    scannerType: CEL
+    inputs:
+        - kubernetesInputSpec:
+                apiVersion: config.openshift.io/v1
+                resource: images
+            name: imageConfigs
+    expression: |
+        imageConfigs.items.exists(
+            img, img.metadata.name == 'cluster' &&
+            has(img.spec.registrySources) &&
+            img.spec.registrySources != null &&
+            has(img.spec.registrySources.allowedRegistries) &&
+            img.spec.registrySources.allowedRegistries != null &&
+            type(img.spec.registrySources.allowedRegistries) == list &&
+            'my-trusted-registry.internal.example.com' in img.spec.registrySources.allowedRegistries
+        )
 ----
 
 These examples can be combined: enforce that only trusted registries are used while preventing unapproved database images in application namespaces.
@@ -192,21 +192,21 @@ CustomRule resources are included by adding them to a `TailoredProfile`. Note: a
 apiVersion: compliance.openshift.io/v1alpha1
 kind: TailoredProfile
 metadata:
-	name: custom-security-checks
-	namespace: openshift-compliance
+    name: custom-security-checks
+    namespace: openshift-compliance
 spec:
-	description: Custom security compliance profile using CEL-based CustomRules
-	enableRules:
-		- kind: CustomRule
-			name: cluster-admin-allow-list
-			rationale: CIS 5.1.1 requires auditing cluster-admin bindings against an allow-list
-		- kind: CustomRule
-			name: disallow-shadow-databases
-			rationale: Ensure the usage of a central, managed database
-		- kind: CustomRule
-			name: allowed-registries-configured
-			rationale: Ensure the cluster only pulls images from trusted registries
-	title: Custom Security Profile
+    description: Custom security compliance profile using CEL-based CustomRules
+    enableRules:
+        - kind: CustomRule
+            name: cluster-admin-allow-list
+            rationale: CIS 5.1.1 requires auditing cluster-admin bindings against an allow-list
+        - kind: CustomRule
+            name: disallow-shadow-databases
+            rationale: Ensure the usage of a central, managed database
+        - kind: CustomRule
+            name: allowed-registries-configured
+            rationale: Ensure the cluster only pulls images from trusted registries
+    title: Custom Security Profile
 ----
 
 .Step 3: Execute the scan with a `ScanSettingBinding`
@@ -217,16 +217,16 @@ Create a `ScanSettingBinding` to link the `TailoredProfile` to scan settings (fo
 apiVersion: compliance.openshift.io/v1alpha1
 kind: ScanSettingBinding
 metadata:
-	name: custom-security-scan
-	namespace: openshift-compliance
+    name: custom-security-scan
+    namespace: openshift-compliance
 profiles:
-	- apiGroup: compliance.openshift.io/v1alpha1
-		kind: TailoredProfile
-		name: custom-security-checks
+    - apiGroup: compliance.openshift.io/v1alpha1
+        kind: TailoredProfile
+        name: custom-security-checks
 settingsRef:
-	apiGroup: compliance.openshift.io/v1alpha1
-	kind: ScanSetting
-	name: default
+    apiGroup: compliance.openshift.io/v1alpha1
+    kind: ScanSetting
+    name: default
 ----
 
 == Reviewing Scan Results
@@ -301,43 +301,43 @@ This rule passes only when no "allow-all" NetworkPolicies exist in namespaces la
 apiVersion: compliance.openshift.io/v1alpha1
 kind: CustomRule
 metadata:
-	name: netpol-disallow-allow-all-in-labeled-namespaces
-	namespace: openshift-compliance
+    name: netpol-disallow-allow-all-in-labeled-namespaces
+    namespace: openshift-compliance
 spec:
-	title: Disallow allow-all NetworkPolicies in labeled namespaces
-	description: |-
-		Flags NetworkPolicies that permit all traffic (empty podSelector plus
-		empty ingress/egress rules) in namespaces labeled
-		`compliance/enforce-networkpolicies=true`.
-	failureReason: |-
-		One or more "allow-all" NetworkPolicies were found in namespaces
-		labeled `compliance/enforce-networkpolicies=true`. Replace them with
-		more restrictive NetworkPolicies or remove the namespace label to opt-out.
-	id: netpol_disallow_allow_all_labeled
-	checkType: Platform
-	scannerType: CEL
-	inputs:
-		- kubernetesInputSpec:
-				apiVersion: networking.k8s.io/v1
-				resource: networkpolicies
-			name: netpols
-		- kubernetesInputSpec:
-				apiVersion: v1
-				resource: namespaces
-			name: namespaces
-	expression: |
-		!netpols.items.exists(np,
-			namespaces.items.exists(ns,
-				ns.metadata.name == np.metadata.namespace &&
-				ns.metadata.labels['compliance/enforce-networkpolicies'] == 'true'
-			) &&
-			np.spec.podSelector == {} &&
-			(
-				(has(np.spec.ingress) && size(np.spec.ingress) == 1 && np.spec.ingress[0] == {}) ||
-				(has(np.spec.egress)  && size(np.spec.egress)  == 1 && np.spec.egress[0]  == {})
-			)
-		)
-	severity: high
+    title: Disallow allow-all NetworkPolicies in labeled namespaces
+    description: |-
+        Flags NetworkPolicies that permit all traffic (empty podSelector plus
+        empty ingress/egress rules) in namespaces labeled
+        `compliance/enforce-networkpolicies=true`.
+    failureReason: |-
+        One or more "allow-all" NetworkPolicies were found in namespaces
+        labeled `compliance/enforce-networkpolicies=true`. Replace them with
+        more restrictive NetworkPolicies or remove the namespace label to opt-out.
+    id: netpol_disallow_allow_all_labeled
+    checkType: Platform
+    scannerType: CEL
+    inputs:
+        - kubernetesInputSpec:
+                apiVersion: networking.k8s.io/v1
+                resource: networkpolicies
+            name: netpols
+        - kubernetesInputSpec:
+                apiVersion: v1
+                resource: namespaces
+            name: namespaces
+    expression: |
+        !netpols.items.exists(np,
+            namespaces.items.exists(ns,
+                ns.metadata.name == np.metadata.namespace &&
+                ns.metadata.labels['compliance/enforce-networkpolicies'] == 'true'
+            ) &&
+            np.spec.podSelector == {} &&
+            (
+                (has(np.spec.ingress) && size(np.spec.ingress) == 1 && np.spec.ingress[0] == {}) ||
+                (has(np.spec.egress)  && size(np.spec.egress)  == 1 && np.spec.egress[0]  == {})
+            )
+        )
+    severity: high
 ----
 
 Notes:
@@ -354,49 +354,49 @@ This rule ensures every namespace labeled `compliance/enforce-networkpolicies=tr
 apiVersion: compliance.openshift.io/v1alpha1
 kind: CustomRule
 metadata:
-	name: netpol-require-deny-all-in-labeled-namespaces
-	namespace: openshift-compliance
+    name: netpol-require-deny-all-in-labeled-namespaces
+    namespace: openshift-compliance
 spec:
-	title: Require deny-all NetworkPolicy in labeled namespaces
-	description: |-
-		Validates that namespaces labeled `compliance/enforce-networkpolicies=true`
-		include at least one NetworkPolicy that selects all pods and contains no
-		ingress/egress rules (deny-all). This helps ensure network isolation.
-	failureReason: |-
-		One or more labeled namespaces do not contain a deny-all NetworkPolicy.
-		Add a NetworkPolicy with `podSelector: {}` and no `ingress`/`egress`
-		rules (and `policyTypes: ["Ingress","Egress"]` if you need both).
-	id: netpol_require_deny_all_labeled
-	checkType: Platform
-	scannerType: CEL
-	inputs:
-		- kubernetesInputSpec:
-				apiVersion: networking.k8s.io/v1
-				resource: networkpolicies
-			name: netpols
-		- kubernetesInputSpec:
-				apiVersion: v1
-				resource: namespaces
-			name: namespaces
-	expression: |
-		namespaces.items.all(ns,
-			ns.metadata.labels['compliance/enforce-networkpolicies'] != 'true' ||
-			netpols.items.exists(np,
-				np.metadata.namespace == ns.metadata.name &&
-				np.spec.podSelector == {} &&
-				(!has(np.spec.ingress) || size(np.spec.ingress) == 0) &&
-				(!has(np.spec.egress)  || size(np.spec.egress)  == 0)
-			)
-		)
-	severity: high
+    title: Require deny-all NetworkPolicy in labeled namespaces
+    description: |-
+        Validates that namespaces labeled `compliance/enforce-networkpolicies=true`
+        include at least one NetworkPolicy that selects all pods and contains no
+        ingress/egress rules (deny-all). This helps ensure network isolation.
+    failureReason: |-
+        One or more labeled namespaces do not contain a deny-all NetworkPolicy.
+        Add a NetworkPolicy with `podSelector: {}` and no `ingress`/`egress`
+        rules (and `policyTypes: ["Ingress","Egress"]` if you need both).
+    id: netpol_require_deny_all_labeled
+    checkType: Platform
+    scannerType: CEL
+    inputs:
+        - kubernetesInputSpec:
+                apiVersion: networking.k8s.io/v1
+                resource: networkpolicies
+            name: netpols
+        - kubernetesInputSpec:
+                apiVersion: v1
+                resource: namespaces
+            name: namespaces
+    expression: |
+        namespaces.items.all(ns,
+            ns.metadata.labels['compliance/enforce-networkpolicies'] != 'true' ||
+            netpols.items.exists(np,
+                np.metadata.namespace == ns.metadata.name &&
+                np.spec.podSelector == {} &&
+                (!has(np.spec.ingress) || size(np.spec.ingress) == 0) &&
+                (!has(np.spec.egress)  || size(np.spec.egress)  == 0)
+            )
+        )
+    severity: high
 ----
 
 Notes:
 
 - This expression evaluates to `true` only when every labeled namespace either
-	has a deny-all NetworkPolicy or is not labeled for enforcement.
+    has a deny-all NetworkPolicy or is not labeled for enforcement.
 - You may prefer separate deny-all policies for ingress and egress depending on
-	operational constraints; adjust the expression accordingly.
+    operational constraints; adjust the expression accordingly.
 
 === Scoping a ValidatingAdmissionPolicy to labeled namespaces
 
@@ -407,27 +407,27 @@ If you also use `ValidatingAdmissionPolicy` (admission-time blocking) you can li
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingAdmissionPolicy
 metadata:
-	name: block-allow-all-netpol
+    name: block-allow-all-netpol
 spec:
-	failurePolicy: Fail
-	matchConstraints:
-		resourceRules:
-			- apiGroups: ["networking.k8s.io"]
-				apiVersions: ["v1"]
-				operations: ["CREATE", "UPDATE", "PATCH"]
-				resources: ["networkpolicies"]
-		namespaceSelector:
-			matchLabels:
-				compliance/enforce-networkpolicies: "true"
-	validations:
-		- expression: "!(
-				object.spec.podSelector == {} &&
-				(
-					(has(object.spec.ingress) && size(object.spec.ingress) == 1 && object.spec.ingress[0] == {}) ||
-					(has(object.spec.egress)  && size(object.spec.egress)  == 1 && object.spec.egress[0]  == {})
-				)
-			)"
-			message: "Allow-all NetworkPolicies (empty {} ingress/egress rules) are forbidden in labeled namespaces. Deny-all is allowed."
+    failurePolicy: Fail
+    matchConstraints:
+        resourceRules:
+            - apiGroups: ["networking.k8s.io"]
+                apiVersions: ["v1"]
+                operations: ["CREATE", "UPDATE", "PATCH"]
+                resources: ["networkpolicies"]
+        namespaceSelector:
+            matchLabels:
+                compliance/enforce-networkpolicies: "true"
+    validations:
+        - expression: "!(
+                object.spec.podSelector == {} &&
+                (
+                    (has(object.spec.ingress) && size(object.spec.ingress) == 1 && object.spec.ingress[0] == {}) ||
+                    (has(object.spec.egress)  && size(object.spec.egress)  == 1 && object.spec.egress[0]  == {})
+                )
+            )"
+            message: "Allow-all NetworkPolicies (empty {} ingress/egress rules) are forbidden in labeled namespaces. Deny-all is allowed."
 ----
 
 Note: `namespaceSelector` limits the admission policy to matching namespaces; adapt the label to your convention.
