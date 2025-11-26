@@ -614,14 +614,21 @@ pre.rouge .gs {
     <span class="na">name</span><span class="pi">:</span> <span class="s">cluster-admin-allow-list</span>
     <span class="na">namespace</span><span class="pi">:</span> <span class="s">openshift-compliance</span>
 <span class="na">spec</span><span class="pi">:</span>
+    <span class="na">title</span><span class="pi">:</span> <span class="s">Audit cluster-admin access against an allow-list</span>
     <span class="na">description</span><span class="pi">:</span> <span class="pi">|-</span>
         <span class="s">Audits subjects bound to the 'cluster-admin' role against a</span>
-        <span class="s">pre-defined allow-list. This aligns with CIS OpenShift</span>
-        <span class="s">Benchmark 5.1.1, which recommends restricting 'cluster-admin'</span>
-        <span class="s">access. Customize the list for your organization.</span>
+        <span class="s">pre-defined allow-list. Aligns with CIS 5.1.1.</span>
     <span class="na">failureReason</span><span class="pi">:</span> <span class="pi">|-</span>
-        <span class="s">Found subject(s) bound to 'cluster-admin' that are NOT</span>
-        <span class="s">on the organizational allow-list.</span>
+        <span class="s">Found subject(s) bound to 'cluster-admin' that are NOT on the allow-list.</span>
+    <span class="na">severity</span><span class="pi">:</span> <span class="s">high</span>
+    <span class="na">id</span><span class="pi">:</span> <span class="s">cluster_admin_allow_list</span>
+    <span class="na">checkType</span><span class="pi">:</span> <span class="s">Platform</span>
+    <span class="na">scannerType</span><span class="pi">:</span> <span class="s">CEL</span>
+    <span class="na">inputs</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">crbs</span>
+            <span class="s">kubernetesInputSpec</span><span class="err">:</span>
+                <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">rbac.authorization.k8s.io/v1</span>
+                <span class="na">resource</span><span class="pi">:</span> <span class="s">clusterrolebindings</span>
     <span class="na">expression</span><span class="pi">:</span> <span class="pi">|-</span>
         <span class="s">crbs.items.filter(crb, crb.metadata.name == 'cluster-admin')[0]</span>
             <span class="s">.subjects.all(subject,</span>
@@ -640,17 +647,7 @@ pre.rouge .gs {
                         <span class="s">'openshift-monitoring/prometheus-k8s'</span>
                     <span class="s">]</span>
                 <span class="s">)</span>
-            <span class="s">)</span>
-    <span class="na">id</span><span class="pi">:</span> <span class="s">cluster_admin_allow_list</span>
-    <span class="na">checkType</span><span class="pi">:</span> <span class="s">Platform</span>
-    <span class="na">inputs</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="na">kubernetesInputSpec</span><span class="pi">:</span>
-                <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">rbac.authorization.k8s.io/v1</span>
-                <span class="na">resource</span><span class="pi">:</span> <span class="s">clusterrolebindings</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">crbs</span>
-    <span class="na">scannerType</span><span class="pi">:</span> <span class="s">CEL</span>
-    <span class="na">severity</span><span class="pi">:</span> <span class="s">high</span>
-    <span class="na">title</span><span class="pi">:</span> <span class="s">Audit cluster-admin access against an allow-list</span></code></pre>
+            <span class="s">)</span></code></pre>
 </div>
 </div>
 </div>
@@ -667,43 +664,31 @@ pre.rouge .gs {
     <span class="na">name</span><span class="pi">:</span> <span class="s">disallow-shadow-databases</span>
     <span class="na">namespace</span><span class="pi">:</span> <span class="s">openshift-compliance</span>
 <span class="na">spec</span><span class="pi">:</span>
+    <span class="na">title</span><span class="pi">:</span> <span class="s">Disallow Unapproved Database Pods in App Namespaces</span>
     <span class="na">description</span><span class="pi">:</span> <span class="pi">|-</span>
-        <span class="s">Ensures application teams do not deploy their own 'shadow'</span>
-        <span class="s">database instances (e.g., postgres, mysql, mongo, redis). Applications</span>
-        <span class="s">must use the centrally managed instance in 'central-dba-prod'.</span>
+        <span class="s">Ensures application teams do not deploy 'shadow' database instances.</span>
     <span class="na">failureReason</span><span class="pi">:</span> <span class="pi">|-</span>
-        <span class="s">One or more pods were found running a disallowed database image</span>
-        <span class="s">in a namespace not approved for database workloads.</span>
-
-        <span class="s">To find non-compliant pods:</span>
-        <span class="s">`oc get pods -A -o json | jq -r '.items[] | "Namespace: \(.metadata.namespace) Pod: \(.metadata.name) Images: \([.spec.containers[].image] | join(","))"' | grep -E "postgres|mysql|mariadb|mongo|redis" | grep -vE "central-dba-prod|openshift-monitoring"`</span>
-
-        <span class="s">Remediation:</span>
-        <span class="s">1. Review identified pods.</span>
-        <span class="s">2. Delete or reconfigure non-compliant pods to use the approved DB.</span>
-        <span class="s">3. Consider admission policies to prevent regressions.</span>
+        <span class="s">One or more pods are running disallowed DB images in unapproved namespaces.</span>
+    <span class="na">severity</span><span class="pi">:</span> <span class="s">high</span>
+    <span class="na">id</span><span class="pi">:</span> <span class="s">disallow_shadow_databases</span>
+    <span class="na">checkType</span><span class="pi">:</span> <span class="s">Platform</span>
+    <span class="na">scannerType</span><span class="pi">:</span> <span class="s">CEL</span>
+    <span class="na">inputs</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">pods</span>
+            <span class="s">kubernetesInputSpec</span><span class="err">:</span>
+                <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+                <span class="na">resource</span><span class="pi">:</span> <span class="s">pods</span>
     <span class="na">expression</span><span class="pi">:</span> <span class="pi">|</span>
         <span class="s">pods.items.all(pod,</span>
             <span class="s">pod.metadata.namespace in [</span>
-            <span class="s">'central-dba-prod',</span>
-            <span class="s">'openshift-monitoring'</span>
+                <span class="s">'central-dba-prod',</span>
+                <span class="s">'openshift-monitoring'</span>
             <span class="s">] ||</span>
             <span class="s">pod.spec.containers.all(container,</span>
-                <span class="s">!['postgres', 'mysql', 'mariadb', 'mongo', 'redis'].exists(</span>
-                    <span class="s">db, container.image.contains(db)</span>
-                <span class="s">)</span>
+                <span class="s">!['postgres','mysql','mariadb','mongo','redis']</span>
+                    <span class="s">.exists(db, container.image.contains(db))</span>
             <span class="s">)</span>
-        <span class="s">)</span>
-    <span class="na">id</span><span class="pi">:</span> <span class="s">disallow_shadow_databases</span>
-    <span class="na">checkType</span><span class="pi">:</span> <span class="s">Platform</span>
-    <span class="na">inputs</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="na">kubernetesInputSpec</span><span class="pi">:</span>
-                <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
-                <span class="na">resource</span><span class="pi">:</span> <span class="s">pods</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">pods</span>
-    <span class="na">scannerType</span><span class="pi">:</span> <span class="s">CEL</span>
-    <span class="na">severity</span><span class="pi">:</span> <span class="s">high</span>
-    <span class="na">title</span><span class="pi">:</span> <span class="s">Disallow Unapproved Database Pods in App Namespaces</span></code></pre>
+        <span class="s">)</span></code></pre>
 </div>
 </div>
 </div>
@@ -720,24 +705,20 @@ pre.rouge .gs {
     <span class="na">name</span><span class="pi">:</span> <span class="s">allowed-registries-configured</span>
     <span class="na">namespace</span><span class="pi">:</span> <span class="s">openshift-compliance</span>
 <span class="na">spec</span><span class="pi">:</span>
-    <span class="na">title</span><span class="pi">:</span> <span class="s2">"</span><span class="s">Allowed</span><span class="nv"> </span><span class="s">registries</span><span class="nv"> </span><span class="s">are</span><span class="nv"> </span><span class="s">configured"</span>
+    <span class="na">title</span><span class="pi">:</span> <span class="s">Allowed registries are configured</span>
     <span class="na">description</span><span class="pi">:</span> <span class="pi">|-</span>
-        <span class="s">Ensure allowed registries are configured so the container runtime</span>
-        <span class="s">only pulls from trusted registries.</span>
-    <span class="na">severity</span><span class="pi">:</span> <span class="s">medium</span>
+        <span class="s">Ensures trusted registries are defined in the cluster image config.</span>
     <span class="na">failureReason</span><span class="pi">:</span> <span class="pi">|-</span>
-        <span class="s">The trusted registry 'my-trusted-registry.internal.example.com' was not</span>
-        <span class="s">found in 'spec.registrySources.allowedRegistries' for</span>
-        <span class="s">the 'image.config.openshift.io/cluster' resource. Patch the cluster image</span>
-        <span class="s">configuration to add this registry.</span>
-    <span class="na">id</span><span class="pi">:</span> <span class="s">allowed-registries-configured</span>
+        <span class="s">Required trusted registry missing from allowedRegistries.</span>
+    <span class="na">severity</span><span class="pi">:</span> <span class="s">medium</span>
+    <span class="na">id</span><span class="pi">:</span> <span class="s">allowed_registries_configured</span>
     <span class="na">checkType</span><span class="pi">:</span> <span class="s">Platform</span>
     <span class="na">scannerType</span><span class="pi">:</span> <span class="s">CEL</span>
     <span class="na">inputs</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="na">kubernetesInputSpec</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">imageConfigs</span>
+            <span class="s">kubernetesInputSpec</span><span class="err">:</span>
                 <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">config.openshift.io/v1</span>
                 <span class="na">resource</span><span class="pi">:</span> <span class="s">images</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">imageConfigs</span>
     <span class="na">expression</span><span class="pi">:</span> <span class="pi">|</span>
         <span class="s">imageConfigs.items.exists(</span>
             <span class="s">img, img.metadata.name == 'cluster' &amp;&amp;</span>
@@ -746,7 +727,8 @@ pre.rouge .gs {
             <span class="s">has(img.spec.registrySources.allowedRegistries) &amp;&amp;</span>
             <span class="s">img.spec.registrySources.allowedRegistries != null &amp;&amp;</span>
             <span class="s">type(img.spec.registrySources.allowedRegistries) == list &amp;&amp;</span>
-            <span class="s">'my-trusted-registry.internal.example.com' in img.spec.registrySources.allowedRegistries</span>
+            <span class="s">'my-trusted-registry.internal.example.com'</span>
+                <span class="s">in img.spec.registrySources.allowedRegistries</span>
         <span class="s">)</span></code></pre>
 </div>
 </div>
@@ -783,18 +765,18 @@ pre.rouge .gs {
     <span class="na">name</span><span class="pi">:</span> <span class="s">custom-security-checks</span>
     <span class="na">namespace</span><span class="pi">:</span> <span class="s">openshift-compliance</span>
 <span class="na">spec</span><span class="pi">:</span>
+    <span class="na">title</span><span class="pi">:</span> <span class="s">Custom Security Profile</span>
     <span class="na">description</span><span class="pi">:</span> <span class="s">Custom security compliance profile using CEL-based CustomRules</span>
     <span class="na">enableRules</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="na">kind</span><span class="pi">:</span> <span class="s">CustomRule</span>
-            <span class="s">name</span><span class="err">:</span> <span class="s">cluster-admin-allow-list</span>
-            <span class="s">rationale</span><span class="err">:</span> <span class="s">CIS 5.1.1 requires auditing cluster-admin bindings against an allow-list</span>
-        <span class="pi">-</span> <span class="na">kind</span><span class="pi">:</span> <span class="s">CustomRule</span>
-            <span class="s">name</span><span class="err">:</span> <span class="s">disallow-shadow-databases</span>
-            <span class="s">rationale</span><span class="err">:</span> <span class="s">Ensure the usage of a central, managed database</span>
-        <span class="pi">-</span> <span class="na">kind</span><span class="pi">:</span> <span class="s">CustomRule</span>
-            <span class="s">name</span><span class="err">:</span> <span class="s">allowed-registries-configured</span>
-            <span class="s">rationale</span><span class="err">:</span> <span class="s">Ensure the cluster only pulls images from trusted registries</span>
-    <span class="na">title</span><span class="pi">:</span> <span class="s">Custom Security Profile</span></code></pre>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">cluster-admin-allow-list</span>
+            <span class="s">kind</span><span class="err">:</span> <span class="s">CustomRule</span>
+            <span class="s">rationale</span><span class="err">:</span> <span class="s">CIS 5.1.1 — audit cluster-admin bindings</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">disallow-shadow-databases</span>
+            <span class="s">kind</span><span class="err">:</span> <span class="s">CustomRule</span>
+            <span class="s">rationale</span><span class="err">:</span> <span class="s">Prevent unapproved database workloads</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">allowed-registries-configured</span>
+            <span class="s">kind</span><span class="err">:</span> <span class="s">CustomRule</span>
+            <span class="s">rationale</span><span class="err">:</span> <span class="s">Restrict image pulls to trusted registries</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -809,13 +791,13 @@ pre.rouge .gs {
     <span class="na">name</span><span class="pi">:</span> <span class="s">custom-security-scan</span>
     <span class="na">namespace</span><span class="pi">:</span> <span class="s">openshift-compliance</span>
 <span class="na">profiles</span><span class="pi">:</span>
-    <span class="pi">-</span> <span class="na">apiGroup</span><span class="pi">:</span> <span class="s">compliance.openshift.io/v1alpha1</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">custom-security-checks</span>
         <span class="s">kind</span><span class="err">:</span> <span class="s">TailoredProfile</span>
-        <span class="s">name</span><span class="err">:</span> <span class="s">custom-security-checks</span>
+        <span class="s">apiGroup</span><span class="err">:</span> <span class="s">compliance.openshift.io/v1alpha1</span>
 <span class="na">settingsRef</span><span class="pi">:</span>
-    <span class="na">apiGroup</span><span class="pi">:</span> <span class="s">compliance.openshift.io/v1alpha1</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
     <span class="na">kind</span><span class="pi">:</span> <span class="s">ScanSetting</span>
-    <span class="na">name</span><span class="pi">:</span> <span class="s">default</span></code></pre>
+    <span class="na">apiGroup</span><span class="pi">:</span> <span class="s">compliance.openshift.io/v1alpha1</span></code></pre>
 </div>
 </div>
 </div>
@@ -850,8 +832,50 @@ custom-security-scan-allowed-registries-configured        FAIL     high</code></
 <div class="sect1">
 <h2 id="_networkpolicy_rules_detect_allow_all_and_require_deny_all_in_scoped_namespaces">NetworkPolicy Rules: detect allow-all and require deny-all in scoped namespaces</h2>
 <div class="sectionbody">
+<div class="sect2">
+<h3 id="_production_ready_tailoredprofile_and_scansettingbinding_for_networkpolicy_customrules">Production-ready TailoredProfile and ScanSettingBinding for NetworkPolicy CustomRules</h3>
+<div class="paragraph">
+<p>Below are CRD-valid, production-ready YAMLs for running only the two NetworkPolicy CustomRules. These are ready to copy, apply, and use in your cluster.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">compliance.openshift.io/v1alpha1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">TailoredProfile</span>
+<span class="na">metadata</span><span class="pi">:</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">networkpolicy-security-checks</span>
+    <span class="na">namespace</span><span class="pi">:</span> <span class="s">openshift-compliance</span>
+<span class="na">spec</span><span class="pi">:</span>
+    <span class="na">title</span><span class="pi">:</span> <span class="s">NetworkPolicy Security Checks</span>
+    <span class="na">description</span><span class="pi">:</span> <span class="s">Custom checks enforcing NetworkPolicy standards for labeled namespaces</span>
+    <span class="na">enableRules</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">netpol-disallow-allow-all-in-labeled-namespaces</span>
+          <span class="na">kind</span><span class="pi">:</span> <span class="s">CustomRule</span>
+          <span class="na">rationale</span><span class="pi">:</span> <span class="s">Detect allow-all NetworkPolicies in enforced namespaces</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">netpol-require-deny-all-in-labeled-namespaces</span>
+          <span class="na">kind</span><span class="pi">:</span> <span class="s">CustomRule</span>
+          <span class="na">rationale</span><span class="pi">:</span> <span class="s">Ensure deny-all NetworkPolicies exist in enforced namespaces</span></code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">compliance.openshift.io/v1alpha1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">ScanSettingBinding</span>
+<span class="na">metadata</span><span class="pi">:</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">networkpolicy-security-scan</span>
+    <span class="na">namespace</span><span class="pi">:</span> <span class="s">openshift-compliance</span>
+<span class="na">profiles</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">networkpolicy-security-checks</span>
+      <span class="na">kind</span><span class="pi">:</span> <span class="s">TailoredProfile</span>
+      <span class="na">apiGroup</span><span class="pi">:</span> <span class="s">compliance.openshift.io/v1alpha1</span>
+<span class="na">settingsRef</span><span class="pi">:</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
+    <span class="na">kind</span><span class="pi">:</span> <span class="s">ScanSetting</span>
+    <span class="na">apiGroup</span><span class="pi">:</span> <span class="s">compliance.openshift.io/v1alpha1</span></code></pre>
+</div>
+</div>
 <div class="paragraph">
 <p>Below are two <code>CustomRule</code> examples that scope enforcement to namespaces with the label <code>compliance/enforce-networkpolicies=true</code>. Modify the label key/value to match your organization.</p>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_detect_allow_all_networkpolicies_in_labeled_namespaces">Detect allow-all NetworkPolicies in labeled namespaces</h3>
@@ -863,43 +887,41 @@ custom-security-scan-allowed-registries-configured        FAIL     high</code></
 <pre class="rouge highlight"><code data-lang="yaml"><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">compliance.openshift.io/v1alpha1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">CustomRule</span>
 <span class="na">metadata</span><span class="pi">:</span>
-    <span class="na">name</span><span class="pi">:</span> <span class="s">netpol-disallow-allow-all-in-labeled-namespaces</span>
-    <span class="na">namespace</span><span class="pi">:</span> <span class="s">openshift-compliance</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">netpol-disallow-allow-all-in-labeled-namespaces</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">openshift-compliance</span>
 <span class="na">spec</span><span class="pi">:</span>
-    <span class="na">title</span><span class="pi">:</span> <span class="s">Disallow allow-all NetworkPolicies in labeled namespaces</span>
-    <span class="na">description</span><span class="pi">:</span> <span class="pi">|-</span>
-        <span class="s">Flags NetworkPolicies that permit all traffic (empty podSelector plus</span>
-        <span class="s">empty ingress/egress rules) in namespaces labeled</span>
-        <span class="s">`compliance/enforce-networkpolicies=true`.</span>
-    <span class="na">failureReason</span><span class="pi">:</span> <span class="pi">|-</span>
-        <span class="s">One or more "allow-all" NetworkPolicies were found in namespaces</span>
-        <span class="s">labeled `compliance/enforce-networkpolicies=true`. Replace them with</span>
-        <span class="s">more restrictive NetworkPolicies or remove the namespace label to opt-out.</span>
-    <span class="na">id</span><span class="pi">:</span> <span class="s">netpol_disallow_allow_all_labeled</span>
-    <span class="na">checkType</span><span class="pi">:</span> <span class="s">Platform</span>
-    <span class="na">scannerType</span><span class="pi">:</span> <span class="s">CEL</span>
-    <span class="na">inputs</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="na">kubernetesInputSpec</span><span class="pi">:</span>
-                <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">networking.k8s.io/v1</span>
-                <span class="na">resource</span><span class="pi">:</span> <span class="s">networkpolicies</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">netpols</span>
-        <span class="pi">-</span> <span class="na">kubernetesInputSpec</span><span class="pi">:</span>
-                <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
-                <span class="na">resource</span><span class="pi">:</span> <span class="s">namespaces</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">namespaces</span>
-    <span class="na">expression</span><span class="pi">:</span> <span class="pi">|</span>
-        <span class="s">!netpols.items.exists(np,</span>
-            <span class="s">namespaces.items.exists(ns,</span>
-                <span class="s">ns.metadata.name == np.metadata.namespace &amp;&amp;</span>
-                <span class="s">ns.metadata.labels['compliance/enforce-networkpolicies'] == 'true'</span>
-            <span class="s">) &amp;&amp;</span>
-            <span class="s">np.spec.podSelector == {} &amp;&amp;</span>
-            <span class="s">(</span>
-                <span class="s">(has(np.spec.ingress) &amp;&amp; size(np.spec.ingress) == 1 &amp;&amp; np.spec.ingress[0] == {}) ||</span>
-                <span class="s">(has(np.spec.egress)  &amp;&amp; size(np.spec.egress)  == 1 &amp;&amp; np.spec.egress[0]  == {})</span>
-            <span class="s">)</span>
-        <span class="s">)</span>
-    <span class="na">severity</span><span class="pi">:</span> <span class="s">high</span></code></pre>
+  <span class="na">title</span><span class="pi">:</span> <span class="s">Disallow allow-all NetworkPolicies in labeled namespaces</span>
+  <span class="na">description</span><span class="pi">:</span> <span class="pi">|-</span>
+    <span class="s">Detects allow-all NetworkPolicies in namespaces labeled</span>
+    <span class="s">compliance/enforce-networkpolicies=true.</span>
+  <span class="na">failureReason</span><span class="pi">:</span> <span class="s">Allow-all NetworkPolicies found in enforced namespaces.</span>
+  <span class="na">severity</span><span class="pi">:</span> <span class="s">high</span>
+  <span class="na">id</span><span class="pi">:</span> <span class="s">netpol_disallow_allow_all_labeled</span>
+  <span class="na">checkType</span><span class="pi">:</span> <span class="s">Platform</span>
+  <span class="na">scannerType</span><span class="pi">:</span> <span class="s">CEL</span>
+  <span class="na">inputs</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">netpols</span>
+      <span class="na">kubernetesInputSpec</span><span class="pi">:</span>
+        <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">networking.k8s.io/v1</span>
+        <span class="na">resource</span><span class="pi">:</span> <span class="s">networkpolicies</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">namespaces</span>
+      <span class="na">kubernetesInputSpec</span><span class="pi">:</span>
+        <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+        <span class="na">resource</span><span class="pi">:</span> <span class="s">namespaces</span>
+  <span class="na">expression</span><span class="pi">:</span> <span class="pi">|</span>
+    <span class="s">!netpols.items.exists(np,</span>
+      <span class="s">namespaces.items.exists(ns,</span>
+        <span class="s">ns.metadata.name == np.metadata.namespace &amp;&amp;</span>
+        <span class="s">has(ns.metadata.labels) &amp;&amp;</span>
+        <span class="s">ns.metadata.labels.exists(k, k == 'compliance/enforce-networkpolicies') &amp;&amp;</span>
+        <span class="s">ns.metadata.labels['compliance/enforce-networkpolicies'] == 'true'</span>
+      <span class="s">) &amp;&amp;</span>
+      <span class="s">np.spec.podSelector == {} &amp;&amp;</span>
+      <span class="s">(</span>
+        <span class="s">(has(np.spec.ingress) &amp;&amp; size(np.spec.ingress) == 1 &amp;&amp; np.spec.ingress[0] == {}) ||</span>
+        <span class="s">(has(np.spec.egress)  &amp;&amp; size(np.spec.egress) == 1 &amp;&amp; np.spec.egress[0]  == {})</span>
+      <span class="s">)</span>
+    <span class="s">)</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -918,49 +940,47 @@ custom-security-scan-allowed-registries-configured        FAIL     high</code></
 </div>
 <div class="sect2">
 <h3 id="_require_a_deny_all_networkpolicy_in_labeled_namespaces">Require a deny-all NetworkPolicy in labeled namespaces</h3>
-<div class="paragraph">
-<p>This rule ensures every namespace labeled <code>compliance/enforce-networkpolicies=true</code> has at least one "deny-all" NetworkPolicy that selects all pods and defines no ingress/egress rules (i.e., defaults to denying traffic).</p>
-</div>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight"><code data-lang="yaml"><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">compliance.openshift.io/v1alpha1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">CustomRule</span>
 <span class="na">metadata</span><span class="pi">:</span>
-    <span class="na">name</span><span class="pi">:</span> <span class="s">netpol-require-deny-all-in-labeled-namespaces</span>
-    <span class="na">namespace</span><span class="pi">:</span> <span class="s">openshift-compliance</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">netpol-require-deny-all-in-labeled-namespaces</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">openshift-compliance</span>
 <span class="na">spec</span><span class="pi">:</span>
-    <span class="na">title</span><span class="pi">:</span> <span class="s">Require deny-all NetworkPolicy in labeled namespaces</span>
-    <span class="na">description</span><span class="pi">:</span> <span class="pi">|-</span>
-        <span class="s">Validates that namespaces labeled `compliance/enforce-networkpolicies=true`</span>
-        <span class="s">include at least one NetworkPolicy that selects all pods and contains no</span>
-        <span class="s">ingress/egress rules (deny-all). This helps ensure network isolation.</span>
-    <span class="na">failureReason</span><span class="pi">:</span> <span class="pi">|-</span>
-        <span class="s">One or more labeled namespaces do not contain a deny-all NetworkPolicy.</span>
-        <span class="s">Add a NetworkPolicy with `podSelector: {}` and no `ingress`/`egress`</span>
-        <span class="s">rules (and `policyTypes: ["Ingress","Egress"]` if you need both).</span>
-    <span class="na">id</span><span class="pi">:</span> <span class="s">netpol_require_deny_all_labeled</span>
-    <span class="na">checkType</span><span class="pi">:</span> <span class="s">Platform</span>
-    <span class="na">scannerType</span><span class="pi">:</span> <span class="s">CEL</span>
-    <span class="na">inputs</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="na">kubernetesInputSpec</span><span class="pi">:</span>
-                <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">networking.k8s.io/v1</span>
-                <span class="na">resource</span><span class="pi">:</span> <span class="s">networkpolicies</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">netpols</span>
-        <span class="pi">-</span> <span class="na">kubernetesInputSpec</span><span class="pi">:</span>
-                <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
-                <span class="na">resource</span><span class="pi">:</span> <span class="s">namespaces</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">namespaces</span>
-    <span class="na">expression</span><span class="pi">:</span> <span class="pi">|</span>
-        <span class="s">namespaces.items.all(ns,</span>
-            <span class="s">ns.metadata.labels['compliance/enforce-networkpolicies'] != 'true' ||</span>
-            <span class="s">netpols.items.exists(np,</span>
-                <span class="s">np.metadata.namespace == ns.metadata.name &amp;&amp;</span>
-                <span class="s">np.spec.podSelector == {} &amp;&amp;</span>
-                <span class="s">(!has(np.spec.ingress) || size(np.spec.ingress) == 0) &amp;&amp;</span>
-                <span class="s">(!has(np.spec.egress)  || size(np.spec.egress)  == 0)</span>
-            <span class="s">)</span>
-        <span class="s">)</span>
-    <span class="na">severity</span><span class="pi">:</span> <span class="s">high</span></code></pre>
+  <span class="na">title</span><span class="pi">:</span> <span class="s">Require deny-all NetworkPolicy in labeled namespaces</span>
+  <span class="na">description</span><span class="pi">:</span> <span class="pi">|-</span>
+    <span class="s">Ensures namespaces with compliance/enforce-networkpolicies=true</span>
+    <span class="s">have a deny-all NetworkPolicy.</span>
+  <span class="na">failureReason</span><span class="pi">:</span> <span class="pi">|-</span>
+    <span class="s">One or more enforced namespaces lack a deny-all NetworkPolicy.</span>
+  <span class="na">severity</span><span class="pi">:</span> <span class="s">high</span>
+  <span class="na">id</span><span class="pi">:</span> <span class="s">netpol_require_deny_all_labeled</span>
+  <span class="na">checkType</span><span class="pi">:</span> <span class="s">Platform</span>
+  <span class="na">scannerType</span><span class="pi">:</span> <span class="s">CEL</span>
+  <span class="na">inputs</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">netpols</span>
+      <span class="na">kubernetesInputSpec</span><span class="pi">:</span>
+        <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">networking.k8s.io/v1</span>
+        <span class="na">resource</span><span class="pi">:</span> <span class="s">networkpolicies</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">namespaces</span>
+      <span class="na">kubernetesInputSpec</span><span class="pi">:</span>
+        <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+        <span class="na">resource</span><span class="pi">:</span> <span class="s">namespaces</span>
+  <span class="na">expression</span><span class="pi">:</span> <span class="pi">|</span>
+    <span class="s">namespaces.items.all(ns,</span>
+      <span class="s">!(</span>
+        <span class="s">has(ns.metadata.labels) &amp;&amp;</span>
+        <span class="s">ns.metadata.labels.exists(k, k == 'compliance/enforce-networkpolicies') &amp;&amp;</span>
+        <span class="s">ns.metadata.labels['compliance/enforce-networkpolicies'] == 'true'</span>
+      <span class="s">) ||</span>
+      <span class="s">netpols.items.exists(np,</span>
+        <span class="s">np.metadata.namespace == ns.metadata.name &amp;&amp;</span>
+        <span class="s">np.spec.podSelector == {} &amp;&amp;</span>
+        <span class="s">(!has(np.spec.ingress) || size(np.spec.ingress) == 0) &amp;&amp;</span>
+        <span class="s">(!has(np.spec.egress)  || size(np.spec.egress)  == 0)</span>
+      <span class="s">)</span>
+    <span class="s">)</span></code></pre>
 </div>
 </div>
 </div>
@@ -1037,7 +1057,7 @@ custom-security-scan-allowed-registries-configured        FAIL     high</code></
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-11-26 10:39:27 +0400
+Last updated 2025-11-26 14:04:59 +0400
 </div>
 </div>
 </body>
