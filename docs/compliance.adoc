@@ -1,8 +1,6 @@
 = Kubernetes Security Playbook: The 10 Essential Control Areas
 :toc: macro
 
-*OpenShift-Native, Framework-Agnostic, Clean Narrative Edition*
-
 A secure Kubernetes platform is built by layering a set of controls that almost every security and compliance framework expects. The terminology may differ across PCI, ISO, CIS, NIST, or internal governance, but the fundamentals repeat: verify what you run, harden how it runs, restrict who can do what, control how it communicates, and ensure you can prove the platform’s behavior over time.
 
 The following narrative describes these controls as a continuous technical progression, using only OpenShift native capabilities.
