@@ -557,7 +557,7 @@ pre.rouge .gs {
 <h2 id="_introduction">Introduction</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>For security teams responsible for Red Hat OpenShift, the Compliance Operator provides automated baseline checks for common standards (CIS, PCI-DSS, etc.) and produces evidence auditors expect. But auditors and internal policy owners often ask for controls that live outside those standard profiles — organization-specific requirements such as mandatory resource labeling, restricting which users can access cardholder-data-processing applications, or enforcing use of a single, central database.</p>
+<p>For security teams responsible for Red Hat OpenShift, the Compliance Operator provides automated baseline checks for common standards (CIS, PCI-DSS, etc.) and produces evidence auditors expect. But auditors and internal policy owners often ask for controls that live outside those standard profiles, organization-specific requirements such as mandatory resource labeling, restricting which users can access cardholder-data-processing applications, or enforcing use of a single, central database.</p>
 </div>
 <div class="paragraph">
 <p>Historically, these requests result in manual, brittle checks: ad-hoc scripts, grepping <code>oc</code> outputs, or marking items as "manually verified." The CustomRule Custom Resource (CRD) addresses this gap by letting you codify custom checks using the Common Expression Language (CEL) and run them with the Compliance Operator alongside built-in checks.</p>
@@ -848,115 +848,8 @@ custom-security-scan-allowed-registries-configured        FAIL     high</code></
 </div>
 </div>
 <div class="sect1">
-<h2 id="_best_practices_for_authoring_customrules">Best Practices for Authoring CustomRules</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><strong>Passing logic:</strong> CEL expressions should evaluate to <code>true</code> when compliant.</p>
-</li>
-<li>
-<p><strong>Descriptive names:</strong> Use specific <code>metadata.name</code> values (e.g., <code>disallow-hostpath-volumes</code>).</p>
-</li>
-<li>
-<p><strong>Helpful descriptions:</strong> Use <code>spec.description</code> to explain the risk and include commands to find violating resources.</p>
-</li>
-<li>
-<p><strong>Actionable <code>failureReason</code>:</strong> Describe exact remediation steps administrators should take.</p>
-</li>
-<li>
-<p><strong>Resource efficiency:</strong> In <code>spec.inputs</code>, request only the resources required by the expression.</p>
-</li>
-<li>
-<p><strong>Keep IDs consistent:</strong> Make <code>spec.id</code> and <code>metadata.name</code> similar to reduce ambiguity.</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_basic_troubleshooting">Basic Troubleshooting</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p><strong>CustomRule status:</strong> <code>oc get customrule &lt;your-rule&gt; -o yaml</code> — an invalid CEL expression will put the rule into an Error state; the rule must be <code>Ready</code> to be added to a <code>TailoredProfile</code>.</p>
-</li>
-<li>
-<p><strong>TailoredProfile status:</strong> Ensure the <code>TailoredProfile</code> is <code>Ready</code> before referencing it in a <code>ScanSettingBinding</code>.</p>
-</li>
-<li>
-<p><strong>Do not mix types:</strong> A <code>TailoredProfile</code> cannot include both <code>Rule</code> and <code>CustomRule</code> kinds.</p>
-</li>
-<li>
-<p><strong>Rescanning:</strong> After modifying a CustomRule, re-run scans by annotating <code>ComplianceScan</code> resources to re-generate <code>ComplianceCheckResult</code> objects.</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_scope_limitations">Scope &amp; Limitations</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>CustomRule currently supports platform-level checks against Kubernetes and OpenShift API resources (Pods, Roles, cluster configuration, etc.). It does not support host-level checks (files, host processes, permissions). For host-level checks continue using existing node <code>Rule</code> resources shipped with the Compliance Operator. Host-level scanning may be considered in future releases.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_support_feedback">Support &amp; Feedback</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>This feature is Tech Preview. For feedback, file issues, or questions, contact Red Hat Support through the Red Hat Customer Portal.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_next_steps">Next Steps</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p>Install the Compliance Operator from OperatorHub via OLM if not already present.</p>
-</li>
-<li>
-<p>Start by applying example <code>CustomRule</code> manifests and creating a <code>TailoredProfile</code> and <code>ScanSettingBinding</code> in a test cluster.</p>
-</li>
-<li>
-<p>Share feedback and example rules with the project to help stabilize the feature.</p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_references">References</h2>
-<div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p>CustomRule example repository: <a href="https://github.com/ComplianceAsCode/compliance-operator/tree/master/config/samples/custom-rules" class="bare">https://github.com/ComplianceAsCode/compliance-operator/tree/master/config/samples/custom-rules</a></p>
-</li>
-</ul>
-</div>
-</div>
-</div>
-<div class="sect1">
 <h2 id="_networkpolicy_rules_detect_allow_all_and_require_deny_all_in_scoped_namespaces">NetworkPolicy Rules: detect allow-all and require deny-all in scoped namespaces</h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p>You can enforce NetworkPolicy requirements using two approaches:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>A <code>CustomRule</code> (CEL) that scans existing <code>NetworkPolicy</code> resources and flags "allow-all" policies in namespaces you choose via a namespace label.</p>
-</li>
-<li>
-<p>A separate <code>CustomRule</code> that ensures each labeled namespace has a "deny-all" policy (a <code>NetworkPolicy</code> that selects all pods and has no ingress/egress rules), ensuring isolation.</p>
-</li>
-</ul>
-</div>
 <div class="paragraph">
 <p>Below are two <code>CustomRule</code> examples that scope enforcement to namespaces with the label <code>compliance/enforce-networkpolicies=true</code>. Modify the label key/value to match your organization.</p>
 </div>
@@ -1070,71 +963,81 @@ custom-security-scan-allowed-registries-configured        FAIL     high</code></
     <span class="na">severity</span><span class="pi">:</span> <span class="s">high</span></code></pre>
 </div>
 </div>
-<div class="paragraph">
-<p>Notes:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>This expression evaluates to <code>true</code> only when every labeled namespace either
-has a deny-all NetworkPolicy or is not labeled for enforcement.</p>
-</li>
-<li>
-<p>You may prefer separate deny-all policies for ingress and egress depending on
-operational constraints; adjust the expression accordingly.</p>
-</li>
-</ul>
-</div>
-</div>
-<div class="sect2">
-<h3 id="_scoping_a_validatingadmissionpolicy_to_labeled_namespaces">Scoping a ValidatingAdmissionPolicy to labeled namespaces</h3>
-<div class="paragraph">
-<p>If you also use <code>ValidatingAdmissionPolicy</code> (admission-time blocking) you can limit enforcement to namespaces with a label using <code>matchConstraints.namespaceSelector</code>. Example (Kubernetes <code>admissionregistration.k8s.io/v1</code>):</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="rouge highlight"><code data-lang="yaml"><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">admissionregistration.k8s.io/v1</span>
-<span class="na">kind</span><span class="pi">:</span> <span class="s">ValidatingAdmissionPolicy</span>
-<span class="na">metadata</span><span class="pi">:</span>
-    <span class="na">name</span><span class="pi">:</span> <span class="s">block-allow-all-netpol</span>
-<span class="na">spec</span><span class="pi">:</span>
-    <span class="na">failurePolicy</span><span class="pi">:</span> <span class="s">Fail</span>
-    <span class="na">matchConstraints</span><span class="pi">:</span>
-        <span class="na">resourceRules</span><span class="pi">:</span>
-            <span class="pi">-</span> <span class="na">apiGroups</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">networking.k8s.io"</span><span class="pi">]</span>
-                <span class="na">apiVersions</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">v1"</span><span class="pi">]</span>
-                <span class="na">operations</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">CREATE"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">UPDATE"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">PATCH"</span><span class="pi">]</span>
-                <span class="na">resources</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">networkpolicies"</span><span class="pi">]</span>
-        <span class="na">namespaceSelector</span><span class="pi">:</span>
-            <span class="na">matchLabels</span><span class="pi">:</span>
-                <span class="na">compliance/enforce-networkpolicies</span><span class="pi">:</span> <span class="s2">"</span><span class="s">true"</span>
-    <span class="na">validations</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="na">expression</span><span class="pi">:</span> <span class="s2">"</span><span class="s">!(</span>
-                <span class="s">object.spec.podSelector</span><span class="nv"> </span><span class="s">==</span><span class="nv"> </span><span class="s">{}</span><span class="nv"> </span><span class="s">&amp;&amp;</span>
-                <span class="s">(</span>
-                    <span class="s">(has(object.spec.ingress)</span><span class="nv"> </span><span class="s">&amp;&amp;</span><span class="nv"> </span><span class="s">size(object.spec.ingress)</span><span class="nv"> </span><span class="s">==</span><span class="nv"> </span><span class="s">1</span><span class="nv"> </span><span class="s">&amp;&amp;</span><span class="nv"> </span><span class="s">object.spec.ingress[0]</span><span class="nv"> </span><span class="s">==</span><span class="nv"> </span><span class="s">{})</span><span class="nv"> </span><span class="s">||</span>
-                    <span class="s">(has(object.spec.egress)</span><span class="nv">  </span><span class="s">&amp;&amp;</span><span class="nv"> </span><span class="s">size(object.spec.egress)</span><span class="nv">  </span><span class="s">==</span><span class="nv"> </span><span class="s">1</span><span class="nv"> </span><span class="s">&amp;&amp;</span><span class="nv"> </span><span class="s">object.spec.egress[0]</span><span class="nv">  </span><span class="s">==</span><span class="nv"> </span><span class="s">{})</span>
-                <span class="s">)</span>
-            <span class="s">)"</span>
-            <span class="na">message</span><span class="pi">:</span> <span class="s2">"</span><span class="s">Allow-all</span><span class="nv"> </span><span class="s">NetworkPolicies</span><span class="nv"> </span><span class="s">(empty</span><span class="nv"> </span><span class="s">{}</span><span class="nv"> </span><span class="s">ingress/egress</span><span class="nv"> </span><span class="s">rules)</span><span class="nv"> </span><span class="s">are</span><span class="nv"> </span><span class="s">forbidden</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">labeled</span><span class="nv"> </span><span class="s">namespaces.</span><span class="nv"> </span><span class="s">Deny-all</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">allowed."</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Note: <code>namespaceSelector</code> limits the admission policy to matching namespaces; adapt the label to your convention.</p>
-</div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_end_of_networkpolicy_rules">End of NetworkPolicy Rules</h2>
+<h2 id="_best_practices_for_authoring_customrules">Best Practices for Authoring CustomRules</h2>
 <div class="sectionbody">
-
+<div class="ulist">
+<ul>
+<li>
+<p><strong>Passing logic:</strong> CEL expressions should evaluate to <code>true</code> when compliant.</p>
+</li>
+<li>
+<p><strong>Descriptive names:</strong> Use specific <code>metadata.name</code> values (e.g., <code>disallow-hostpath-volumes</code>).</p>
+</li>
+<li>
+<p><strong>Helpful descriptions:</strong> Use <code>spec.description</code> to explain the risk and include commands to find violating resources.</p>
+</li>
+<li>
+<p><strong>Actionable <code>failureReason</code>:</strong> Describe exact remediation steps administrators should take.</p>
+</li>
+<li>
+<p><strong>Resource efficiency:</strong> In <code>spec.inputs</code>, request only the resources required by the expression.</p>
+</li>
+<li>
+<p><strong>Keep IDs consistent:</strong> Make <code>spec.id</code> and <code>metadata.name</code> similar to reduce ambiguity.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_basic_troubleshooting">Basic Troubleshooting</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p><strong>CustomRule status:</strong> <code>oc get customrule &lt;your-rule&gt; -o yaml</code>, an invalid CEL expression will put the rule into an Error state; the rule must be <code>Ready</code> to be added to a <code>TailoredProfile</code>.</p>
+</li>
+<li>
+<p><strong>TailoredProfile status:</strong> Ensure the <code>TailoredProfile</code> is <code>Ready</code> before referencing it in a <code>ScanSettingBinding</code>.</p>
+</li>
+<li>
+<p><strong>Do not mix types:</strong> A <code>TailoredProfile</code> cannot include both <code>Rule</code> and <code>CustomRule</code> kinds.</p>
+</li>
+<li>
+<p><strong>Rescanning:</strong> After modifying a CustomRule, re-run scans by annotating <code>ComplianceScan</code> resources to re-generate <code>ComplianceCheckResult</code> objects.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_scope_limitations">Scope &amp; Limitations</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>CustomRule currently supports platform-level checks against Kubernetes and OpenShift API resources (Pods, Roles, cluster configuration, etc.). It does not support host-level checks (files, host processes, permissions). For host-level checks continue using existing node <code>Rule</code> resources shipped with the Compliance Operator. Host-level scanning may be considered in future releases.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_references">References</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>CustomRule example repository: <a href="https://github.com/ComplianceAsCode/compliance-operator/tree/master/config/samples/custom-rules" class="bare">https://github.com/ComplianceAsCode/compliance-operator/tree/master/config/samples/custom-rules</a></p>
+</li>
+</ul>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-11-26 10:29:31 +0400
+Last updated 2025-11-26 10:39:27 +0400
 </div>
 </div>
 </body>
