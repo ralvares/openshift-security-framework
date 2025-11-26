@@ -51,9 +51,9 @@ spec:
     scannerType: CEL
     inputs:
         - name: crbs
-            kubernetesInputSpec:
-                apiVersion: rbac.authorization.k8s.io/v1
-                resource: clusterrolebindings
+          kubernetesInputSpec:
+            apiVersion: rbac.authorization.k8s.io/v1
+            resource: clusterrolebindings
     expression: |-
         crbs.items.filter(crb, crb.metadata.name == 'cluster-admin')[0]
             .subjects.all(subject,
@@ -98,9 +98,9 @@ spec:
     scannerType: CEL
     inputs:
         - name: pods
-            kubernetesInputSpec:
-                apiVersion: v1
-                resource: pods
+          kubernetesInputSpec:
+            apiVersion: v1
+            resource: pods
     expression: |
         pods.items.all(pod,
             pod.metadata.namespace in [
@@ -137,9 +137,9 @@ spec:
     scannerType: CEL
     inputs:
         - name: imageConfigs
-            kubernetesInputSpec:
-                apiVersion: config.openshift.io/v1
-                resource: images
+          kubernetesInputSpec:
+            apiVersion: config.openshift.io/v1
+            resource: images
     expression: |
         imageConfigs.items.exists(
             img, img.metadata.name == 'cluster' &&
@@ -181,14 +181,14 @@ spec:
     description: Custom security compliance profile using CEL-based CustomRules
     enableRules:
         - name: cluster-admin-allow-list
-            kind: CustomRule
-            rationale: CIS 5.1.1 — audit cluster-admin bindings
+          kind: CustomRule
+          rationale: CIS 5.1.1 — audit cluster-admin bindings
         - name: disallow-shadow-databases
-            kind: CustomRule
-            rationale: Prevent unapproved database workloads
+          kind: CustomRule
+          rationale: Prevent unapproved database workloads
         - name: allowed-registries-configured
-            kind: CustomRule
-            rationale: Restrict image pulls to trusted registries
+          kind: CustomRule
+          rationale: Restrict image pulls to trusted registries
 ----
 
 .Step 3: Execute the scan with a `ScanSettingBinding`
@@ -203,8 +203,8 @@ metadata:
     namespace: openshift-compliance
 profiles:
     - name: custom-security-checks
-        kind: TailoredProfile
-        apiGroup: compliance.openshift.io/v1alpha1
+      kind: TailoredProfile
+      apiGroup: compliance.openshift.io/v1alpha1
 settingsRef:
     name: default
     kind: ScanSetting

@@ -626,9 +626,9 @@ pre.rouge .gs {
     <span class="na">scannerType</span><span class="pi">:</span> <span class="s">CEL</span>
     <span class="na">inputs</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">crbs</span>
-            <span class="s">kubernetesInputSpec</span><span class="err">:</span>
-                <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">rbac.authorization.k8s.io/v1</span>
-                <span class="na">resource</span><span class="pi">:</span> <span class="s">clusterrolebindings</span>
+          <span class="na">kubernetesInputSpec</span><span class="pi">:</span>
+            <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">rbac.authorization.k8s.io/v1</span>
+            <span class="na">resource</span><span class="pi">:</span> <span class="s">clusterrolebindings</span>
     <span class="na">expression</span><span class="pi">:</span> <span class="pi">|-</span>
         <span class="s">crbs.items.filter(crb, crb.metadata.name == 'cluster-admin')[0]</span>
             <span class="s">.subjects.all(subject,</span>
@@ -675,9 +675,9 @@ pre.rouge .gs {
     <span class="na">scannerType</span><span class="pi">:</span> <span class="s">CEL</span>
     <span class="na">inputs</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">pods</span>
-            <span class="s">kubernetesInputSpec</span><span class="err">:</span>
-                <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
-                <span class="na">resource</span><span class="pi">:</span> <span class="s">pods</span>
+          <span class="na">kubernetesInputSpec</span><span class="pi">:</span>
+            <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+            <span class="na">resource</span><span class="pi">:</span> <span class="s">pods</span>
     <span class="na">expression</span><span class="pi">:</span> <span class="pi">|</span>
         <span class="s">pods.items.all(pod,</span>
             <span class="s">pod.metadata.namespace in [</span>
@@ -716,9 +716,9 @@ pre.rouge .gs {
     <span class="na">scannerType</span><span class="pi">:</span> <span class="s">CEL</span>
     <span class="na">inputs</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">imageConfigs</span>
-            <span class="s">kubernetesInputSpec</span><span class="err">:</span>
-                <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">config.openshift.io/v1</span>
-                <span class="na">resource</span><span class="pi">:</span> <span class="s">images</span>
+          <span class="na">kubernetesInputSpec</span><span class="pi">:</span>
+            <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">config.openshift.io/v1</span>
+            <span class="na">resource</span><span class="pi">:</span> <span class="s">images</span>
     <span class="na">expression</span><span class="pi">:</span> <span class="pi">|</span>
         <span class="s">imageConfigs.items.exists(</span>
             <span class="s">img, img.metadata.name == 'cluster' &amp;&amp;</span>
@@ -769,14 +769,14 @@ pre.rouge .gs {
     <span class="na">description</span><span class="pi">:</span> <span class="s">Custom security compliance profile using CEL-based CustomRules</span>
     <span class="na">enableRules</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">cluster-admin-allow-list</span>
-            <span class="s">kind</span><span class="err">:</span> <span class="s">CustomRule</span>
-            <span class="s">rationale</span><span class="err">:</span> <span class="s">CIS 5.1.1 — audit cluster-admin bindings</span>
+          <span class="na">kind</span><span class="pi">:</span> <span class="s">CustomRule</span>
+          <span class="na">rationale</span><span class="pi">:</span> <span class="s">CIS 5.1.1 — audit cluster-admin bindings</span>
         <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">disallow-shadow-databases</span>
-            <span class="s">kind</span><span class="err">:</span> <span class="s">CustomRule</span>
-            <span class="s">rationale</span><span class="err">:</span> <span class="s">Prevent unapproved database workloads</span>
+          <span class="na">kind</span><span class="pi">:</span> <span class="s">CustomRule</span>
+          <span class="na">rationale</span><span class="pi">:</span> <span class="s">Prevent unapproved database workloads</span>
         <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">allowed-registries-configured</span>
-            <span class="s">kind</span><span class="err">:</span> <span class="s">CustomRule</span>
-            <span class="s">rationale</span><span class="err">:</span> <span class="s">Restrict image pulls to trusted registries</span></code></pre>
+          <span class="na">kind</span><span class="pi">:</span> <span class="s">CustomRule</span>
+          <span class="na">rationale</span><span class="pi">:</span> <span class="s">Restrict image pulls to trusted registries</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -792,8 +792,8 @@ pre.rouge .gs {
     <span class="na">namespace</span><span class="pi">:</span> <span class="s">openshift-compliance</span>
 <span class="na">profiles</span><span class="pi">:</span>
     <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">custom-security-checks</span>
-        <span class="s">kind</span><span class="err">:</span> <span class="s">TailoredProfile</span>
-        <span class="s">apiGroup</span><span class="err">:</span> <span class="s">compliance.openshift.io/v1alpha1</span>
+      <span class="na">kind</span><span class="pi">:</span> <span class="s">TailoredProfile</span>
+      <span class="na">apiGroup</span><span class="pi">:</span> <span class="s">compliance.openshift.io/v1alpha1</span>
 <span class="na">settingsRef</span><span class="pi">:</span>
     <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
     <span class="na">kind</span><span class="pi">:</span> <span class="s">ScanSetting</span>
@@ -1057,7 +1057,7 @@ custom-security-scan-allowed-registries-configured        FAIL     high</code></
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-11-26 14:04:59 +0400
+Last updated 2025-11-26 14:58:09 +0400
 </div>
 </div>
 </body>
