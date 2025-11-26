@@ -4,7 +4,7 @@
 
 == Introduction
 
-For security teams responsible for Red Hat OpenShift, the Compliance Operator provides automated baseline checks for common standards (CIS, PCI-DSS, etc.) and produces evidence auditors expect. But auditors and internal policy owners often ask for controls that live outside those standard profiles — organization-specific requirements such as mandatory resource labeling, restricting which users can access cardholder-data-processing applications, or enforcing use of a single, central database.
+For security teams responsible for Red Hat OpenShift, the Compliance Operator provides automated baseline checks for common standards (CIS, PCI-DSS, etc.) and produces evidence auditors expect. But auditors and internal policy owners often ask for controls that live outside those standard profiles, organization-specific requirements such as mandatory resource labeling, restricting which users can access cardholder-data-processing applications, or enforcing use of a single, central database.
 
 Historically, these requests result in manual, brittle checks: ad-hoc scripts, grepping `oc` outputs, or marking items as "manually verified." The CustomRule Custom Resource (CRD) addresses this gap by letting you codify custom checks using the Common Expression Language (CEL) and run them with the Compliance Operator alongside built-in checks.
 
@@ -249,46 +249,7 @@ custom-security-scan-allowed-registries-configured        FAIL     high
 
 A `FAIL` indicates the rule executed and identified non-compliant resources.
 
-== Best Practices for Authoring CustomRules
-
-- **Passing logic:** CEL expressions should evaluate to `true` when compliant.
-- **Descriptive names:** Use specific `metadata.name` values (e.g., `disallow-hostpath-volumes`).
-- **Helpful descriptions:** Use `spec.description` to explain the risk and include commands to find violating resources.
-- **Actionable `failureReason`:** Describe exact remediation steps administrators should take.
-- **Resource efficiency:** In `spec.inputs`, request only the resources required by the expression.
-- **Keep IDs consistent:** Make `spec.id` and `metadata.name` similar to reduce ambiguity.
-
-== Basic Troubleshooting
-
-- **CustomRule status:** `oc get customrule <your-rule> -o yaml` — an invalid CEL expression will put the rule into an Error state; the rule must be `Ready` to be added to a `TailoredProfile`.
-- **TailoredProfile status:** Ensure the `TailoredProfile` is `Ready` before referencing it in a `ScanSettingBinding`.
-- **Do not mix types:** A `TailoredProfile` cannot include both `Rule` and `CustomRule` kinds.
-- **Rescanning:** After modifying a CustomRule, re-run scans by annotating `ComplianceScan` resources to re-generate `ComplianceCheckResult` objects.
-
-== Scope & Limitations
-
-CustomRule currently supports platform-level checks against Kubernetes and OpenShift API resources (Pods, Roles, cluster configuration, etc.). It does not support host-level checks (files, host processes, permissions). For host-level checks continue using existing node `Rule` resources shipped with the Compliance Operator. Host-level scanning may be considered in future releases.
-
-== Support & Feedback
-
-This feature is Tech Preview. For feedback, file issues, or questions, contact Red Hat Support through the Red Hat Customer Portal.
-
-== Next Steps
-
-- Install the Compliance Operator from OperatorHub via OLM if not already present.
-- Start by applying example `CustomRule` manifests and creating a `TailoredProfile` and `ScanSettingBinding` in a test cluster.
-- Share feedback and example rules with the project to help stabilize the feature.
-
-== References
-
-- CustomRule example repository: https://github.com/ComplianceAsCode/compliance-operator/tree/master/config/samples/custom-rules
-
 == NetworkPolicy Rules: detect allow-all and require deny-all in scoped namespaces
-
-You can enforce NetworkPolicy requirements using two approaches:
-
-- A `CustomRule` (CEL) that scans existing `NetworkPolicy` resources and flags "allow-all" policies in namespaces you choose via a namespace label.
-- A separate `CustomRule` that ensures each labeled namespace has a "deny-all" policy (a `NetworkPolicy` that selects all pods and has no ingress/egress rules), ensuring isolation.
 
 Below are two `CustomRule` examples that scope enforcement to namespaces with the label `compliance/enforce-networkpolicies=true`. Modify the label key/value to match your organization.
 
@@ -391,46 +352,28 @@ spec:
     severity: high
 ----
 
-Notes:
+== Best Practices for Authoring CustomRules
 
-- This expression evaluates to `true` only when every labeled namespace either
-    has a deny-all NetworkPolicy or is not labeled for enforcement.
-- You may prefer separate deny-all policies for ingress and egress depending on
-    operational constraints; adjust the expression accordingly.
+- **Passing logic:** CEL expressions should evaluate to `true` when compliant.
+- **Descriptive names:** Use specific `metadata.name` values (e.g., `disallow-hostpath-volumes`).
+- **Helpful descriptions:** Use `spec.description` to explain the risk and include commands to find violating resources.
+- **Actionable `failureReason`:** Describe exact remediation steps administrators should take.
+- **Resource efficiency:** In `spec.inputs`, request only the resources required by the expression.
+- **Keep IDs consistent:** Make `spec.id` and `metadata.name` similar to reduce ambiguity.
 
-=== Scoping a ValidatingAdmissionPolicy to labeled namespaces
+== Basic Troubleshooting
 
-If you also use `ValidatingAdmissionPolicy` (admission-time blocking) you can limit enforcement to namespaces with a label using `matchConstraints.namespaceSelector`. Example (Kubernetes `admissionregistration.k8s.io/v1`):
+- **CustomRule status:** `oc get customrule <your-rule> -o yaml`, an invalid CEL expression will put the rule into an Error state; the rule must be `Ready` to be added to a `TailoredProfile`.
+- **TailoredProfile status:** Ensure the `TailoredProfile` is `Ready` before referencing it in a `ScanSettingBinding`.
+- **Do not mix types:** A `TailoredProfile` cannot include both `Rule` and `CustomRule` kinds.
+- **Rescanning:** After modifying a CustomRule, re-run scans by annotating `ComplianceScan` resources to re-generate `ComplianceCheckResult` objects.
 
-[source,yaml]
-----
-apiVersion: admissionregistration.k8s.io/v1
-kind: ValidatingAdmissionPolicy
-metadata:
-    name: block-allow-all-netpol
-spec:
-    failurePolicy: Fail
-    matchConstraints:
-        resourceRules:
-            - apiGroups: ["networking.k8s.io"]
-                apiVersions: ["v1"]
-                operations: ["CREATE", "UPDATE", "PATCH"]
-                resources: ["networkpolicies"]
-        namespaceSelector:
-            matchLabels:
-                compliance/enforce-networkpolicies: "true"
-    validations:
-        - expression: "!(
-                object.spec.podSelector == {} &&
-                (
-                    (has(object.spec.ingress) && size(object.spec.ingress) == 1 && object.spec.ingress[0] == {}) ||
-                    (has(object.spec.egress)  && size(object.spec.egress)  == 1 && object.spec.egress[0]  == {})
-                )
-            )"
-            message: "Allow-all NetworkPolicies (empty {} ingress/egress rules) are forbidden in labeled namespaces. Deny-all is allowed."
-----
+== Scope & Limitations
 
-Note: `namespaceSelector` limits the admission policy to matching namespaces; adapt the label to your convention.
+CustomRule currently supports platform-level checks against Kubernetes and OpenShift API resources (Pods, Roles, cluster configuration, etc.). It does not support host-level checks (files, host processes, permissions). For host-level checks continue using existing node `Rule` resources shipped with the Compliance Operator. Host-level scanning may be considered in future releases.
 
-== End of NetworkPolicy Rules
+
+== References
+
+- CustomRule example repository: https://github.com/ComplianceAsCode/compliance-operator/tree/master/config/samples/custom-rules
 
