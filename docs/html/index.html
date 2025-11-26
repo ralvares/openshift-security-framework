@@ -4,18 +4,84 @@
   <meta charset="UTF-8">
   <title>OpenShift Security Framework Documentation</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 2em; }
-    h1 { color: #005ca5; }
-    .doc-link { margin-bottom: 2em; }
-    .doc-link h2 { margin-bottom: 0.2em; }
-    .doc-link p { margin-top: 0; color: #333; }
-    ul { margin-top: 0.5em; }
+    :root {
+      --rh-red: #EE0000;
+      --rh-black: #151515;
+      --rh-gray: #6A6E73;
+      --rh-light-gray: #F0F0F0;
+      --rh-blue: #0066CC;
+    }
+    body {
+      font-family: "Red Hat Text", "Overpass", Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      color: var(--rh-black);
+      background-color: #fff;
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    h1 {
+      color: var(--rh-black);
+      font-weight: 400;
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid var(--rh-red);
+      padding-bottom: 0.5rem;
+    }
+    h2 {
+      color: var(--rh-black);
+      font-weight: 600;
+      font-size: 1.5rem;
+      margin-top: 2.5rem;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    p.intro {
+      font-size: 1.125rem;
+      color: var(--rh-gray);
+      margin-bottom: 3rem;
+      max-width: 800px;
+    }
+    .doc-link {
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      border: 1px solid var(--rh-light-gray);
+      border-radius: 4px;
+      transition: box-shadow 0.2s ease;
+    }
+    .doc-link:hover {
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border-color: #ccc;
+    }
+    .doc-link h3 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.25rem;
+    }
+    .doc-link a {
+      color: var(--rh-blue);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .doc-link a:hover {
+      text-decoration: underline;
+    }
+    .doc-link p {
+      margin: 0;
+      color: var(--rh-black);
+      font-size: 1rem;
+    }
   </style>
 </head>
 <body>
-  <h1>OpenShift Network Policy</h1>
-  <p>
-    This page provides quick access to the main documentation topics for OpenShift Network Policies. Each section below includes a link and a brief overview of the content, focused on cluster, admin, and developer network policy controls and workflows.
+<div class="container">
+  <h1>OpenShift Security Topics</h1>
+  <p class="intro">
+    A collection of guides and playbooks for securing OpenShift clusters. From network segmentation and compliance controls to operational workflows.
   </p>
 
   <h2>Network Policies</h2>
@@ -57,5 +123,6 @@
     <h3><a href="cco.html">CCO - Compliance & Customization Overview</a></h3>
     <p>High-level guidance for customizing the compliance-operator, profiles, and integrations for scan automation.</p>
   </div>
+</div>
 </body>
 </html>
