@@ -636,10 +636,54 @@ openshift-machine-config-operator	kube-rbac-proxy-crio-master-2</code></pre>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_example_accessing_the_kubernetes_api">Example: Accessing the Kubernetes API</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A practical example of this behavior is observed when pods communicate with the Kubernetes API server. In every OpenShift cluster, there is a default service named <code>kubernetes</code> in the <code>default</code> namespace that provides a stable entry point for the API.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight"><code data-lang="bash">oc describe service kubernetes <span class="nt">-n</span> default</code></pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="title">Sample Output</div>
+<div class="content">
+<pre class="rouge highlight"><code data-lang="yaml"><span class="na">Name</span><span class="pi">:</span>                     <span class="s">kubernetes</span>
+<span class="na">Namespace</span><span class="pi">:</span>                <span class="s">default</span>
+<span class="na">Labels</span><span class="pi">:</span>                   <span class="s">component=apiserver</span>
+                          <span class="s">provider=kubernetes</span>
+<span class="na">Annotations</span><span class="pi">:</span>              <span class="s">&lt;none&gt;</span>
+<span class="na">Selector</span><span class="pi">:</span>                 <span class="s">&lt;none&gt;</span>
+<span class="na">Type</span><span class="pi">:</span>                     <span class="s">ClusterIP</span>
+<span class="na">IP Family Policy</span><span class="pi">:</span>         <span class="s">SingleStack</span>
+<span class="na">IP Families</span><span class="pi">:</span>              <span class="s">IPv4</span>
+<span class="na">IP</span><span class="pi">:</span>                       <span class="s">172.30.0.1</span>
+<span class="na">IPs</span><span class="pi">:</span>                      <span class="s">172.30.0.1</span>
+<span class="na">Port</span><span class="pi">:</span>                     <span class="s">https  443/TCP</span>
+<span class="na">TargetPort</span><span class="pi">:</span>               <span class="s">6443/TCP</span>
+<span class="na">Endpoints</span><span class="pi">:</span>                <span class="s">192.168.50.10:6443,192.168.50.11:6443,192.168.50.12:6443</span>
+<span class="na">Session Affinity</span><span class="pi">:</span>         <span class="s">None</span>
+<span class="na">Internal Traffic Policy</span><span class="pi">:</span>  <span class="s">Cluster</span>
+<span class="na">Events</span><span class="pi">:</span>                   <span class="s">&lt;none&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Notice the <strong>Endpoints</strong> field: <code>192.168.50.10:6443, 192.168.50.11:6443, &#8230;&#8203;</code>. These IP addresses correspond to the control plane nodes where the <code>kube-apiserver</code> static pods are running.</p>
+</div>
+<div class="paragraph">
+<p>When a pod in your cluster (e.g., an Operator or a custom controller) makes a request to the Kubernetes API, the traffic is routed to one of these endpoints. Since these endpoints are hosted by static pods (which are not managed by a Deployment) and use private IPs, RHACS identifies the destination as an <strong>Internal Entity</strong>.</p>
+</div>
+<div class="paragraph">
+<p>This is why you might see connections from your workloads to "Internal Entities" in the Network Graph, representing legitimate communication with the Kubernetes control plane.</p>
+</div>
+</div>
+</div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-11-27 09:33:26 +0400
+Last updated 2025-11-27 09:52:40 +0400
 </div>
 </div>
 </body>
