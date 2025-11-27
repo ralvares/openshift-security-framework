@@ -1,5 +1,22 @@
 = RHACS Internal Entities
 
+Internal Entities are things you can see in the Red Hat Advanced Cluster Security for Kubernetes (RHACS) network graph.
+
+**What Internal Entities Mean**
+
+* An Internal Entity shows a connection between a deployment and an IP address that belongs to the private address space (like the one defined in RFC 1918).
+
+* When RHACS shows traffic involving an Internal Entity, it is essentially saying: "We cannot find the specific deployment(s) involved, but don’t worry, that traffic is not leaving the cluster".
+
+**When Internal Entities Show Up**
+
+The sources list several situations that can cause Internal Entities to appear on the network graph:
+
+* When a deployment is communicating with the orchestrator API.
+* When a deployment communicates using a networking Container Network Interface (CNI) plugin.
+* When a deployment (acting as the server) is deleted or its IP address changes while the client trying to connect to it is still running.
+* If the Sensor restarts, it can reset the mapping of IP addresses to deployments. This means the Sensor doesn't recognize the IP addresses of past or existing entities, causing them to appear as Internal Entities.
+
 In Red Hat Advanced Cluster Security (RHACS), an **Internal Entity** refers to a network endpoint that is part of the cluster's internal network infrastructure but is not managed directly by the Kubernetes orchestrator (e.g., not a Deployment, DaemonSet, or StatefulSet).
 
 These entities typically use IP addresses from the private address space defined in **RFC 1918** (e.g., `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`), which are reserved for private networks and not routable on the global internet.
@@ -41,14 +58,23 @@ openshift-machine-config-operator	kube-rbac-proxy-crio-master-1
 openshift-machine-config-operator	kube-rbac-proxy-crio-master-2
 ----
 
-== Why RHACS Classifies Them as Internal Entities
+== Understanding Internal Entities in the Network Graph
 
-Even though these components are fundamental to the cluster, RHACS classifies them as "Internal Entities" because:
+Internal Entities are elements you can visualize in the RHACS network graph.
 
-1. **Orchestration Status**: They are not managed objects within the standard Kubernetes workload model.
-2. **Network Location**: They reside within the internal network (using private RFC 1918 IPs).
+=== What Internal Entities Mean
 
-Understanding this distinction is important when analyzing network graphs and policy violations, as traffic to and from these core components will appear as connections to "Internal Entities" rather than standard deployment-to-deployment traffic.
+* **Private Network Connection**: An Internal Entity represents a connection between a deployment and an IP address that belongs to the private address space (as defined in RFC 1918).
+* **Unidentified Deployment**: When RHACS displays traffic involving an Internal Entity, it essentially means: "We cannot identify the specific deployment(s) involved, but the traffic is confirmed to be staying within the cluster."
+
+=== When Internal Entities Show Up
+
+There are several common situations that cause Internal Entities to appear on the network graph:
+
+* **Orchestrator API Communication**: When a deployment communicates with the Kubernetes/OpenShift API server (often hosted on static pods).
+* **CNI Plugin Traffic**: When a deployment communicates using a networking Container Network Interface (CNI) plugin, like Calico, which might use internal IPs for control traffic.
+* **Transient or Deleted Workloads**: When a deployment (acting as a server) is deleted or its IP address changes while a client is still trying to connect to it.
+* **Sensor Restarts**: If the RHACS Sensor restarts, it may reset its mapping of IP addresses to deployments. This can cause existing connections to be temporarily unrecognized and labeled as Internal Entities until the mapping is rebuilt.
 
 == Example: Accessing the Kubernetes API
 
