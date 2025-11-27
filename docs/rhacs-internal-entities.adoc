@@ -1,0 +1,51 @@
+= RHACS Internal Entities
+
+In Red Hat Advanced Cluster Security (RHACS), an **Internal Entity** refers to a network endpoint that is part of the cluster's internal network infrastructure but is not managed directly by the Kubernetes orchestrator (e.g., not a Deployment, DaemonSet, or StatefulSet).
+
+These entities typically use IP addresses from the private address space defined in **RFC 1918** (e.g., `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`), which are reserved for private networks and not routable on the global internet.
+
+== Static Pods and Infrastructure Components
+
+A common example of internal entities in an OpenShift cluster are the critical control plane components. Services such as `etcd`, `kube-apiserver`, `kube-controller-manager`, and `kube-scheduler` often run as **static pods**.
+
+Unlike standard application workloads, static pods are:
+
+* Not managed by Kubernetes controllers (like Deployments).
+* Started directly by the `kubelet` daemon on each node.
+* Defined by static configuration files located in `/etc/kubernetes/manifests/` on control-plane nodes.
+
+You can identify these static pods in your cluster by checking for the `kubernetes.io/config.source` annotation. For example:
+
+[source,bash]
+----
+oc get pods -A -o json | jq -r '.items[] | select(.metadata.annotations."kubernetes.io/config.source" == "file") | [.metadata.namespace,.metadata.name] | @tsv'
+----
+
+.Sample Output
+[source,tsv]
+----
+openshift-etcd	etcd-master-0
+openshift-etcd	etcd-master-1
+openshift-etcd	etcd-master-2
+openshift-kube-apiserver	kube-apiserver-master-0
+openshift-kube-apiserver	kube-apiserver-master-1
+openshift-kube-apiserver	kube-apiserver-master-2
+openshift-kube-controller-manager	kube-controller-manager-master-0
+openshift-kube-controller-manager	kube-controller-manager-master-1
+openshift-kube-controller-manager	kube-controller-manager-master-2
+openshift-kube-scheduler	openshift-kube-scheduler-master-0
+openshift-kube-scheduler	openshift-kube-scheduler-master-1
+openshift-kube-scheduler	openshift-kube-scheduler-master-2
+openshift-machine-config-operator	kube-rbac-proxy-crio-master-0
+openshift-machine-config-operator	kube-rbac-proxy-crio-master-1
+openshift-machine-config-operator	kube-rbac-proxy-crio-master-2
+----
+
+== Why RHACS Classifies Them as Internal Entities
+
+Even though these components are fundamental to the cluster, RHACS classifies them as "Internal Entities" because:
+
+1. **Orchestration Status**: They are not managed objects within the standard Kubernetes workload model.
+2. **Network Location**: They reside within the internal network (using private RFC 1918 IPs).
+
+Understanding this distinction is important when analyzing network graphs and policy violations, as traffic to and from these core components will appear as connections to "Internal Entities" rather than standard deployment-to-deployment traffic.
