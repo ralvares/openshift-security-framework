@@ -570,10 +570,20 @@ pre.rouge .gs {
 <p>A common example of internal entities in an OpenShift cluster are the critical control plane components. Services such as <code>etcd</code>, <code>kube-apiserver</code>, <code>kube-controller-manager</code>, and <code>kube-scheduler</code> often run as <strong>static pods</strong>.</p>
 </div>
 <div class="paragraph">
-<p>Unlike standard application workloads, static pods are:
-* Not managed by Kubernetes controllers (like Deployments).
-* Started directly by the <code>kubelet</code> daemon on each node.
-* Defined by static configuration files located in <code>/etc/kubernetes/manifests/</code> on control-plane nodes.</p>
+<p>Unlike standard application workloads, static pods are:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Not managed by Kubernetes controllers (like Deployments).</p>
+</li>
+<li>
+<p>Started directly by the <code>kubelet</code> daemon on each node.</p>
+</li>
+<li>
+<p>Defined by static configuration files located in <code>/etc/kubernetes/manifests/</code> on control-plane nodes.</p>
+</li>
+</ul>
 </div>
 <div class="paragraph">
 <p>You can identify these static pods in your cluster by checking for the <code>kubernetes.io/config.source</code> annotation. For example:</p>
@@ -629,7 +639,7 @@ openshift-machine-config-operator	kube-rbac-proxy-crio-master-2</code></pre>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-11-27 09:31:24 +0400
+Last updated 2025-11-27 09:33:26 +0400
 </div>
 </div>
 </body>
